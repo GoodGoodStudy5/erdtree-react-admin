@@ -18,13 +18,29 @@ const CHECK_REMEMBER = 'remember_me';
 const USER_USERNAME = 'login_username';
 const USER_PASSWORD = 'login_password';
 
+/**
+ * 读取记住我的密码, 密钥变更或缓存被篡改时丢弃缓存并放弃回填
+ * @param cache - 密码缓存密文
+ */
+function readRememberedPassword(cache: string): string | undefined {
+  try {
+    return decryption(cache)?.value;
+  } catch {
+    localStorage.removeItem(USER_PASSWORD);
+    return undefined;
+  }
+}
+
 function Login() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [getToken, setToken] = useToken();
   const [isLoading, setLoading] = useState(false);
-  const [isRemember, setRemember] = useState(true);
+  // 记住我勾选状态来自上次登录的缓存
+  const [isRemember, setRemember] = useState(
+    () => localStorage.getItem(CHECK_REMEMBER) !== 'false',
+  );
   const [messageApi, contextHolder] = message.useMessage();
   const { search } = useLocation();
   const { permissions } = useCommonStore();
@@ -41,49 +57,11 @@ function Login() {
       document.body.className = 'theme-dark';
     }
     setThemeValue(themeCache === 'dark' ? 'dark' : 'light');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeCache]);
-
-  useEffect(() => {
-    // 清除上一会话的残留请求
-    cancelAllRequest();
-
-    // 如果存在token，则直接进入页面
-    if (getToken()) {
-      // 如果不存在缓存则获取权限
-      if (!permissions.length) {
-        getUserPermissions();
-      } else {
-        // 有权限则直接跳转
-        handleGoMenu(permissions);
-      }
-    }
-
-    // 如果存在记住我缓存
-    const remember = localStorage.getItem(CHECK_REMEMBER);
-    setRemember(remember !== 'false');
-
-    // 如果存在账号密码缓存，则自动填充
-    const username = localStorage.getItem(USER_USERNAME);
-    const password = localStorage.getItem(USER_PASSWORD);
-    if (username && password) {
-      const newPassword = decryption(password);
-      form.setFieldsValue({ username, password: newPassword.value });
-    }
-
-    // 读取权限过期提示（由请求拦截器在整页跳转前写入 localStorage）
-    const expiredMsg = localStorage.getItem(LOGIN_EXPIRED_MSG);
-    if (expiredMsg) {
-      messageApi.error({ content: expiredMsg, key: 'permission-expired' });
-      localStorage.removeItem(LOGIN_EXPIRED_MSG);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // 语言切换修改title
   useEffect(() => {
     setTitle(t, t('login.login'));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
 
   /** 获取用户权限 */
@@ -160,6 +138,36 @@ function Login() {
     }
     navigate(firstMenu);
   };
+
+  useEffect(() => {
+    // 清除上一会话的残留请求
+    cancelAllRequest();
+
+    // 如果存在token，则直接进入页面
+    if (getToken()) {
+      // 如果不存在缓存则获取权限
+      if (!permissions.length) {
+        getUserPermissions();
+      } else {
+        // 有权限则直接跳转
+        handleGoMenu(permissions);
+      }
+    }
+
+    // 如果存在账号密码缓存，则自动填充
+    const username = localStorage.getItem(USER_USERNAME);
+    const password = localStorage.getItem(USER_PASSWORD);
+    if (username && password) {
+      form.setFieldsValue({ username, password: readRememberedPassword(password) });
+    }
+
+    // 读取权限过期提示（由请求拦截器在整页跳转前写入 localStorage）
+    const expiredMsg = localStorage.getItem(LOGIN_EXPIRED_MSG);
+    if (expiredMsg) {
+      messageApi.error({ content: expiredMsg, key: 'permission-expired' });
+      localStorage.removeItem(LOGIN_EXPIRED_MSG);
+    }
+  }, []);
 
   /**
    * 处理登录

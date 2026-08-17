@@ -18,9 +18,6 @@ function WangEditor(props: EditorProps) {
   // editor 实例
   const [editor, setEditor] = useState<IDomEditor | null>(null);
 
-  // 编辑器内容
-  const [html, setHtml] = useState(value);
-
   // 工具栏配置
   const toolbarConfig: Partial<IToolbarConfig> = {};
 
@@ -39,11 +36,6 @@ function WangEditor(props: EditorProps) {
     },
   };
 
-  // 监听值变化
-  useEffect(() => {
-    setHtml(value || '');
-  }, [value]);
-
   // 及时销毁 editor ，重要！
   useEffect(() => {
     return () => {
@@ -57,7 +49,6 @@ function WangEditor(props: EditorProps) {
    * 更改富文本内容
    */
   const handleChange = (editor: IDomEditor) => {
-    setHtml(editor.getHtml());
     onChange(editor.getHtml());
   };
 
@@ -72,7 +63,7 @@ function WangEditor(props: EditorProps) {
 
       <Editor
         defaultConfig={editorConfig}
-        value={html}
+        value={value || ''}
         onCreated={setEditor}
         onChange={handleChange}
         mode="default"

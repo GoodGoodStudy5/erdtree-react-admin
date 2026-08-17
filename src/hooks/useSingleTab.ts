@@ -30,72 +30,6 @@ export function useSingleTab(props: Props) {
   const { isPhone, isCollapsed, menuList, permissions } = useCommonStore();
   const { addTabs, setNav, setActiveKey } = useTabsStore((state) => state);
 
-  /** 初始化操作 */
-  const handleInit = useCallback(() => {
-    const title = handleGetTitle();
-    setTitle(t, title);
-    const newOpenKey = getOpenMenuByRouter(fatherPath);
-    if (!isPhone && !isCollapsed) {
-      setOpenKeys(newOpenKey);
-      setSelectedKeys(fatherPath);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // 处理默认展开
-  useEffect(() => {
-    handleInit();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /**
-   * 添加标签
-   * @param path - 路径
-   */
-  const handleAddTab = useCallback(
-    (path = pathname) => {
-      // 当值为空时匹配路由
-      if (path === '/') return;
-      const title = i18n.language === 'zh' ? zhTitle : enTitle;
-      const currentTitle = handleGetTitle();
-      const menuByKeyProps = {
-        menus: menuList,
-        permissions,
-        key: fatherPath,
-      };
-      const newNav = getMenuByKey(menuByKeyProps)?.nav || [];
-      newNav.push({
-        label: title,
-        labelZh: zhTitle,
-        labelEn: enTitle,
-      });
-
-      const newTab: TabsData = {
-        label: currentTitle,
-        labelEn: enTitle,
-        labelZh: zhTitle,
-        key: pathname,
-        nav: newNav,
-        urlParams: search,
-      };
-      setActiveKey(newTab.key);
-      setNav(newTab.nav);
-      addTabs(newTab);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pathname, search],
-  );
-
-  useEffect(() => {
-    handleAddTab();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffectOnActive(() => {
-    handleAddTab();
-    handleInit();
-  }, []);
-
   /** 获取路由对应名称 */
   const getNameByRoute = (): string => {
     const route = search?.substring(1, search.length);
@@ -134,6 +68,69 @@ export function useSingleTab(props: Props) {
     result = routeName ? newUpdateTitle : newCreateTitle;
     return result;
   };
+
+  /** 初始化操作 */
+  const handleInit = useCallback(() => {
+    const title = handleGetTitle();
+    setTitle(t, title);
+    const newOpenKey = getOpenMenuByRouter(fatherPath);
+    if (!isPhone && !isCollapsed) {
+      setOpenKeys(newOpenKey);
+      setSelectedKeys(fatherPath);
+    }
+  }, []);
+
+  // 处理默认展开
+  useEffect(() => {
+    handleInit();
+  }, []);
+
+  /**
+   * 添加标签
+   * @param path - 路径
+   */
+  const handleAddTab = useCallback(
+    (path = pathname) => {
+      // 当值为空时匹配路由
+      if (path === '/') return;
+      const title = i18n.language === 'zh' ? zhTitle : enTitle;
+      const currentTitle = handleGetTitle();
+      const menuByKeyProps = {
+        menus: menuList,
+        permissions,
+        key: fatherPath,
+      };
+      const newNav = getMenuByKey(menuByKeyProps)?.nav || [];
+      newNav.push({
+        label: title,
+        labelZh: zhTitle,
+        labelEn: enTitle,
+      });
+
+      const newTab: TabsData = {
+        label: currentTitle,
+        labelEn: enTitle,
+        labelZh: zhTitle,
+        key: pathname,
+        nav: newNav,
+        urlParams: search,
+      };
+      setActiveKey(newTab.key);
+      setNav(newTab.nav);
+      addTabs(newTab);
+    },
+
+    [pathname, search],
+  );
+
+  useEffect(() => {
+    handleAddTab();
+  }, []);
+
+  useEffectOnActive(() => {
+    handleAddTab();
+    handleInit();
+  }, []);
 
   return [];
 }

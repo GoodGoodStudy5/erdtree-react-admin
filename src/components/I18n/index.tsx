@@ -28,7 +28,6 @@ function I18n() {
     } else if (currentLanguage !== lang) {
       i18n.changeLanguage(lang);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 下拉菜单内容
@@ -53,7 +52,6 @@ function I18n() {
     // 通过路由获取标签名
     const title = getTabTitle(tabs, path);
     if (title) setTitle(t, title);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   /** 点击更换语言 */

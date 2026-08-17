@@ -5,3 +5,5 @@ allowBuilds:
   core-js: true
   es5-ext: true
   esbuild: true
+  # code-inspector-plugin 的可选依赖, 仅用于个别 IDE 唤起方式, 不构建也能正常跳转
+  node-pty: false

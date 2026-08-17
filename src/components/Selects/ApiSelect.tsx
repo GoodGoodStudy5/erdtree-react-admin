@@ -46,7 +46,6 @@ function ApiSelect(props: ApiSelectProps) {
     if (props.value && options.length === 0) {
       getApiData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.value]);
 
   /**

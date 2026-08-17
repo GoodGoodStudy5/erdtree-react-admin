@@ -1,5 +1,5 @@
 import { type TableProps, type CheckboxProps, Button, Popover, Divider, Checkbox } from 'antd';
-import { useEffect, useState, memo } from 'react';
+import { useState, memo } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { TableColumn } from '#/public';
@@ -21,52 +21,51 @@ interface Props {
   getTableChecks: (checks: string[], sortList: string[]) => void;
 }
 
+/**
+ * 过滤表格数据为多选组数据
+ * @param columns - 表格数据
+ */
+const filterColumns = (columns: TableProps['columns']) => {
+  const result: CheckboxList[] = [],
+    currentOptions: string[] = [];
+
+  if (!columns?.length) return { list: result, checkedList: currentOptions };
+
+  for (let i = 0; i < columns.length; i++) {
+    const item = columns[i];
+    const { dataIndex } = item as { dataIndex: string };
+
+    if (!item.hidden && dataIndex) {
+      currentOptions?.push(dataIndex);
+    }
+
+    result.push({
+      label: item.title as string,
+      value: dataIndex,
+    });
+  }
+
+  return { list: result, checkedList: currentOptions };
+};
+
 function TableFilter(props: Props) {
   const { columns, cacheColumns, className, getTableChecks } = props;
   const { t } = useTranslation();
   const [isOpen, setOpen] = useState(false);
-  const [list, setList] = useState<CheckboxList[]>([]);
-  const [checkedList, setCheckedList] = useState<string[]>([]);
+  // 首屏字段勾选状态由 columns 播种, 后续由用户勾选与拖拽接管
+  const [list, setList] = useState<CheckboxList[]>(() => filterColumns(columns).list);
+  const [checkedList, setCheckedList] = useState<string[]>(
+    () => filterColumns(columns).checkedList,
+  );
   const checkAll = list.length === checkedList.length;
   const indeterminate = checkedList.length > 0 && checkedList.length < list.length;
   const params: Partial<Props> = { ...props };
   delete params.getTableChecks;
   delete params.cacheColumns;
 
-  useEffect(() => {
-    filterColumns(columns);
-  }, []);
-
   /** 处理点击事件 */
   const handleClick = () => {
     setOpen(!isOpen);
-  };
-
-  /**
-   * 过滤表格数据为多选组数据
-   * @param columns - 表格数据
-   */
-  const filterColumns = (columns: TableProps['columns']) => {
-    if (!columns?.length) return [];
-    const result: CheckboxList[] = [],
-      currentOptions: string[] = [];
-
-    for (let i = 0; i < columns?.length; i++) {
-      const item = columns[i];
-      const { dataIndex } = item as { dataIndex: string };
-
-      if (!item.hidden && dataIndex) {
-        currentOptions?.push(dataIndex);
-      }
-
-      result.push({
-        label: item.title as string,
-        value: dataIndex,
-      });
-    }
-
-    setList(result);
-    setCheckedList(currentOptions);
   };
 
   /**

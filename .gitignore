@@ -7,13 +7,19 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 package-lock.json
-pnpm-lock.yaml
+# pnpm-lock.yaml
 yarn.lock
 
 node_modules
 dist
 dist-ssr
 *.local
+
+# ai coding
+.scratch
+.design
+AGENTS.override.md
+CLAUDE.local.md
 
 # Editor directories and files
 .idea

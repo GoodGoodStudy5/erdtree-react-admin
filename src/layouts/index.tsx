@@ -57,17 +57,16 @@ function Layout() {
     return deferredPathname;
   }, [deferredPathname]);
 
-  // 只在 ref 变化时更新 store，避免每次渲染都触发更新
+  // keepalive 实例挂载后发布到 store, 供跨页面刷新调用
   useEffect(() => {
     if (keepaliveRef.current && !aliveRef.current) {
       setAliveRef(keepaliveRef);
     }
-  }, [keepaliveRef.current]);
+  }, []);
 
   /** 获取用户信息和权限 */
   const getUserInfo = useCallback(async () => {
     try {
-      setLoading(true);
       const { code, data } = await getUserRefreshPermissions({ refresh_cache: false });
       if (Number(code) !== 200) return;
       const { user, permissions } = data;
@@ -79,20 +78,17 @@ function Layout() {
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /** 获取菜单数据 */
   const getMenuData = useCallback(async () => {
     try {
-      setLoading(true);
       const { code, data } = await getMenuList();
       if (Number(code) !== 200) return;
       setMenuList(data || []);
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -101,7 +97,6 @@ function Layout() {
       getUserInfo();
       getMenuData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 组件卸载时确保关闭进度条（退出登录场景）
@@ -124,17 +119,17 @@ function Layout() {
     return () => {
       nprogress?.start?.();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   /** 判断是否是手机端 */
-  const handleIsPhone = useCallback(
-    debounce(() => {
-      const isPhone = window.innerWidth <= 768;
-      // 手机首次进来收缩菜单
-      if (isPhone) toggleCollapsed(true);
-      togglePhone(isPhone);
-    }, 500),
+  const handleIsPhone = useMemo(
+    () =>
+      debounce(() => {
+        const isPhone = window.innerWidth <= 768;
+        // 手机首次进来收缩菜单
+        if (isPhone) toggleCollapsed(true);
+        togglePhone(isPhone);
+      }, 500),
     [toggleCollapsed, togglePhone],
   );
 

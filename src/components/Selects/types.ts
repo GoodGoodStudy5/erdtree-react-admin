@@ -1,7 +1,5 @@
 import type { SelectProps, TreeSelectProps } from 'antd';
-import type { ServerResult } from '@south/request';
-
-export type ApiFn = (params?: object | unknown[]) => Promise<ServerResult<unknown>>;
+import type { ApiFn } from '#/form';
 
 // api参数
 interface ApiParam {

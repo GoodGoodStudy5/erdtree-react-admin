@@ -36,7 +36,6 @@ function Forget() {
       document.body.className = 'theme-dark';
     }
     setThemeValue(themeCache === 'dark' ? 'dark' : 'light');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeCache]);
 
   useEffect(() => {
@@ -51,7 +50,6 @@ function Forget() {
   // 语言切换修改title
   useEffect(() => {
     setTitle(t, t('login.resetPassword'));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
 
   /**

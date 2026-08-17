@@ -1,7 +1,7 @@
 import type { MouseEventHandler, ReactNode, RefObject } from 'react';
 import type { ModalProps } from 'antd';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Modal, Spin, Tooltip } from 'antd';
 import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
@@ -20,18 +20,11 @@ function BaseModal(props: Props) {
   const { isPhone } = useCommonStore();
   const [isDisabled, setDisabled] = useState(true);
   const [isFullscreen, setFullscreen] = useState(false);
-  const [bounds, setBounds] = useState({ left: 0, top: 0, bottom: 0, right: 0 });
   const [cacheBounds, setCacheBounds] = useState({ left: 0, top: 0, bottom: 0, right: 0 });
   const draggleRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (isFullscreen) {
-      setBounds({ left: 0, top: 0, bottom: 0, right: 0 });
-    } else {
-      setBounds(cacheBounds);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFullscreen]);
+  // 最大化时取消拖拽偏移, 还原时回到上次拖拽位置
+  const bounds = isFullscreen ? { left: 0, top: 0, bottom: 0, right: 0 } : cacheBounds;
 
   /** 开始拖拽对话框 */
   const onStartMouse = (_event: DraggableEvent, uiData: DraggableData) => {
@@ -44,7 +37,6 @@ function BaseModal(props: Props) {
       top: -targetRect.top + uiData.y,
       bottom: clientHeight - (targetRect.bottom - uiData.y),
     };
-    setBounds(data);
     setCacheBounds(data);
   };
 

@@ -1,4 +1,5 @@
 import type { RouteObject } from 'react-router-dom';
+import type { RouteModules } from '../utils/helper';
 import { useEffect, useMemo } from 'react';
 import { handleRoutes } from '../utils/helper';
 import { useRoutes } from 'react-router-dom';
@@ -7,48 +8,46 @@ import Forget from '@/pages/forget';
 import NotFound from '@/pages/404';
 import Guards from './Guards';
 
-type PageFiles = Record<string, () => Promise<any>>;
-const pages = import.meta.glob('../../pages/**/*.tsx', { eager: false }) as PageFiles;
+const pages = import.meta.glob('../../pages/**/*.tsx', { eager: false }) as RouteModules;
 
 // 预加载组件
-const components = import.meta.glob('../../../components/**/*.tsx', { eager: false }) as PageFiles;
+const components = import.meta.glob('../../../components/**/*.tsx', {
+  eager: false,
+}) as RouteModules;
 
 // 预加载的路由集合
 const preloadedRoutes = new Set<string>();
 // 预加载的组件集合
 const preloadedComponents = new Set<string>();
 
+/**
+ * 空闲时预热模块, 避免首次进入页面才发起请求
+ * @param modules - 模块表
+ * @param preloaded - 已预热路径, 防止重复请求
+ * @param label - 失败日志前缀
+ */
+function preloadModules(modules: RouteModules, preloaded: Set<string>, label: string) {
+  for (const path of Object.keys(modules)) {
+    if (preloaded.has(path)) continue;
+    preloaded.add(path);
+    modules[path]().catch(() => {
+      console.error(`${label}错误：`, path);
+    });
+  }
+}
+
 function App() {
   // 预加载路由和组件，在空闲时间加载
   useEffect(() => {
     // 使用 requestIdleCallback 在浏览器空闲时预加载
-    if ('requestIdleCallback' in window) {
-      const idleCallbackId = (requestIdleCallback as any)(() => {
-        // 预加载页面路由
-        Object.entries(pages).forEach(([path]) => {
-          if (preloadedRoutes.has(path)) return;
-          preloadedRoutes.add(path);
-          pages[path]().catch(() => {
-            console.error('预加载路由错误：', path);
-          });
-        });
+    if (!('requestIdleCallback' in window)) return;
 
-        // 预加载组件
-        Object.entries(components).forEach(([path]) => {
-          if (preloadedComponents.has(path)) return;
-          preloadedComponents.add(path);
-          components[path]().catch(() => {
-            console.error('预加载组件错误：', path);
-          });
-        });
-      });
+    const idleCallbackId = requestIdleCallback(() => {
+      preloadModules(pages, preloadedRoutes, '预加载路由');
+      preloadModules(components, preloadedComponents, '预加载组件');
+    });
 
-      return () => {
-        if ('cancelIdleCallback' in window) {
-          (cancelIdleCallback as any)(idleCallbackId);
-        }
-      };
-    }
+    return () => cancelIdleCallback(idleCallbackId);
   }, []);
 
   // 使用 useMemo 缓存路由配置，避免每次渲染都重新创建

@@ -12,10 +12,8 @@
     }
   },
   "dependencies": {
-    "@south/message": "workspace:^",
-    "crypto-js": "^4.2.0"
-  },
-  "devDependencies": {
-    "@types/crypto-js": "^4.2.2"
+    "@noble/ciphers": "^2.3.0",
+    "@noble/hashes": "^2.3.0",
+    "@south/message": "workspace:^"
   }
 }

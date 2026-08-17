@@ -1,4 +1,5 @@
 import type { RouteObject } from 'react-router-dom';
+import type { ComponentType } from 'react';
 import { lazy } from 'react';
 import { ROUTER_EXCLUDE } from './config';
 
@@ -20,11 +21,14 @@ export function layoutRoutes(routes: RouteObject[]): RouteObject[] {
   return layouts;
 }
 
+/** 页面模块表, key 为 glob 命中的文件路径 */
+export type RouteModules = Record<string, () => Promise<{ default?: ComponentType }>>;
+
 /**
  * 处理路由
  * @param routes - 路由数据
  */
-export function handleRoutes(routes: Record<string, () => Promise<any>>): RouteObject[] {
+export function handleRoutes(routes: RouteModules): RouteObject[] {
   const layouts: RouteObject[] = []; // layout内部组件
 
   for (const key in routes) {
@@ -39,7 +43,7 @@ export function handleRoutes(routes: Record<string, () => Promise<any>>): RouteO
     const LazyComponent = lazy(async () => {
       const module = await routes[key]();
       // 处理不同的模块导出格式
-      const Component = module?.default || module;
+      const Component = (module?.default || module) as ComponentType;
       return {
         default: Component,
       };

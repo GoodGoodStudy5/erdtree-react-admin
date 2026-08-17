@@ -81,7 +81,6 @@ function Page() {
   // 首次进入自动加载接口数据
   useEffect(() => {
     if (pagePermission.page) getPage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagePermission.page]);
 
   // 每次进入调用
@@ -238,13 +237,7 @@ function Page() {
         </div>
       );
     },
-    [
-      pagePermission.update,
-      pagePermission.delete,
-      t,
-      onUpdate,
-      onDelete,
-    ],
+    [pagePermission.update, pagePermission.delete, t, onUpdate, onDelete],
   );
 
   // 缓存列配置

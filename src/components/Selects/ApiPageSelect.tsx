@@ -1,6 +1,5 @@
 import type { ApiPageSelectProps } from './types';
 import type { DefaultOptionType, SelectProps } from 'antd/es/select';
-import { debounce } from 'lodash';
 import { Select, Spin } from 'antd';
 import { MAX_TAG_COUNT } from './index';
 import { useTranslation } from 'react-i18next';
@@ -17,14 +16,18 @@ function ApiPageSelect(props: ApiPageSelectProps) {
     queryKey = 'query',
     page = 1,
     pageSize = 20,
+    onSearch,
   } = props;
   const { t } = useTranslation();
   const [isLoading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(page);
   const [options, setOptions] = useState<DefaultOptionType[]>([]);
-  const [isFetch, setFetch] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const hasMore = useRef(true);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // 卸载时丢弃未触发的搜索
+  useEffect(() => () => clearTimeout(searchTimerRef.current), []);
 
   // 清除自定义属性
   const params: Partial<ApiPageSelectProps> = { ...props };
@@ -34,91 +37,87 @@ function ApiPageSelect(props: ApiPageSelectProps) {
   delete params.pageKey;
   delete params.pageSizeKey;
 
-  useEffect(() => {
-    if (isFetch) {
-      setFetch(false);
-      getApiData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFetch]);
+  /**
+   * 获取接口数据
+   * @param nextPage - 目标页码
+   * @param query - 搜索关键字
+   * @param isReset - 换关键字时重新允许翻页
+   */
+  const getApiData = useCallback(
+    async (nextPage: number, query: string, isReset = false) => {
+      if (isReset) hasMore.current = true;
+      if (!props.api || !hasMore.current) return;
+      try {
+        const { api, params, apiResultKey } = props;
 
-  /** 获取接口数据 */
-  const getApiData = useCallback(async () => {
-    if (!props.api || !hasMore.current) return;
-    try {
-      const { api, params, apiResultKey } = props;
+        const apiPageFun = {
+          [pageKey]: nextPage,
+          [pageSizeKey]: pageSize,
+          [queryKey]: query || undefined,
+        };
 
-      const apiPageFun = {
-        [pageKey]: currentPage,
-        [pageSizeKey]: pageSize,
-        [queryKey]: searchValue || undefined,
-      };
+        if (Array.isArray(params)) {
+          for (let i = 0; i < params?.length; i++) {
+            const item = params[i];
 
-      if (Array.isArray(params)) {
-        for (let i = 0; i < params?.length; i++) {
-          const item = params[i];
-
-          if (item.constructor === Object) {
-            params[i] = { ...item, ...apiPageFun };
+            if (item.constructor === Object) {
+              params[i] = { ...item, ...apiPageFun };
+            }
           }
         }
-      }
 
-      setLoading(true);
-      if (api) {
-        const apiFun = Array.isArray(params) ? api(...params) : api({ ...params, ...apiPageFun });
-        const { code, data } = await apiFun;
-        if (Number(code) !== 200) return;
-        const result = (
-          apiResultKey ? (data as { [apiResultKey: string]: unknown })?.[apiResultKey] : data
-        ) as DefaultOptionType[];
-        if (result?.length) {
-          const newOption = options.concat(result);
-          setOptions(newOption);
-        }
-        hasMore.current = !!result?.length;
+        setLoading(true);
+        if (api) {
+          const apiFun = Array.isArray(params) ? api(...params) : api({ ...params, ...apiPageFun });
+          const { code, data } = await apiFun;
+          if (Number(code) !== 200) return;
+          const result = (
+            apiResultKey ? (data as { [apiResultKey: string]: unknown })?.[apiResultKey] : data
+          ) as DefaultOptionType[];
+          if (result?.length) {
+            setOptions((prev) => prev.concat(result));
+          }
+          hasMore.current = !!result?.length;
 
-        // 如果不存在更多数据，尾部显示没有更多数据且居中
-        if (!hasMore.current) {
-          setOptions((prev) => {
-            if (prev.length) {
-              return prev.concat([
-                {
-                  [props?.fieldNames?.label || 'label']: t('public.noMoreData'),
-                  [props?.fieldNames?.value || 'value']: t('public.noMoreData'),
-                  disabled: true,
-                  className: 'text-center',
-                },
-              ]);
-            }
-            return prev;
-          });
+          // 如果不存在更多数据，尾部显示没有更多数据且居中
+          if (!hasMore.current) {
+            setOptions((prev) => {
+              if (prev.length) {
+                return prev.concat([
+                  {
+                    [props?.fieldNames?.label || 'label']: t('public.noMoreData'),
+                    [props?.fieldNames?.value || 'value']: t('public.noMoreData'),
+                    disabled: true,
+                    className: 'text-center',
+                  },
+                ]);
+              }
+              return prev;
+            });
+          }
         }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    props.api,
-    props.params,
-    props.apiResultKey,
-    props.fieldNames,
-    currentPage,
-    searchValue,
-    pageKey,
-    pageSizeKey,
-    queryKey,
-    pageSize,
-    options,
-    t,
-  ]);
+    },
+    [
+      props.api,
+      props.params,
+      props.apiResultKey,
+      props.fieldNames,
+      pageKey,
+      pageSizeKey,
+      queryKey,
+      pageSize,
+      t,
+    ],
+  );
 
   useEffect(() => {
     // 当有值且列表为空时，自动获取接口
     if (props.value && options.length === 0) {
-      getApiData();
+      getApiData(currentPage, searchValue);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.value]);
 
   /**
@@ -126,7 +125,7 @@ function ApiPageSelect(props: ApiPageSelectProps) {
    * @param open - 是否展开
    */
   const onOpenChange = (open: boolean) => {
-    if (open && !options?.length) getApiData();
+    if (open && !options?.length) getApiData(currentPage, searchValue);
 
     props.onOpenChange?.(open);
   };
@@ -139,11 +138,12 @@ function ApiPageSelect(props: ApiPageSelectProps) {
 
       // 触底判断
       if (scrollTop + clientHeight >= scrollHeight - threshold && !isLoading && hasMore.current) {
-        setCurrentPage((prev) => prev + 1);
-        setFetch(true);
+        const nextPage = currentPage + 1;
+        setCurrentPage(nextPage);
+        getApiData(nextPage, searchValue);
       }
     },
-    [isLoading],
+    [isLoading, currentPage, searchValue, getApiData],
   );
 
   /** 自定义下拉框内容 */
@@ -151,26 +151,25 @@ function ApiPageSelect(props: ApiPageSelectProps) {
     <>
       {menu}
       <div className="py-3px text-center">
-        {isLoading && hasMore && !!options?.length && <Spin size="small" spinning />}
+        {isLoading && !!options?.length && <Spin size="small" spinning />}
       </div>
     </>
   );
 
-  /** 初始化 */
-  const handleInit = () => {
-    setOptions([]);
-    setCurrentPage(page);
-    hasMore.current = true;
+  /** 处理搜索, 停止输入 200ms 后才请求 */
+  const handleSearch: SelectProps['onSearch'] = (value) => {
+    clearTimeout(searchTimerRef.current);
+
+    searchTimerRef.current = setTimeout(() => {
+      onSearch?.(value);
+
+      // 重置分页与已加载项, 换关键字后从第一页重新取数
+      setOptions([]);
+      setCurrentPage(page);
+      setSearchValue(value);
+      getApiData(page, value, true);
+    }, 200);
   };
-
-  /** 处理搜索 */
-  const handleSearch: SelectProps['onSearch'] = debounce((value) => {
-    props?.onSearch?.(value);
-
-    handleInit();
-    setSearchValue(value);
-    setFetch(true);
-  }, 200);
 
   return (
     <Select

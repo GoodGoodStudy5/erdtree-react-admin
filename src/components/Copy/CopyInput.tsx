@@ -18,7 +18,6 @@ function CopyInput(props: InputProps) {
     if (error) {
       messageApi.warning({ content: error || t('public.copyFailed'), key: 'copy' });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCopied, error]);
 
   /**

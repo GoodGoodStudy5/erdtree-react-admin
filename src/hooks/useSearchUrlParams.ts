@@ -16,12 +16,10 @@ export const useSearchUrlParams = (form: FormInstance) => {
       ...form?.getFieldsValue(),
       ...urlParams,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     handleSetSearchForm();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /** 将搜索参数带入url中 */

@@ -131,9 +131,19 @@ export default tseslint.config(
       'no-async-promise-executor': 'warn',
       // 禁止使用后缀运算符的非空断言"!"
       '@typescript-eslint/no-non-null-assertion': 'warn',
+      // 禁止未使用变量, 解构剔除字段与 _ 前缀视为有意不使用
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          ignoreRestSiblings: true,
+          // varsIgnorePattern: '^_',
+          // argsIgnorePattern: '^_',
+          // caughtErrorsIgnorePattern: '^_',
+        },
+      ],
       // 官方hooks校验
       'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'error',
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
 );

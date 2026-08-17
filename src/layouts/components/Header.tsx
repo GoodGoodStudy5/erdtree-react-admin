@@ -1,6 +1,6 @@
 import type { PasswordModal } from './UpdatePassword';
 import type { MenuProps } from 'antd';
-import { useMemo, useRef, memo } from 'react';
+import { useRef, memo } from 'react';
 import { App, Dropdown } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/hooks/useCommonStore';
@@ -74,48 +74,38 @@ function Header() {
     });
   };
 
-  /** 右侧组件抽离减少重复渲染 */
-  const RightRender = () => {
-    return useMemo(
-      () => (
-        <div className="flex items-center">
-          <GlobalSearch />
-          <Fullscreen />
-          <I18n />
-          <Theme />
-          <Dropdown className="min-w-50px" menu={{ items, onClick }}>
-            <div
-              className="ant-dropdown-link flex items-center cursor-pointer"
-              onClick={(e) => e.preventDefault()}
-            >
-              <img
-                src={Avatar}
-                width={27}
-                height={27}
-                alt="Avatar"
-                className="rounded-1/2 overflow-hidden object-cover bg-light-500"
-              />
-              <span className="ml-2 text-15px min-w-50px truncate">
-                {username || 'south-admin'}
-              </span>
-            </div>
-          </Dropdown>
+  /** 右侧内容 */
+  const rightRender = (
+    <div className="flex items-center">
+      <GlobalSearch />
+      <Fullscreen />
+      <I18n />
+      <Theme />
+      <Dropdown className="min-w-50px" menu={{ items, onClick }}>
+        <div
+          className="ant-dropdown-link flex items-center cursor-pointer"
+          onClick={(e) => e.preventDefault()}
+        >
+          <img
+            src={Avatar}
+            width={27}
+            height={27}
+            alt="Avatar"
+            className="rounded-1/2 overflow-hidden object-cover bg-light-500"
+          />
+          <span className="ml-2 text-15px min-w-50px truncate">{username || 'south-admin'}</span>
         </div>
-      ),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [username],
-    );
-  };
+      </Dropdown>
+    </div>
+  );
 
   /** icon渲染 */
-  const IconRender = () => {
-    return (
-      <div className="text-lg cursor-pointer" onClick={() => toggleCollapsed(!isCollapsed)}>
-        {isCollapsed && <MenuUnfoldOutlined />}
-        {!isCollapsed && <MenuFoldOutlined />}
-      </div>
-    );
-  };
+  const iconRender = (
+    <div className="text-lg cursor-pointer" onClick={() => toggleCollapsed(!isCollapsed)}>
+      {isCollapsed && <MenuUnfoldOutlined />}
+      {!isCollapsed && <MenuFoldOutlined />}
+    </div>
+  );
 
   return (
     <>
@@ -134,12 +124,12 @@ function Header() {
         `}
       >
         <div className="flex item-center">
-          <IconRender />
+          {iconRender}
 
           <Nav className="ml-15px" list={nav} />
         </div>
 
-        <RightRender />
+        {rightRender}
       </header>
 
       <UpdatePassword passwordRef={passwordRef} />

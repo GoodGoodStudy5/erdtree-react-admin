@@ -1,9 +1,28 @@
 import type { PermissionData } from '@/servers/system/role';
 import { Checkbox, Spin } from 'antd';
-import { type Key, useState, useEffect, useCallback } from 'react';
+import { type Key, useState, useCallback } from 'react';
 import { Icon } from '@iconify/react';
 import { CaretDownOutlined, CaretRightOutlined } from '@ant-design/icons';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+
+/**
+ * 获取子节点全部key
+ * @param item - 列表
+ */
+const getChildKeys = (item?: PermissionData) => {
+  if (!item?.children?.length) return [];
+  const result: Key[] = [];
+
+  for (let i = 0; i < item.children.length; i++) {
+    const child = item.children[i];
+    if (child?.key) result.push(child.key);
+    if (child?.children?.length) {
+      const childKeys = getChildKeys(child);
+      result.push(...childKeys);
+    }
+  }
+  return result;
+};
 
 interface Props {
   isBordered?: boolean;
@@ -16,24 +35,16 @@ interface Props {
 function MenuAuthorize(props: Props) {
   const { isBordered = true, treeData, defaultCheckedKeys, onChange, isLoading = false } = props;
   const theme = usePublicStore((state) => state.theme);
-  const [checkedKeys, setCheckedKeys] = useState<Key[]>([]);
   const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
-  const [list, setList] = useState<PermissionData[]>(treeData || []);
-
-  useEffect(() => {
-    setCheckedKeys(
-      defaultCheckedKeys?.length ? defaultCheckedKeys.map((item) => item?.toString()) : [],
-    );
-  }, [defaultCheckedKeys]);
-
-  useEffect(() => {
-    setList(treeData || []);
-  }, [treeData]);
+  const list = treeData || [];
+  // 勾选结果由外部表单值驱动, 本地勾选经 onChange 回流后生效
+  const checkedKeys: Key[] = defaultCheckedKeys?.length
+    ? defaultCheckedKeys.map((item) => item?.toString())
+    : [];
 
   /** 更新选中状态 */
   const updateCheckedKeys = useCallback(
     (keys: Key[]) => {
-      setCheckedKeys(keys);
       onChange?.(keys);
     },
     [onChange],
@@ -147,25 +158,6 @@ function MenuAuthorize(props: Props) {
     }
   }, [expandedKeys.length, list, getAllExpandableKeys]);
 
-  /**
-   * 获取子节点全部key
-   * @param item - 列表
-   */
-  const getChildKeys = (item?: PermissionData) => {
-    if (!item?.children?.length) return [];
-    const result: Key[] = [];
-
-    for (let i = 0; i < item.children.length; i++) {
-      const child = item.children[i];
-      if (child?.key) result.push(child.key);
-      if (child?.children?.length) {
-        const childKeys = getChildKeys(child);
-        result.push(...childKeys);
-      }
-    }
-    return result;
-  };
-
   /** 渲染树节点 */
   const renderTreeNode = (list: PermissionData[], step = 0) => {
     if (!list?.length) return null;
@@ -234,7 +226,7 @@ function MenuAuthorize(props: Props) {
                   </div>
                 </Checkbox>
               </div>
-              {hasChildren && isExpanded && renderTreeNode(item.children!, step + 1)}
+              {hasChildren && isExpanded && renderTreeNode(item.children ?? [], step + 1)}
             </div>
           );
         })}

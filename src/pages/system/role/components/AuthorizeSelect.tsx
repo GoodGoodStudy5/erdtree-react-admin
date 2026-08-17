@@ -12,10 +12,6 @@ function AuthorizeSelect(props: Props) {
   const [list, setList] = useState<PermissionData[]>([]);
   const [isLoading, setLoading] = useState(false);
 
-  useEffect(() => {
-    getList();
-  }, []);
-
   /** 获取数据 */
   const getList = async () => {
     const params = { roleId: id };
@@ -31,10 +27,16 @@ function AuthorizeSelect(props: Props) {
     }
   };
 
+  useEffect(() => {
+    getList();
+  }, []);
+
   /** 点击复选框 */
   const handleCheckedKeysChange = (checkedKeys: Key[]) => {
     // 将字符串数组转换为整数数组
-    const numberKeys = checkedKeys.map(key => typeof key === 'string' ? parseInt(key, 10) : key as number);
+    const numberKeys = checkedKeys.map((key) =>
+      typeof key === 'string' ? parseInt(key, 10) : (key as number),
+    );
     onChange?.(numberKeys);
   };
 

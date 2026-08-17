@@ -2,7 +2,7 @@ import type { ResizeCallbackData } from 'react-resizable';
 import type { ColumnsType } from 'antd/es/table';
 import type { EnumShowType, TableColumn } from '#/public';
 import { type TableProps, Table, Button, message, Tag } from 'antd';
-import { useMemo, useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
+import { useMemo, useState, useRef, useCallback, type ReactNode } from 'react';
 import { useFiler } from './hooks/useFiler';
 import { useTranslation } from 'react-i18next';
 import { EMPTY_VALUE } from '@/utils/config';
@@ -58,6 +58,9 @@ function BaseTable(props: Props) {
   const tableRef = useRef<HTMLDivElement>(null);
   const [tableFilters, setTableFilters] = useState<string[]>([]);
   const [sortList, setSortList] = useState<string[]>([]);
+  const [prevColumns, setPrevColumns] = useState(props.columns);
+  // 行高取自真实渲染结果, 虚拟滚动需要它换算可视条数
+  /* eslint-disable-next-line react-hooks/refs */
   const rows = tableRef.current?.querySelectorAll('.ant-table-row');
 
   // 清除自定义属性
@@ -69,16 +72,18 @@ function BaseTable(props: Props) {
   delete params.isOperate;
   delete (params as TableColumn).enum;
 
-  useEffect(() => {
+  // 外部换掉列定义时丢弃用户的筛选、排序与列宽调整
+  if (prevColumns !== props.columns) {
     const newColumns = filterTableColumns(props.columns as TableColumn[]);
     const columnKeys = newColumns
       ?.filter((col) => !(col as TableColumn).hidden)
       .map((col) => col.dataIndex)
       .filter(Boolean) as string[];
+    setPrevColumns(props.columns);
     setColumns(newColumns);
     setTableFilters(columnKeys);
     setSortList(columnKeys);
-  }, [props.columns]);
+  }
 
   // 添加新增缺少方法警告
   if (isCreate && !onCreate) {
@@ -96,7 +101,8 @@ function BaseTable(props: Props) {
     });
   }
 
-  // 表格高度
+  // 表格高度, 虚拟滚动需要在渲染期得到它才能算出这一帧的可视条数
+  /* eslint-disable-next-line react-hooks/refs */
   const tableHeight = getTableHeight(tableRef.current);
 
   /**
@@ -133,86 +139,88 @@ function BaseTable(props: Props) {
     const result = newColumns
       .filter((col) => !(col as TableColumn).hidden)
       .map((col, index) => ({
-      ...col,
-      ellipsis: col.ellipsis ?? true,
-      // 手机端去除列固定，除非设置了isKeepFixed
-      fixed: col?.fixed && !(isPhone && !(col as TableColumn)?.isKeepFixed) ? col.fixed : false,
-      onHeaderCell: (column: object, i: number) => ({
-        ...col?.onHeaderCell?.(column, i),
-        width: col.width,
-        onResize: handleResize(index),
-      }),
-      onCell: (data: object, index?: number) => {
-        return {
-          ...col?.onCell?.(data, index),
-          style: {
-            ...col?.onCell?.(data, index)?.style,
-            maxWidth: col.width,
-            width: col.width,
-          },
-        };
-      },
-      render: (value: unknown, record: object, index: number) => {
-        const renderContent = col?.render?.(value, record, index);
-        let showValue: ReactNode | string = renderContent as ReactNode;
-        let showType: EnumShowType = 'text';
-        let color: string | undefined = undefined;
-        let isStringArr = false; // 是否是字符串数组
-        const enumList = (col as TableColumn)?.enum;
+        ...col,
+        ellipsis: col.ellipsis ?? true,
+        // 手机端去除列固定，除非设置了isKeepFixed
+        fixed: col?.fixed && !(isPhone && !(col as TableColumn)?.isKeepFixed) ? col.fixed : false,
+        onHeaderCell: (column: object, i: number) => ({
+          ...col?.onHeaderCell?.(column, i),
+          width: col.width,
+          onResize: handleResize(index),
+        }),
+        onCell: (data: object, index?: number) => {
+          return {
+            ...col?.onCell?.(data, index),
+            style: {
+              ...col?.onCell?.(data, index)?.style,
+              maxWidth: col.width,
+              width: col.width,
+            },
+          };
+        },
+        render: (value: unknown, record: object, index: number) => {
+          const renderContent = col?.render?.(value, record, index);
+          let showValue: ReactNode | string = renderContent as ReactNode;
+          let showType: EnumShowType = 'text';
+          let color: string | undefined = undefined;
+          let isStringArr = false; // 是否是字符串数组
+          const enumList = (col as TableColumn)?.enum;
 
-        if (enumList && typeof enumList === 'object') {
-          if (Array.isArray(enumList)) {
-            for (let i = 0; i < enumList?.length; i++) {
-              const item = enumList[i];
-              if (String(item.value) === String(showValue)) {
-                showValue = item.label;
-                color = item.color;
-                showType = item?.type || 'text';
-                break;
+          if (enumList && typeof enumList === 'object') {
+            if (Array.isArray(enumList)) {
+              for (let i = 0; i < enumList?.length; i++) {
+                const item = enumList[i];
+                if (String(item.value) === String(showValue)) {
+                  showValue = item.label;
+                  color = item.color;
+                  showType = item?.type || 'text';
+                  break;
+                }
+              }
+            } else {
+              for (const key in enumList) {
+                if (key === String(showValue)) {
+                  showValue = enumList[key] as string;
+                  break;
+                }
               }
             }
-          } else {
-            for (const key in enumList) {
-              if (key === String(showValue)) {
-                showValue = enumList[key] as string;
-                break;
-              }
+          }
+
+          // 如果是字符串数组则用逗号分隔
+          if (Array.isArray(showValue)) {
+            isStringArr = showValue?.every((item) => typeof item === 'string');
+            if (isStringArr) showValue = showValue?.join(', ') || EMPTY_VALUE;
+          }
+
+          if (!['object', 'function'].includes(typeof renderContent) || isStringArr) {
+            const textContent = String(showValue ?? EMPTY_VALUE);
+
+            // 如果显示类型为标签
+            if (showType === 'tag') {
+              return <Tag color={color}>{textContent}</Tag>;
             }
-          }
-        }
 
-        // 如果是字符串数组则用逗号分隔
-        if (Array.isArray(showValue)) {
-          isStringArr = showValue?.every((item) => typeof item === 'string');
-          if (isStringArr) showValue = showValue?.join(', ') || EMPTY_VALUE;
-        }
+            // 超出不省略则换行
+            if (col.ellipsis !== undefined && !col.ellipsis) {
+              return (
+                <span className="break-all break-words whitespace-pre-wrap">{textContent}</span>
+              );
+            }
 
-        if (!['object', 'function'].includes(typeof renderContent) || isStringArr) {
-          const textContent = String(showValue ?? EMPTY_VALUE);
-
-          // 如果显示类型为标签
-          if (showType === 'tag') {
-            return <Tag color={color}>{textContent}</Tag>;
-          }
-
-          // 超出不省略则换行
-          if (col.ellipsis !== undefined && !col.ellipsis) {
-            return <span className="break-all break-words whitespace-pre-wrap">{textContent}</span>;
+            return (
+              <EllipsisText
+                width={col.width}
+                text={textContent}
+                color={color}
+                className="break-all"
+              />
+            );
           }
 
-          return (
-            <EllipsisText
-              width={col.width}
-              text={textContent}
-              color={color}
-              className="break-all"
-            />
-          );
-        }
-
-        return renderContent;
-      },
-    }));
+          return renderContent;
+        },
+      }));
 
     return result;
   }, [columns, tableFilters, sortList, isPhone, size, handleFilterTable]);

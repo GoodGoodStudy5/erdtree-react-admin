@@ -1,6 +1,6 @@
 import type { BreadcrumbProps } from 'antd';
 import type { NavData } from '@/menus/utils/helper';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/hooks/useCommonStore';
 
@@ -14,7 +14,6 @@ function Nav(props: Props) {
   const { i18n } = useTranslation();
   // 是否手机端
   const { isPhone } = useCommonStore();
-  const [nav, setNav] = useState<BreadcrumbProps['items']>([]);
 
   // 数据处理
   const handleList = useCallback(
@@ -37,9 +36,7 @@ function Nav(props: Props) {
     [i18n.language],
   );
 
-  useEffect(() => {
-    setNav(handleList(list));
-  }, [handleList, list]);
+  const nav = useMemo(() => handleList(list), [handleList, list]);
 
   return useMemo(
     () => (
@@ -62,7 +59,7 @@ function Nav(props: Props) {
         )}
       </>
     ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [nav],
   );
 }

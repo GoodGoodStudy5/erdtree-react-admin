@@ -1,6 +1,6 @@
 import type { InitTableState } from '../utils/reducer';
 import type { CSSProperties, ReactNode } from 'react';
-import { useEffect, useReducer, useRef, useMemo, memo, useCallback } from 'react';
+import { useEffect, useReducer, useRef, useMemo, memo } from 'react';
 import { reducer } from '../utils/reducer';
 import { isNumber } from '@/utils/is';
 import { ScrollContext } from '../utils/state';
@@ -57,6 +57,9 @@ const VirtualTable = memo(
       return temp;
     }, [state.rowHeight, totalLen]);
 
+    // 可视高度必须在渲染期拿到, renderLen 决定这一帧渲染哪几行
+    // 改为 effect 测量会让首帧只渲染一行再撑开, 滚动时出现空白
+    /* eslint-disable react-hooks/refs */
     // table的scrollY值
     let tableScrollY = 0;
     if (typeof scrollY === 'string') {
@@ -85,6 +88,7 @@ const VirtualTable = memo(
       }
       return temp;
     }, [state.rowHeight, totalLen, tableScrollY]);
+    /* eslint-enable react-hooks/refs */
 
     // 渲染中的第一条
     let start = state.rowHeight ? (state.curScrollTop / state.rowHeight) | 0 : 0;
@@ -114,22 +118,26 @@ const VirtualTable = memo(
     }, [totalLen]);
 
     /** 滑动节流 */
-    const throttleScroll = useCallback(
-      throttle((e: Event) => {
-        const scrollTop: number = (e?.target as HTMLElement)?.scrollTop ?? 0;
+    // tableScrollY 来自上面的渲染期测量, 滚动回调只在事件触发时读到它
+    /* eslint-disable react-hooks/refs */
+    const throttleScroll = useMemo(
+      () =>
+        throttle((e: Event) => {
+          const scrollTop: number = (e?.target as HTMLElement)?.scrollTop ?? 0;
 
-        if (scrollTop !== state.curScrollTop) {
-          const scrollHeight = (e?.target as HTMLElement)?.scrollHeight - tableScrollY;
-          dispatch({
-            type: 'changeScroll',
-            curScrollTop: scrollTop,
-            scrollHeight,
-            tableScrollY,
-          });
-        }
-      }, 60),
+          if (scrollTop !== state.curScrollTop) {
+            const scrollHeight = (e?.target as HTMLElement)?.scrollHeight - tableScrollY;
+            dispatch({
+              type: 'changeScroll',
+              curScrollTop: scrollTop,
+              scrollHeight,
+              tableScrollY,
+            });
+          }
+        }, 60),
       [state.curScrollTop, tableScrollY],
     );
+    /* eslint-enable react-hooks/refs */
 
     useEffect(() => {
       const ref = wrapTableRef?.current?.parentNode as HTMLElement;

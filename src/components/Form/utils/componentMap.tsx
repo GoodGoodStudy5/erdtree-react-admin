@@ -7,11 +7,22 @@ import { Input, Spin } from 'antd';
 import { type KeyboardEvent, lazy, Suspense } from 'react';
 import { cloneDeep } from 'lodash';
 
+/**
+ * 注册表容纳任意表单组件, props 形状随组件而异
+ * 收窄成具体类型会让每个注册点与每次透传都失去可赋值性, 这里的 any 是注册表的入口约定
+ */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type AnyComponent = React.ComponentType<any>;
+type AnyLazyComponent = React.LazyExoticComponent<AnyComponent>;
+/** 透传给具体表单组件的参数 */
+type AnyProps = any;
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 // 存储已加载的组件
-const loadedComponents = new Map<string, React.ComponentType<any>>();
+const loadedComponents = new Map<string, AnyComponent>();
 
 // 使用React.lazy创建懒加载组件
-const lazyComponents = new Map<string, React.LazyExoticComponent<any>>();
+const lazyComponents = new Map<string, AnyLazyComponent>();
 
 // 注册懒加载组件
 lazyComponents.set(
@@ -120,7 +131,7 @@ function LazyComponentWrapper({
 }: {
   componentType: ComponentType;
   t: TFunction;
-  componentProps: any;
+  componentProps: AnyProps;
   fallback: React.ReactNode;
   form: FormInstance;
   name: string | string[];
@@ -161,6 +172,8 @@ function LazyComponentWrapper({
 
   return (
     <Suspense fallback={fallback}>
+      {/* 注册表在模块加载时一次性建好, 同一 componentType 始终取到同一个组件引用, 不会重置状态 */}
+      {/* eslint-disable-next-line react-hooks/static-components */}
       <LazyComponent {...mergedProps} />
     </Suspense>
   );
@@ -265,7 +278,7 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
  * @param name - 组件名
  * @param component - 组件
  */
-export function addComponent(name: ComponentType, component: any): void {
+export function addComponent(name: ComponentType, component: AnyComponent): void {
   loadedComponents.set(name, component);
 }
 

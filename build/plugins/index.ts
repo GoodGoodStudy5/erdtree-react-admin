@@ -4,25 +4,35 @@ import { timePlugin } from './time';
 import { nojekyllPlugin } from './nojekyll';
 import { autoImportPlugin } from './autoImport';
 import { versionUpdatePlugin } from './version';
-import react from '@vitejs/plugin-react-swc';
+import react from '@vitejs/plugin-react';
 import unocss from 'unocss/vite';
 import legacy from '@vitejs/plugin-legacy';
 import viteCompression from 'vite-plugin-compression';
+import { codeInspectorPlugin } from 'code-inspector-plugin';
 
 export function createVitePlugins() {
   const isDev = process.env.NODE_ENV === 'development';
-  
+
   // 插件参数
   const vitePlugins: PluginOption[] = [
-    // React SWC 插件，配置以支持 React 19
-    react({
-      // 确保使用正确的 JSX 运行时
-      tsDecorators: false,
-    }),
+    // React 插件，配置以支持 React 19
+    react({}),
     unocss(),
     // 自动导入
     autoImportPlugin(),
   ];
+
+  // 开发环境才启用这些插件
+  if (isDev) {
+    vitePlugins.push(
+      // 按住 alt + shift 点击页面元素, 直接跳到对应源码位置
+      // 不指定 editor, 由插件自动探测, 避免团队内 IDE 不一致
+      codeInspectorPlugin({
+        bundler: 'vite',
+        dev: isDev,
+      }),
+    );
+  }
 
   // 生产环境才启用这些插件
   if (!isDev) {
@@ -31,14 +41,14 @@ export function createVitePlugins() {
       viteCompression(),
       // 兼容低版本
       legacy({
-        targets: [ 
-          'Android > 39', 
-          'Chrome >= 60', 
-          'Safari >= 10.1', 
-          'iOS >= 10.3', 
-          'Firefox >= 54', 
-          'Edge >= 15', 
-        ], 
+        targets: [
+          'Android > 39',
+          'Chrome >= 60',
+          'Safari >= 10.1',
+          'iOS >= 10.3',
+          'Firefox >= 54',
+          'Edge >= 15',
+        ],
         additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
       }),
       // 版本控制

@@ -20,7 +20,6 @@ function Theme() {
       document.body.className = 'theme-dark';
     }
     setThemeValue(themeCache === 'dark' ? 'dark' : 'light');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeCache]);
 
   /**

@@ -59,7 +59,8 @@ const BaseSearch = (props: Props) => {
   const { isPhone } = useCommonStore();
   let [form] = Form.useForm();
   const [isExpand, setExpand] = useState(false);
-  const [isFirst, setFirst] = useState(true);
+  // 搜索条件只在首次拿到数据时回填, 之后交给用户输入
+  const isFirstRef = useRef(true);
 
   if (searchForm) {
     form = searchForm;
@@ -76,15 +77,15 @@ const BaseSearch = (props: Props) => {
   // 初始化内容
   useEffect(() => {
     try {
-      if (Object.keys(data).length && isFirst) {
-        setFirst(false);
+      if (Object.keys(data).length && isFirstRef.current) {
+        isFirstRef.current = false;
         form.setFieldsValue({ ...data });
       }
     } catch (e) {
       console.error(e);
       console.warn('传入的搜索数据不是一个对象');
     }
-  }, [data, form, isFirst]);
+  }, [data, form]);
 
   // 清除多余参数
   const formProps = { ...props };

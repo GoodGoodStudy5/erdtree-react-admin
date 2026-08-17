@@ -20,11 +20,11 @@ import type {
   ApiTreeSelectProps,
   ApiPageSelectProps,
 } from '@/components/Selects/types';
+import type { ServerResult } from '@south/request';
 import type { Key, ReactNode } from 'react';
 import type { RangePickerProps } from 'antd/lib/date-picker';
 import type { DefaultOptionType } from 'antd/lib/select';
 import type { RuleObject } from 'antd/lib/form';
-import type { ServerResult } from '@south/request';
 import type { BusinessComponents } from '@/components/Business';
 import type { EditorProps } from '@/components/WangEditor';
 import type { TextAreaProps } from 'antd/es/input';
@@ -34,12 +34,7 @@ export type BaseFormData = Record<string, unknown>;
 
 // 基础数据组件
 type DefaultDataComponents =
-  | 'Input'
-  | 'InputNumber'
-  | 'TextArea'
-  | 'InputPassword'
-  | 'AutoComplete'
-  | 'customize';
+  'Input' | 'InputNumber' | 'TextArea' | 'InputPassword' | 'AutoComplete' | 'customize';
 
 // 下拉组件
 type SelectComponents = 'Select' | 'TreeSelect' | 'ApiSelect' | 'ApiTreeSelect' | 'ApiPageSelect';
@@ -97,9 +92,8 @@ export interface ApiResult extends Omit<DefaultOptionType, 'value'> {
   value?: string | number;
 }
 
-export type ApiFn = {
-  <T extends unknown[]>(...params: T): Promise<ServerResult<unknown>>;
-};
+/** API 请求函数, 入参个数与形状由具体接口决定 */
+export type ApiFn = (...params: unknown[]) => Promise<ServerResult<unknown>>;
 
 // 组件参数
 export type ComponentProps =

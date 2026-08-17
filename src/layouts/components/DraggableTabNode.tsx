@@ -24,10 +24,7 @@ const DraggableTabNode: FC<DraggableTabPaneProps> = (props) => {
   };
 
   // 过滤掉右键事件，避免与拖拽冲突
-  const { onContextMenu: _onContextMenu, ...restListeners } = listeners as {
-    onContextMenu?: never;
-    [key: string]: any;
-  };
+  const { onContextMenu: _onContextMenu, ...restListeners } = listeners ?? {};
 
   return (
     <div
