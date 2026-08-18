@@ -2,10 +2,10 @@ import type { SideMenu } from '#/public';
 import { Fragment } from 'react';
 import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/hooks';
 import { getMenuByKey, getOpenMenuByRouter } from '@/menus';
 import { useMenuStore, useTabsStore } from '@/stores';
+import { $t, i18n } from '@/locales';
 
 interface Props {
   list: SideMenu[]; // 列表
@@ -17,7 +17,6 @@ interface Props {
 /** 全局搜索结果列表, 支持上下键选中与回车跳转 */
 export function SearchResult(props: Props) {
   const { list, active, onCancel, changActive } = props;
-  const { t, i18n } = useTranslation();
   const { permissions, menuList } = useCommonStore();
   const { addTabs, setActiveKey } = useTabsStore((state) => state);
   const setOpenKeys = useMenuStore((state) => state.setOpenKeys);
@@ -56,7 +55,7 @@ export function SearchResult(props: Props) {
       {!list?.length && (
         <div className="flex flex-col items-center pt-5 text-warm-gray-400">
           <Icon className="text-40px" icon="mdi:archive-cancel-outline" />
-          <span className="mt-1">{t('public.notSearchContent')}</span>
+          <span className="mt-1">{$t('public.notSearchContent')}</span>
         </div>
       )}
       {list?.length > 0 && (

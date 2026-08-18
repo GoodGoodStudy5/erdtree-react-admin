@@ -4,7 +4,6 @@ import type { EnumShowType, TableColumn } from '#/public';
 import { type TableProps, Table, Button, message, Tag } from 'antd';
 import { useMemo, useState, useRef, useCallback, type ReactNode } from 'react';
 import { useFiler } from './hooks/useFiler';
-import { useTranslation } from 'react-i18next';
 import { EMPTY_VALUE } from '@/utils';
 import { useCommonStore } from '@/hooks';
 import { PlusOutlined, RedoOutlined } from '@ant-design/icons';
@@ -14,6 +13,7 @@ import { useVirtualTable } from './hooks/useVirtual';
 import { TableFilter } from './components/TableFilter';
 import { EllipsisText } from './components/EllipsisText';
 import './index.less';
+import { $t } from '@/locales';
 
 type Components = TableProps<object>['components'];
 
@@ -52,7 +52,6 @@ export function BaseTable(props: Props) {
     getPage,
     onCreate,
   } = props;
-  const { t } = useTranslation();
   const { isPhone } = useCommonStore();
   const [handleFilterTable] = useFiler();
   const [columns, setColumns] = useState(filterTableColumns(props.columns as TableColumn[]));
@@ -89,7 +88,7 @@ export function BaseTable(props: Props) {
   // 添加新增缺少方法警告
   if (isCreate && !onCreate) {
     message.warning({
-      content: t('public.createMethodWarning'),
+      content: $t('public.createMethodWarning'),
       key: 'createMethodWarning',
     });
   }
@@ -97,7 +96,7 @@ export function BaseTable(props: Props) {
   // 添加分页缺少方法警告
   if (isOperate && !getPage) {
     message.warning({
-      content: t('public.getPageWarning'),
+      content: $t('public.getPageWarning'),
       key: 'getPageWarning',
     });
   }
@@ -295,7 +294,7 @@ export function BaseTable(props: Props) {
                 icon={<PlusOutlined />}
                 onClick={onCreate}
               >
-                {t('public.create')}
+                {$t('public.create')}
               </Button>
             )}
             {leftContent}
@@ -309,7 +308,7 @@ export function BaseTable(props: Props) {
               icon={<RedoOutlined className="transform rotate-270" disabled={!!isLoading} />}
               onClick={getPage}
             >
-              {t('public.refresh')}
+              {$t('public.refresh')}
             </Button>
 
             <TableFilter

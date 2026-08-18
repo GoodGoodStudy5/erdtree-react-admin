@@ -2,7 +2,6 @@ import type { PasswordModal } from './UpdatePassword';
 import type { MenuProps } from 'antd';
 import { useRef, memo } from 'react';
 import { App, Dropdown } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/hooks';
 import { useMenuStore } from '@/stores';
 import {
@@ -17,12 +16,12 @@ import styles from '../index.module.less';
 import { Fullscreen, GlobalSearch, I18n, Theme } from '@/components';
 import UpdatePassword from './UpdatePassword';
 import Nav from './Nav';
+import { $t } from '@/locales';
 
 type MenuKey = 'password' | 'logout';
 
 function Header() {
   const [handleLogout] = useLogout();
-  const { t } = useTranslation();
   const { modal } = App.useApp();
   const { isCollapsed, isMaximize, username, nav } = useCommonStore();
   // 是否窗口最大化
@@ -33,12 +32,12 @@ function Header() {
   const items: MenuProps['items'] = [
     {
       key: 'password',
-      label: <span>{t('public.changePassword')}</span>,
+      label: <span>{$t('public.changePassword')}</span>,
       icon: <FormOutlined className="mr-1" />,
     },
     {
       key: 'logout',
-      label: <span>{t('public.signOut')}</span>,
+      label: <span>{$t('public.signOut')}</span>,
       icon: <LogoutOutlined className="mr-1" />,
     },
   ];
@@ -62,9 +61,9 @@ function Header() {
   /** 退出登录 */
   const onLogout = () => {
     modal.confirm({
-      title: t('public.kindTips'),
+      title: $t('public.kindTips'),
       icon: <ExclamationCircleOutlined />,
-      content: t('public.signOutMessage'),
+      content: $t('public.signOutMessage'),
       onOk() {
         handleLogout();
       },

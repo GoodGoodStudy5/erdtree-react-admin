@@ -3,12 +3,12 @@ import type { BaseFormData, BaseSearchList } from '#/form';
 import { type CSSProperties, type ReactNode, type Ref, useEffect, useState, useMemo } from 'react';
 import { type FormProps, Button, Col, Flex } from 'antd';
 import { Form } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { filterDayjs } from '../Dates';
 import { useCommonStore } from '@/hooks';
 import { getComponent } from '../Form/utils/componentMap';
 import { SearchOutlined, ReloadOutlined, DownOutlined } from '@ant-design/icons';
 import { filterEmptyStr, filterFormItem, handleValuePropName } from '../Form/utils/helper';
+import { $t } from '@/locales';
 
 interface Props extends FormProps {
   list: BaseSearchList[];
@@ -52,7 +52,6 @@ export const BaseSearch = (props: Props) => {
     defaultRowExpand = 2,
     handleFinish,
   } = props;
-  const { t } = useTranslation();
   const { isPhone } = useCommonStore();
   let [form] = Form.useForm();
   const [isExpand, setExpand] = useState(false);
@@ -190,7 +189,7 @@ export const BaseSearch = (props: Props) => {
           loading={isLoading}
           icon={<SearchOutlined />}
         >
-          {t('public.search')}
+          {$t('public.search')}
         </Button>
       )}
 
@@ -200,7 +199,7 @@ export const BaseSearch = (props: Props) => {
           icon={<ReloadOutlined />}
           onClick={onReset}
         >
-          {t('public.reset')}
+          {$t('public.reset')}
         </Button>
       )}
 
@@ -242,7 +241,7 @@ export const BaseSearch = (props: Props) => {
                 wrapperCol={getWrapperCol(item)}
                 valuePropName={handleValuePropName(item.component)}
               >
-                {getComponent(t, item, form)}
+                {getComponent(item, form)}
               </Form.Item>
             ))}
             {renderBtnList}
@@ -263,7 +262,7 @@ export const BaseSearch = (props: Props) => {
                   wrapperCol={getWrapperCol(item)}
                   valuePropName={handleValuePropName(item.component)}
                 >
-                  {getComponent(t, item, form)}
+                  {getComponent(item, form)}
                 </Form.Item>
               </div>
             ))}

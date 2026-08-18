@@ -1,11 +1,11 @@
 import type { ApiFn, BaseFormList } from '#/form';
-import type { TFunction } from 'i18next';
 import { getPartnerDemo } from '@/servers';
+import { $t } from '@/locales';
 
 // 搜索数据
-export const searchList = (t: TFunction): BaseFormList[] => [
+export const searchList = (): BaseFormList[] => [
   {
-    label: t('public.date'),
+    label: $t('public.date'),
     name: 'pay_date',
     component: 'RangePicker',
     componentProps: {
@@ -13,13 +13,13 @@ export const searchList = (t: TFunction): BaseFormList[] => [
     },
   },
   {
-    label: t('dashboard.gameID'),
+    label: $t('dashboard.gameID'),
     name: 'game_ids',
     wrapperWidth: 200,
     component: 'GameSelect',
   },
   {
-    label: t('dashboard.cooperativeCompany'),
+    label: $t('dashboard.cooperativeCompany'),
     name: 'partners',
     wrapperWidth: 200,
     component: 'ApiSelect',

@@ -3,19 +3,18 @@ import { Dropdown } from 'antd';
 import { Icon } from '@iconify/react';
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/react/shallow';
 import { LANG } from '@/utils';
 import { setTitle } from '@/utils';
 import { getTabTitle } from '@/stores';
 import { useTabsStore } from '@/stores';
+import { i18n } from '@/locales';
 
 /** 界面语言取值 */
 export type Langs = 'zh' | 'en';
 
 /** 语言切换入口 */
 export function I18n() {
-  const { t, i18n } = useTranslation();
   const { pathname, search } = useLocation();
   const { tabs } = useTabsStore(useShallow((state) => state));
 
@@ -53,7 +52,7 @@ export function I18n() {
     const path = `${pathname}${search || ''}`;
     // 通过路由获取标签名
     const title = getTabTitle(tabs, path);
-    if (title) setTitle(t, title);
+    if (title) setTitle(title);
   }, [pathname]);
 
   /** 点击更换语言 */

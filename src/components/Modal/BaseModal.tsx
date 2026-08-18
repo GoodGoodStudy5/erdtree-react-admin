@@ -4,10 +4,10 @@ import type { DraggableData, DraggableEvent } from 'react-draggable';
 import { useRef, useState } from 'react';
 import { Modal, Spin, Tooltip } from 'antd';
 import { Icon } from '@iconify/react';
-import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/hooks';
 import Draggable from 'react-draggable';
 import './index.less';
+import { $t } from '@/locales';
 
 interface Props extends Omit<ModalProps, 'onCancel'> {
   isLoading?: boolean;
@@ -17,7 +17,6 @@ interface Props extends Omit<ModalProps, 'onCancel'> {
 /** 弹窗, 支持标题栏拖拽与全屏, 移动端自动铺满 */
 export function BaseModal(props: Props) {
   const { width, children, wrapClassName, onCancel, isLoading = false } = props;
-  const { t } = useTranslation();
   const { isPhone } = useCommonStore();
   const [isDisabled, setDisabled] = useState(true);
   const [isFullscreen, setFullscreen] = useState(false);
@@ -66,7 +65,7 @@ export function BaseModal(props: Props) {
       <Tooltip
         className="hover:text-#404040"
         placement="bottom"
-        title={!isFullscreen ? t('public.maximize') : t('public.exitMaximized')}
+        title={!isFullscreen ? $t('public.maximize') : $t('public.exitMaximized')}
       >
         <div className="p-10px mt-3px cursor-pointer" onClick={onFullscreen}>
           <Icon
@@ -79,7 +78,7 @@ export function BaseModal(props: Props) {
           />
         </div>
       </Tooltip>
-      <Tooltip placement="bottom" title={t('public.close')}>
+      <Tooltip placement="bottom" title={$t('public.close')}>
         <div className="p-10px mt-3px cursor-pointer" onClick={handleCancel}>
           <Icon className="text-lg" icon="ant-design:close-outlined" />
         </div>
@@ -120,8 +119,8 @@ export function BaseModal(props: Props) {
       closable={false}
       maskClosable={false}
       modalRender={!isPhone ? modalRender : undefined}
-      okText={t('public.ok')}
-      cancelText={t('public.cancel')}
+      okText={$t('public.ok')}
+      cancelText={$t('public.cancel')}
       {...props}
       className={`base-modal ${props.className}`}
       title={titleRender}

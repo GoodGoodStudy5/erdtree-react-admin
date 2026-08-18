@@ -1,16 +1,15 @@
 import type { ApiSelectProps } from './types';
 import type { DefaultOptionType } from 'antd/es/select';
 import { Select } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback, memo } from 'react';
 import { MAX_TAG_COUNT } from './constants';
 import { Loading } from './components/Loading';
+import { $t } from '@/locales';
 
 /**
  * @description: 根据API获取数据下拉组件
  */
 function ApiSelect(props: ApiSelectProps) {
-  const { t } = useTranslation();
   const [isLoading, setLoading] = useState(false);
   const [options, setOptions] = useState<DefaultOptionType[]>([]);
 
@@ -63,7 +62,7 @@ function ApiSelect(props: ApiSelectProps) {
       allowClear
       showSearch
       maxTagCount={MAX_TAG_COUNT}
-      placeholder={t('public.inputPleaseSelect')}
+      placeholder={$t('public.inputPleaseSelect')}
       optionFilterProp={params?.fieldNames?.label || 'label'}
       {...params}
       loading={isLoading}

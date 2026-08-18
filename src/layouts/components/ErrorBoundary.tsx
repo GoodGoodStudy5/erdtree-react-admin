@@ -1,10 +1,10 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { Button, Result, Tooltip } from 'antd';
 import { LogoutOutlined, MessageOutlined, RedoOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
 import { useUserStore } from '@/stores';
 import { createLog } from '@/servers';
 import { useLogout } from '@/hooks';
+import { $t } from '@/locales';
 
 interface Props {
   children: ReactNode;
@@ -18,7 +18,6 @@ interface State {
 // 错误内容组件
 const ErrorContent = ({ error }: { error: Error | null }) => {
   const [handleLogout] = useLogout();
-  const { t } = useTranslation();
 
   /** 刷新当前页面 */
   const handleRefresh = () => {
@@ -29,21 +28,21 @@ const ErrorContent = ({ error }: { error: Error | null }) => {
     <div className="flex items-center justify-center h-full">
       <Result
         status="error"
-        title={t('public.pageErrorTitle')}
+        title={$t('public.pageErrorTitle')}
         subTitle={
           <div className="flex">
             <Tooltip title={String(error)} placement="top">
               <MessageOutlined className="mr-5px rotate-y-180" />
             </Tooltip>
-            {t('public.pagepageErrorSubTitle')}
+            {$t('public.pagepageErrorSubTitle')}
           </div>
         }
         extra={[
           <Button key="refresh" type="primary" icon={<RedoOutlined />} onClick={handleRefresh}>
-            {t('public.refreshPage')}
+            {$t('public.refreshPage')}
           </Button>,
           <Button key="hard-refresh" icon={<LogoutOutlined />} onClick={handleLogout}>
-            {t('public.signOut')}
+            {$t('public.signOut')}
           </Button>,
         ]}
       />

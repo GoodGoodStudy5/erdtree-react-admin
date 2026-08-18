@@ -1,23 +1,22 @@
 import type { InputProps } from 'antd';
 import { Input, message } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { useClipboard } from '@/hooks';
+import { $t } from '@/locales';
 
 const { Search } = Input;
 
 /** 带复制按钮的输入框, 成功与失败都以全局提示反馈 */
 export function CopyInput(props: InputProps) {
-  const { t } = useTranslation();
   const [messageApi, contextHolder] = message.useMessage();
   const [isCopied, error, copyText] = useClipboard();
 
   useEffect(() => {
     if (isCopied && !error) {
-      messageApi.success({ content: t('public.copySuccessfully'), key: 'copy' });
+      messageApi.success({ content: $t('public.copySuccessfully'), key: 'copy' });
     }
 
     if (error) {
-      messageApi.warning({ content: error || t('public.copyFailed'), key: 'copy' });
+      messageApi.warning({ content: error || $t('public.copyFailed'), key: 'copy' });
     }
   }, [isCopied, error]);
 
@@ -26,12 +25,12 @@ export function CopyInput(props: InputProps) {
    * @param value - 复制内容
    */
   const handleCopy = (value: string) => {
-    if (!value) return messageApi.warning({ content: t('public.inputPleaseEnter'), key: 'copy' });
+    if (!value) return messageApi.warning({ content: $t('public.inputPleaseEnter'), key: 'copy' });
     try {
       copyText(value);
     } catch (e) {
       console.error(e);
-      messageApi.warning({ content: t('public.copyFailed'), key: 'copy' });
+      messageApi.warning({ content: $t('public.copyFailed'), key: 'copy' });
     }
   };
 
@@ -40,8 +39,8 @@ export function CopyInput(props: InputProps) {
       {contextHolder}
       <Search
         {...props}
-        placeholder={t('public.inputPleaseEnter')}
-        enterButton={t('public.copy')}
+        placeholder={$t('public.inputPleaseEnter')}
+        enterButton={$t('public.copy')}
         onSearch={handleCopy}
       />
     </>

@@ -1,10 +1,10 @@
-import type { TFunction } from 'i18next';
 import type { MessageInstance } from 'antd/es/message/interface';
 import { VERSION } from '@/utils';
 import axios from 'axios';
+import { $t } from '@/locales';
 
 /** 版本监控 */
-export const versionCheck = async (t: TFunction, messageApi: MessageInstance) => {
+export const versionCheck = async (messageApi: MessageInstance) => {
   if (import.meta.env.MODE === 'development') return;
 
   try {
@@ -28,7 +28,7 @@ export const versionCheck = async (t: TFunction, messageApi: MessageInstance) =>
       let reloadTimer: ReturnType<typeof setTimeout> | null = null;
 
       messageApi.info({
-        content: t('public.reloadPageMsg'),
+        content: $t('public.reloadPageMsg'),
         key: 'reload',
         duration: 10,
         onClick: () => {

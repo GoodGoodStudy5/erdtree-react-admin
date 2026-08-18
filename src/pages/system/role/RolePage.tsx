@@ -5,6 +5,7 @@ import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { searchList, createList, tableColumns } from './model';
 import { getRolePage, getRoleById, createRole, updateRole, deleteRole } from '@/servers';
+import { $t } from '@/locales';
 
 // 当前行数据
 interface RowData {
@@ -18,13 +19,12 @@ const initCreate = {
 };
 
 function RolePage() {
-  const { t } = useTranslation();
   const createFormRef = useRef<FormInstance>(null);
   const [isFetch, setFetch] = useState(false);
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [isCreateLoading, setCreateLoading] = useState(false);
-  const [createTitle, setCreateTitle] = useState(ADD_TITLE(t));
+  const [createTitle, setCreateTitle] = useState(ADD_TITLE());
   const [createId, setCreateId] = useState('');
   const [createData, setCreateData] = useState<BaseFormData>(initCreate);
   const [searchData, setSearchData] = useState<BaseFormData>({});
@@ -92,7 +92,7 @@ function RolePage() {
   /** 点击新增 */
   const onCreate = () => {
     setCreateOpen(true);
-    setCreateTitle(ADD_TITLE(t));
+    setCreateTitle(ADD_TITLE());
     setCreateId('');
     setCreateData(initCreate);
   };
@@ -104,7 +104,7 @@ function RolePage() {
   const onUpdate = async (id: string) => {
     try {
       setCreateOpen(true);
-      setCreateTitle(EDIT_TITLE(t, id));
+      setCreateTitle(EDIT_TITLE(id));
       setCreateId(id);
       setCreateLoading(true);
       const { code, data } = await getRoleById(id);
@@ -122,7 +122,7 @@ function RolePage() {
   const onCopy = async (id: string) => {
     try {
       setCreateOpen(true);
-      setCreateTitle(ADD_TITLE(t));
+      setCreateTitle(ADD_TITLE());
       setCreateId('');
       setCreateLoading(true);
       const { code, data } = await getRoleById(id);
@@ -154,7 +154,7 @@ function RolePage() {
       const functions = () => (createId ? updateRole(createId, values) : createRole(values));
       const { code, message } = await functions();
       if (Number(code) !== 200) return;
-      messageApi.success(message || t('public.successfulOperation'));
+      messageApi.success(message || $t('public.successfulOperation'));
       setCreateOpen(false);
       getPage();
     } finally {
@@ -171,7 +171,7 @@ function RolePage() {
       setLoading(true);
       const { code, message } = await deleteRole(id);
       if (Number(code) === 200) {
-        messageApi.success(message || t('public.successfullyDeleted'));
+        messageApi.success(message || $t('public.successfullyDeleted'));
         getPage();
       }
     } finally {
@@ -208,7 +208,7 @@ function RolePage() {
               className="small-btn"
               onClick={() => onCopy((record as RowData).id)}
             >
-              {t('public.copy')}
+              {$t('public.copy')}
             </Button>
           )}
           {pagePermission.delete === true && (
@@ -227,19 +227,18 @@ function RolePage() {
       onUpdate,
       onCopy,
       onDelete,
-      t,
     ],
   );
 
   // 缓存列配置
-  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
+  const columns = useMemo(() => tableColumns(optionRender), [optionRender]);
 
   return (
     <BaseContent isPermission={pagePermission.page}>
       {contextHolder}
       <BaseCard>
         <BaseSearch
-          list={searchList(t)}
+          list={searchList()}
           data={searchData}
           isLoading={isLoading}
           handleFinish={onSearch}
@@ -273,9 +272,9 @@ function RolePage() {
         onClose={closeCreate}
         footer={
           <div className="flex justify-end gap-10px">
-            <Button onClick={closeCreate}>{t('public.cancel')}</Button>
+            <Button onClick={closeCreate}>{$t('public.cancel')}</Button>
             <Button type="primary" onClick={createSubmit}>
-              {t('public.confirm')}
+              {$t('public.confirm')}
             </Button>
           </div>
         }
@@ -284,7 +283,7 @@ function RolePage() {
           <BaseForm
             form={form}
             ref={createFormRef}
-            list={createList(t, roles?.join(','))}
+            list={createList(roles?.join(','))}
             data={createData}
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 19 }}

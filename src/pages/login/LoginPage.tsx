@@ -12,6 +12,7 @@ import { encryption, decryption } from '@south/utils';
 import { getFirstMenu } from '@/menus';
 import { cancelAllRequest } from '@/utils';
 import Logo from '@/assets/images/logo.svg';
+import { $t, i18n } from '@/locales';
 
 const CHECK_REMEMBER = 'remember_me';
 const USER_USERNAME = 'login_username';
@@ -31,7 +32,6 @@ function readRememberedPassword(cache: string): string | undefined {
 }
 
 function LoginPage() {
-  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [getToken, setToken] = useToken();
@@ -60,7 +60,7 @@ function LoginPage() {
 
   // 语言切换修改title
   useEffect(() => {
-    setTitle(t, t('login.login'));
+    setTitle($t('login.login'));
   }, [i18n.language]);
 
   /** 获取用户权限 */
@@ -118,7 +118,7 @@ function LoginPage() {
 
     // 菜单仍为空（接口失败或返回空），无法确定跳转目标
     if (!menuData?.length) {
-      return messageApi.error({ content: t('login.notPermissions'), key: 'permissions' });
+      return messageApi.error({ content: $t('login.notPermissions'), key: 'permissions' });
     }
 
     // 如果存在重定向
@@ -133,7 +133,7 @@ function LoginPage() {
     // 有权限则直接跳转
     const firstMenu = getFirstMenu(menuData, permissions);
     if (!firstMenu) {
-      return messageApi.error({ content: t('login.notPermissions'), key: 'permissions' });
+      return messageApi.error({ content: $t('login.notPermissions'), key: 'permissions' });
     }
     navigate(firstMenu);
   };
@@ -184,7 +184,7 @@ function LoginPage() {
       handleRemember(values.username, encryption(passwordObj));
 
       if (!permissions?.length || !token) {
-        return messageApi.error({ content: t('login.notPermissions'), key: 'permissions' });
+        return messageApi.error({ content: $t('login.notPermissions'), key: 'permissions' });
       }
 
       setToken(token);
@@ -261,7 +261,7 @@ function LoginPage() {
         >
           <div className="pb-20px pt-10px flex items-center justify-center">
             <img className="mr-2 object-contain" width="32" height="32" src={Logo} alt="LOGO" />
-            <span className="text-22px font-bold tracking-2px">{t('login.systemLogin')}</span>
+            <span className="text-22px font-bold tracking-2px">{$t('login.systemLogin')}</span>
           </div>
           <Form
             form={form}
@@ -276,34 +276,40 @@ function LoginPage() {
                 : {}
             }
           >
-            <div className="text-#AAA6A6 text-14px mb-8px">{t('login.username')}</div>
+            <div className="text-#AAA6A6 text-14px mb-8px">{$t('login.username')}</div>
 
             <Form.Item
               name="username"
               className="!mb-15px"
               rules={[
-                { required: true, message: t('public.pleaseEnter', { name: t('login.username') }) },
+                {
+                  required: true,
+                  message: $t('public.pleaseEnter', { name: $t('login.username') }),
+                },
               ]}
             >
               <Input
                 allow-clear="true"
-                placeholder={t('public.pleaseEnter', { name: t('login.username') })}
+                placeholder={$t('public.pleaseEnter', { name: $t('login.username') })}
                 autoComplete="username"
               />
             </Form.Item>
 
-            <div className="text-#AAA6A6 text-14px mb-8px">{t('login.password')}</div>
+            <div className="text-#AAA6A6 text-14px mb-8px">{$t('login.password')}</div>
 
             <Form.Item
               name="password"
               className="!mb-15px"
               rules={[
-                { required: true, message: t('public.pleaseEnter', { name: t('login.password') }) },
-                PASSWORD_RULE(t),
+                {
+                  required: true,
+                  message: $t('public.pleaseEnter', { name: $t('login.password') }),
+                },
+                PASSWORD_RULE(),
               ]}
             >
               <Input.Password
-                placeholder={t('public.pleaseEnter', { name: t('login.password') })}
+                placeholder={$t('public.pleaseEnter', { name: $t('login.password') })}
                 autoComplete="current-password"
               />
             </Form.Item>
@@ -314,17 +320,17 @@ function LoginPage() {
               className="w-full mt-15px mb-25px rounded-5px tracking-2px"
               loading={isLoading}
             >
-              {t('login.login')}
+              {$t('login.login')}
             </Button>
           </Form>
 
           <div className="flex justify-between items-center mb-5px px-1px">
             <Checkbox checked={isRemember} onChange={onRemember}>
-              {t('login.rememberMe')}
+              {$t('login.rememberMe')}
             </Checkbox>
 
             <div className="text-blue-500 cursor-pointer" onClick={onForgetPassword}>
-              {t('login.forgetPassword')}
+              {$t('login.forgetPassword')}
             </div>
           </div>
         </div>

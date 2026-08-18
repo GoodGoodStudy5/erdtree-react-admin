@@ -52,7 +52,8 @@ function AppRouter() {
       <ConfigProvider locale={locale} theme={themeConfig}>
         <App>
           <StaticMessage />
-          <RouterPage />
+          {/* 语言切换后整树重挂载, 让各处直接调用的 $t 重新取值 */}
+          <RouterPage key={currentLanguage} />
         </App>
       </ConfigProvider>
     </Router>

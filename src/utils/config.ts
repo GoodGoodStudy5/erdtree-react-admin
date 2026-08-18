@@ -1,7 +1,7 @@
-import type { TFunction } from 'i18next';
+import { $t } from '@/locales';
 
 /** 浏览器标签标题的后缀, 取当前系统名 */
-export const TITLE_SUFFIX = (t: TFunction) => t('public.currentName');
+export const TITLE_SUFFIX = () => $t('public.currentName');
 /** 页面水印的文案前缀, 后面拼当前登录人 */
 export const WATERMARK_PREFIX = 'admin';
 /** 登录令牌在 localStorage 中的键名 */
@@ -32,16 +32,15 @@ export const TIME_PICKER_FORMAT = 'HH:mm:ss';
 export const FORM_REQUIRED = [{ required: true }];
 
 /** 新增弹窗标题 */
-export const ADD_TITLE = (t: TFunction, title?: string) =>
-  t('public.createTitle', { title: title ?? '' });
+export const ADD_TITLE = (title?: string) => $t('public.createTitle', { title: title ?? '' });
 /** 编辑弹窗标题, 带上被编辑对象的名称, 便于确认改的是哪一条 */
-export const EDIT_TITLE = (t: TFunction, name: string, title?: string) =>
-  `${t('public.editTitle', { title: title ?? '' })}${name ? `(${name})` : ''}`;
+export const EDIT_TITLE = (name: string, title?: string) =>
+  `${$t('public.editTitle', { title: title ?? '' })}${name ? `(${name})` : ''}`;
 
 /** 密码校验规则: 6 到 30 位, 必须同时含字母与数字 */
-export const PASSWORD_RULE = (t: TFunction) => ({
+export const PASSWORD_RULE = () => ({
   pattern: /^(?=.*\d)(?=.*[a-zA-Z])[\da-zA-Z~!@#$%^&*+\.\_\-*]{6,30}$/,
-  message: t('login.passwordRuleMessage'),
+  message: $t('login.passwordRuleMessage'),
 });
 
 // 环境判断

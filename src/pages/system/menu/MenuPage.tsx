@@ -12,6 +12,7 @@ import {
   deleteMenu,
   batchDeleteMenu,
 } from '@/servers';
+import { $t, i18n } from '@/locales';
 
 // 当前行数据
 interface RowData {
@@ -28,13 +29,12 @@ const initCreate = {
 };
 
 function MenuPage() {
-  const { t, i18n } = useTranslation();
   const createFormRef = useRef<FormInstance>(null);
   const [isFetch, setFetch] = useState(false);
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [isCreateLoading, setCreateLoading] = useState(false);
-  const [createTitle, setCreateTitle] = useState(ADD_TITLE(t));
+  const [createTitle, setCreateTitle] = useState(ADD_TITLE());
   const [createId, setCreateId] = useState('');
   const [createData, setCreateData] = useState<BaseFormData>(initCreate);
   const [searchData, setSearchData] = useState<BaseFormData>({});
@@ -109,7 +109,7 @@ function MenuPage() {
     let type = record?.id ? record?.type : undefined;
     if (type && type < 3) type = type + 1;
     setCreateOpen(true);
-    setCreateTitle(ADD_TITLE(t));
+    setCreateTitle(ADD_TITLE());
     setCreateId('');
     setCreateData({ ...initCreate, parentId: id, type });
   };
@@ -121,7 +121,7 @@ function MenuPage() {
   const onUpdate = async (id: string) => {
     try {
       setCreateOpen(true);
-      setCreateTitle(EDIT_TITLE(t, id));
+      setCreateTitle(EDIT_TITLE(id));
       setCreateId(id);
       setCreateLoading(true);
       const { code, data } = await getMenuById(id);
@@ -152,7 +152,7 @@ function MenuPage() {
       const functions = () => (createId ? updateMenu(createId, values) : createMenu(values));
       const { code, message } = await functions();
       if (Number(code) !== 200) return;
-      messageApi.success(message || t('public.successfulOperation'));
+      messageApi.success(message || $t('public.successfulOperation'));
       setCreateOpen(false);
       getPage();
     } catch (e) {
@@ -171,7 +171,7 @@ function MenuPage() {
       setLoading(true);
       const { code, message } = await deleteMenu(id);
       if (Number(code) === 200) {
-        messageApi.success(message || t('public.successfullyDeleted'));
+        messageApi.success(message || $t('public.successfullyDeleted'));
         getPage();
       }
     } finally {
@@ -184,14 +184,14 @@ function MenuPage() {
    */
   const onBatchDelete = async () => {
     if (selectedRowKeys.length === 0) {
-      messageApi.warning(t('public.selectAtLeastOne'));
+      messageApi.warning($t('public.selectAtLeastOne'));
       return;
     }
     try {
       setLoading(true);
       const { code, message } = await batchDeleteMenu(selectedRowKeys as string[]);
       if (Number(code) === 200) {
-        messageApi.success(message || t('public.successfullyDeleted'));
+        messageApi.success(message || $t('public.successfullyDeleted'));
         setSelectedRowKeys([]);
         getPage();
       }
@@ -226,7 +226,7 @@ function MenuPage() {
               type="primary"
               onClick={() => onCreate(record as RowData)}
             >
-              {t('systems:menu.addChildMenu')}
+              {$t('systems:menu.addChildMenu')}
             </Button>
           )}
           {pagePermission.update === true && (
@@ -247,7 +247,6 @@ function MenuPage() {
       pagePermission.create,
       pagePermission.update,
       pagePermission.delete,
-      t,
       i18n.language,
       onCreate,
       onUpdate,
@@ -256,14 +255,14 @@ function MenuPage() {
   );
 
   // 缓存列配置
-  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
+  const columns = useMemo(() => tableColumns(optionRender), [optionRender]);
 
   return (
     <BaseContent isPermission={pagePermission.page}>
       {contextHolder}
       <BaseCard>
         <BaseSearch
-          list={searchList(t)}
+          list={searchList()}
           data={searchData}
           isLoading={isLoading}
           handleFinish={onSearch}
@@ -285,14 +284,14 @@ function MenuPage() {
           leftContent={
             selectedRowKeys.length > 0 && pagePermission.delete ? (
               <Popconfirm
-                title={t('public.kindTips')}
-                description={t('public.batchDeleteConfirmMessage', { name: '' })}
+                title={$t('public.kindTips')}
+                description={$t('public.batchDeleteConfirmMessage', { name: '' })}
                 onConfirm={onBatchDelete}
-                okText={t('public.confirm')}
-                cancelText={t('public.cancel')}
+                okText={$t('public.confirm')}
+                cancelText={$t('public.cancel')}
               >
                 <Button danger className="small-btn">
-                  {t('public.batchDelete')} ({selectedRowKeys.length})
+                  {$t('public.batchDelete')} ({selectedRowKeys.length})
                 </Button>
               </Popconfirm>
             ) : undefined
@@ -320,7 +319,7 @@ function MenuPage() {
         <BaseForm
           ref={createFormRef}
           form={form}
-          list={createList(t, createId, type)}
+          list={createList(createId, type)}
           data={createData}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 19 }}

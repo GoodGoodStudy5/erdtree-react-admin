@@ -9,7 +9,6 @@ const initSearch = {
 };
 
 function DashboardPage() {
-  const { t } = useTranslation();
   const [isLoading, setLoading] = useState(false);
   const { permissions, isPhone } = useCommonStore();
   const isPermission = checkPermission('/dashboard', permissions);
@@ -55,7 +54,7 @@ function DashboardPage() {
     <BaseContent isPermission={isPermission}>
       <BaseCard>
         <BaseSearch
-          list={searchList(t)}
+          list={searchList()}
           data={initSearch}
           initialValues={initSearch}
           isLoading={isLoading}

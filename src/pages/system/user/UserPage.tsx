@@ -11,6 +11,7 @@ import {
   getUserPage,
   updateUser,
 } from '@/servers';
+import { $t } from '@/locales';
 
 // 当前行数据
 interface RowData {
@@ -24,14 +25,13 @@ const initCreate = {
 };
 
 function UserPage() {
-  const { t } = useTranslation();
   const createFormRef = useRef<FormInstance>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const [isFetch, setFetch] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [isCreateLoading, setCreateLoading] = useState(false);
   const [isCreateOpen, setCreateOpen] = useState(false);
-  const [createTitle, setCreateTitle] = useState(ADD_TITLE(t));
+  const [createTitle, setCreateTitle] = useState(ADD_TITLE());
   const [createId, setCreateId] = useState('');
   const [createData, setCreateData] = useState<BaseFormData>(initCreate);
   const [searchData, setSearchData] = useState<BaseFormData>({});
@@ -102,7 +102,7 @@ function UserPage() {
   /** 点击新增 */
   const onCreate = () => {
     setCreateOpen(true);
-    setCreateTitle(ADD_TITLE(t));
+    setCreateTitle(ADD_TITLE());
     setCreateId('');
     setCreateData(initCreate);
   };
@@ -114,7 +114,7 @@ function UserPage() {
   const onUpdate = async (id: string) => {
     try {
       setCreateOpen(true);
-      setCreateTitle(EDIT_TITLE(t, id));
+      setCreateTitle(EDIT_TITLE(id));
       setCreateId(id);
       setCreateLoading(true);
       const { code, data } = await getUserById(id);
@@ -145,7 +145,7 @@ function UserPage() {
       const functions = () => (createId ? updateUser(createId, values) : createUser(values));
       const { code, message } = await functions();
       if (Number(code) !== 200) return;
-      messageApi.success(message || t('public.successfulOperation'));
+      messageApi.success(message || $t('public.successfulOperation'));
       setCreateOpen(false);
       getPage();
     } finally {
@@ -162,7 +162,7 @@ function UserPage() {
       setLoading(true);
       const { code, message } = await deleteUser(id);
       if (Number(code) === 200) {
-        messageApi.success(message || t('public.successfullyDeleted'));
+        messageApi.success(message || $t('public.successfullyDeleted'));
         getPage();
       }
     } finally {
@@ -175,7 +175,7 @@ function UserPage() {
     try {
       if (!selectedRowKeys.length) {
         return messageApi.warning({
-          content: t('public.tableSelectWarning'),
+          content: $t('public.tableSelectWarning'),
           key: 'pleaseSelect',
         });
       }
@@ -183,7 +183,7 @@ function UserPage() {
       const params = { ids: selectedRowKeys };
       const { code, message } = await batchDeleteUser(params);
       if (Number(code) === 200) {
-        messageApi.success(message || t('public.successfullyDeleted'));
+        messageApi.success(message || $t('public.successfullyDeleted'));
         getPage();
       }
     } finally {
@@ -237,11 +237,11 @@ function UserPage() {
         </div>
       );
     },
-    [pagePermission.update, pagePermission.delete, t, onUpdate, onDelete],
+    [pagePermission.update, pagePermission.delete, onUpdate, onDelete],
   );
 
   // 缓存列配置
-  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
+  const columns = useMemo(() => tableColumns(optionRender), [optionRender]);
 
   /** 左侧渲染 */
   const leftContentRender = (
@@ -258,7 +258,7 @@ function UserPage() {
       {contextHolder}
       <BaseCard>
         <BaseSearch
-          list={searchList(t)}
+          list={searchList()}
           searchForm={searchForm}
           data={searchData}
           type="grid"
@@ -299,7 +299,7 @@ function UserPage() {
         <BaseForm
           form={form}
           ref={createFormRef}
-          list={createList(t, !createId)}
+          list={createList(!createId)}
           labelCol={{ span: 4 }}
           data={createData}
           handleFinish={handleCreate}

@@ -1,6 +1,5 @@
 import type { MenuProps } from 'antd';
 import { useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import {
   RedoOutlined,
   CloseOutlined,
@@ -10,6 +9,7 @@ import {
 import { useCommonStore } from '@/hooks';
 import { useTabsStore } from '@/stores';
 import { useShallow } from 'zustand/shallow';
+import { $t } from '@/locales';
 
 enum ITabEnums {
   REFRESH = 'refresh', // 重新加载
@@ -26,7 +26,6 @@ interface Props {
 }
 
 export function useDropdownMenu(props: Props) {
-  const { t } = useTranslation();
   const { activeKey, onOpenChange, handleRefresh } = props;
   const { pathname } = useLocation();
   const { tabs } = useCommonStore();
@@ -40,31 +39,31 @@ export function useDropdownMenu(props: Props) {
     return [
       {
         key: ITabEnums.REFRESH,
-        label: t('public.reload'),
+        label: $t('public.reload'),
         disabled: key !== pathname,
         icon: <RedoOutlined className="mr-5px transform rotate-270" />,
       },
       {
         key: ITabEnums.CLOSE_CURRENT,
-        label: t('public.closeTab'),
+        label: $t('public.closeTab'),
         disabled: tabs.length <= 1,
         icon: <CloseOutlined className="mr-5px" />,
       },
       {
         key: ITabEnums.CLOSE_OTHER,
-        label: t('public.closeOther'),
+        label: $t('public.closeOther'),
         disabled: tabs.length <= 1,
         icon: <VerticalAlignMiddleOutlined className="mr-5px transform rotate-90" />,
       },
       {
         key: ITabEnums.CLOSE_LEFT,
-        label: t('public.closeLeft'),
+        label: $t('public.closeLeft'),
         disabled: index === 0,
         icon: <VerticalAlignTopOutlined className="mr-5px transform rotate-270" />,
       },
       {
         key: ITabEnums.CLOSE_RIGHT,
-        label: t('public.closeRight'),
+        label: $t('public.closeRight'),
         disabled: index === tabs.length - 1,
         icon: <VerticalAlignTopOutlined className="mr-5px transform rotate-90" />,
       },

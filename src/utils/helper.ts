@@ -1,6 +1,5 @@
 import type { ArrayData } from '#/public';
 import type { Constant } from './constants';
-import type { TFunction } from 'i18next';
 import { TITLE_SUFFIX } from './config';
 
 /**
@@ -149,8 +148,8 @@ export function recursiveData<T extends RecursiveChildren<T>, U>(
  * @param t - 国际化
  * @param title - 标题
  */
-export function setTitle(t: TFunction, title: string) {
-  const value = `${title ? title + '-' : ''}${TITLE_SUFFIX(t)}`;
+export function setTitle(title: string) {
+  const value = `${title ? title + '-' : ''}${TITLE_SUFFIX()}`;
   if (document.title === value) return;
   document.title = value;
 }

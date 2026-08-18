@@ -1,4 +1,3 @@
-import type { TFunction } from 'i18next';
 import type { ComponentType, BaseFormList } from '#/form';
 import { initCompProps } from './helper';
 import type { FormInstance, InputProps } from 'antd';
@@ -123,14 +122,12 @@ lazyComponents.set(
 // eslint-disable-next-line react-refresh/only-export-components
 function LazyComponentWrapper({
   componentType,
-  t,
   componentProps,
   fallback,
   form,
   name,
 }: {
   componentType: ComponentType;
-  t: TFunction;
   componentProps: AnyProps;
   fallback: React.ReactNode;
   form: FormInstance;
@@ -164,7 +161,7 @@ function LazyComponentWrapper({
   };
 
   const mergedProps = {
-    ...initCompProps(t, componentType as ComponentType),
+    ...initCompProps(componentType as ComponentType),
     ...componentProps,
     value: fieldValue !== undefined ? fieldValue : componentProps?.value,
     onChange: handleChange,
@@ -205,7 +202,7 @@ const handleInputProps = (componentProps?: ComponentProps) => {
  * @param t - i18n 转换函数
  * @param item - 表单项
  */
-export function getComponent(t: TFunction, item: BaseFormList, form: FormInstance) {
+export function getComponent(item: BaseFormList, form: FormInstance) {
   const { component, componentProps, name } = item;
 
   const handlePressEnter = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -222,7 +219,7 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
   // 输入框渲染
   const renderInput = (
     <Input
-      {...(initCompProps(t, 'Input') as InputProps)}
+      {...(initCompProps('Input') as InputProps)}
       {...handleInputProps(componentProps)}
       onPressEnter={handlePressEnter}
     />
@@ -249,7 +246,6 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
     return (
       <LazyComponentWrapper
         componentType={component}
-        t={t}
         componentProps={componentProps}
         fallback={<LoadingComponent />}
         form={form}
@@ -266,7 +262,7 @@ export function getComponent(t: TFunction, item: BaseFormList, form: FormInstanc
 
   return (
     <Comp
-      {...initCompProps(t, component as ComponentType)}
+      {...initCompProps(component as ComponentType)}
       {...componentProps}
       onPressEnter={handlePressEnter}
     />

@@ -17,19 +17,18 @@ import { useDropdownMenu } from '../hooks/useDropdownMenu';
 import { useCommonStore } from '@/hooks';
 import { useTabsStore, usePublicStore, getTabTitle } from '@/stores';
 import { useShallow } from 'zustand/react/shallow';
-import { useTranslation } from 'react-i18next';
 import { setTitle } from '@/utils';
 import styles from '../index.module.less';
 import TabRefresh from './TabRefresh';
 import TabMaximize from './TabMaximize';
 import TabOptions from './TabOptions';
+import { $t, i18n } from '@/locales';
 
 interface LayoutTabsProps {
   aliveRef: RefObject<KeepAliveRef | null>;
 }
 
 function LayoutTabs({ aliveRef }: LayoutTabsProps) {
-  const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -95,12 +94,12 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         // 路由变化同步浏览器标题，
         const title =
           i18n.language === 'en' ? newItems.labelEn : newItems.labelZh || newItems.label;
-        if (title) setTitle(t, title);
+        if (title) setTitle(title);
       } else {
         setActiveKey(path);
       }
     },
-    [permissions, menuList, pathname, setActiveKey, setNav, addTabs, t, i18n],
+    [permissions, menuList, pathname, setActiveKey, setNav, addTabs, i18n],
   );
 
   // 初始化标签 & 路由变化时同步
@@ -128,7 +127,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
 
         // 刷新标题
         const title = getTabTitle(tabs, key);
-        if (title) setTitle(t, title);
+        if (title) setTitle(title);
       });
     },
     [urlParamsMap, navigate, setActiveKey],
@@ -200,7 +199,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
 
       timerRef.current = setTimeout(() => {
         messageApi.success({
-          content: t('public.refreshSuccessfully'),
+          content: $t('public.refreshSuccessfully'),
           key: 'refresh',
         });
         setRefresh(false);
@@ -217,7 +216,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         }, 1000),
       );
     },
-    [activeKey, refreshTime, messageApi, t, setRefresh, aliveRef],
+    [activeKey, refreshTime, messageApi, setRefresh, aliveRef],
   );
 
   /**

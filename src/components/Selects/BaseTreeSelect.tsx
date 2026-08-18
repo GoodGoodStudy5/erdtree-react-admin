@@ -1,11 +1,10 @@
 import { TreeSelect, type TreeSelectProps } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { MAX_TAG_COUNT } from './constants';
+import { $t } from '@/locales';
 
 /** 树形下拉, 多选标签数超出后按容器宽度收起 */
 export function BaseTreeSelect(props: TreeSelectProps) {
   const { treeData } = props;
-  const { t } = useTranslation();
 
   const currentTreeData =
     treeData?.map((item) => {
@@ -22,7 +21,7 @@ export function BaseTreeSelect(props: TreeSelectProps) {
       showSearch
       maxTagCount={MAX_TAG_COUNT}
       treeNodeFilterProp={props?.fieldNames?.label || 'label'}
-      placeholder={t('public.inputPleaseSelect')}
+      placeholder={$t('public.inputPleaseSelect')}
       {...props}
       treeData={currentTreeData}
     />

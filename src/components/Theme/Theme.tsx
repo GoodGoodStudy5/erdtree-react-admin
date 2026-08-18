@@ -2,13 +2,12 @@ import { ThemeType, usePublicStore } from '@/stores';
 import { Tooltip } from 'antd';
 import { Icon } from '@iconify/react';
 import { MouseEvent, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { THEME_KEY } from '@/utils';
 import './index.module.less';
+import { $t } from '@/locales';
 
 /** 明暗主题切换入口, 选择结果落 localStorage */
 export function Theme() {
-  const { t } = useTranslation();
   const themeCache = (localStorage.getItem(THEME_KEY) || 'light') as ThemeType;
   const [theme, setTheme] = useState<ThemeType>(themeCache);
   const setThemeValue = usePublicStore((state) => state.setThemeValue);
@@ -76,7 +75,7 @@ export function Theme() {
   };
 
   return (
-    <Tooltip title={t('public.themes')}>
+    <Tooltip title={$t('public.themes')}>
       <div className={'flex items-center justify-center text-17px mr-4 cursor-pointer'}>
         <div
           style={{ display: theme === 'light' ? 'block' : 'none' }}

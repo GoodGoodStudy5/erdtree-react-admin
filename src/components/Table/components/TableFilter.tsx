@@ -1,9 +1,9 @@
 import { type TableProps, type CheckboxProps, Button, Popover, Divider, Checkbox } from 'antd';
 import { useState, memo } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
 import { TableColumn } from '#/public';
 import { DragContent } from './DragContent';
+import { $t } from '@/locales';
 
 /**
  * 表格字段筛选
@@ -49,7 +49,6 @@ const filterColumns = (columns: TableProps['columns']) => {
 
 function TableFilter(props: Props) {
   const { columns, cacheColumns, className, getTableChecks } = props;
-  const { t } = useTranslation();
   const [isOpen, setOpen] = useState(false);
   // 首屏字段勾选状态由 columns 播种, 后续由用户勾选与拖拽接管
   const [list, setList] = useState<CheckboxList[]>(() => filterColumns(columns).list);
@@ -131,7 +130,7 @@ function TableFilter(props: Props) {
             onChange={onCheckAllChange}
             checked={checkAll}
           >
-            {t('public.checkAll')}
+            {$t('public.checkAll')}
           </Checkbox>
         </div>
 
@@ -148,7 +147,7 @@ function TableFilter(props: Props) {
         <Divider className="!mt-10px !mb-5px" />
 
         <Button className="flex-1 text-center" type="link" size="small" onClick={handleReset}>
-          {t('public.reset')}
+          {$t('public.reset')}
         </Button>
       </div>
     );
@@ -169,7 +168,7 @@ function TableFilter(props: Props) {
     >
       <div {...params} className={`${className} inline-block`}>
         <Button icon={<SettingOutlined />} className="small-btn">
-          {t('public.columnFilter')}
+          {$t('public.columnFilter')}
         </Button>
       </div>
     </Popover>

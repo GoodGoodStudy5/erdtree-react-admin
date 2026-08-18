@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
+import { $t } from '@/locales';
 
 /** 表单项懒加载期间的占位 */
 export function LoadingComponent() {
-  const { t } = useTranslation();
   const [num, setNum] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -38,7 +38,7 @@ export function LoadingComponent() {
 
   return (
     <div className="flex items-center text-gray-500">
-      <div>{t('public.loading')}</div>
+      <div>{$t('public.loading')}</div>
       <div className="ml-2px tracking-2px">{renderDots()}</div>
     </div>
   );

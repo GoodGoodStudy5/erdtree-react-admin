@@ -5,7 +5,6 @@ import { Skeleton, message } from 'antd';
 import { debounce } from 'lodash';
 import { useShallow } from 'zustand/shallow';
 import { useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { motion } from 'motion/react';
 import { versionCheck } from './utils/helper';
 import { getMenuList } from '@/servers';
@@ -23,7 +22,6 @@ import styles from './index.module.less';
 
 function Layout() {
   const [getToken] = useToken();
-  const { t } = useTranslation();
   const { pathname } = useLocation();
   const token = getToken();
   const outlet = useOutlet();
@@ -113,7 +111,7 @@ function Layout() {
     nprogress?.done?.();
 
     requestAnimationFrame(() => {
-      versionCheck(t, messageApi);
+      versionCheck(messageApi);
     });
 
     return () => {

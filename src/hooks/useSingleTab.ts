@@ -1,5 +1,4 @@
 import type { TabsData } from '@/stores';
-import { useTranslation } from 'react-i18next';
 import { getMenuByKey, getMenuName, getOpenMenuByRouter } from '@/menus';
 import { ADD_TITLE, EDIT_TITLE } from '@/utils';
 import { setTitle } from '@/utils';
@@ -8,6 +7,7 @@ import { useLocation } from 'react-router-dom';
 import { useCallback, useEffect } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { useMenuStore, useTabsStore } from '@/stores';
+import { i18n } from '@/locales';
 
 interface Props {
   fatherPath: string;
@@ -24,7 +24,6 @@ interface Props {
  */
 export function useSingleTab(props: Props) {
   const { fatherPath, zhTitle, enTitle, name } = props;
-  const { t, i18n } = useTranslation();
   const { pathname, search } = useLocation();
   const { setOpenKeys, setSelectedKeys } = useMenuStore((state) => state);
   const { isPhone, isCollapsed, menuList, permissions } = useCommonStore();
@@ -58,11 +57,11 @@ export function useSingleTab(props: Props) {
 
     if (!title) {
       const menuName = getMenuName(menuList, fatherPath, i18n.language);
-      newCreateTitle = `${title || ADD_TITLE(t)}${menuName}`;
-      newUpdateTitle = `${EDIT_TITLE(t, routeName, menuName)}`;
+      newCreateTitle = `${title || ADD_TITLE()}${menuName}`;
+      newUpdateTitle = `${EDIT_TITLE(routeName, menuName)}`;
     } else {
       const label = routeName ? `(${routeName})` : '';
-      newCreateTitle = `${title || ADD_TITLE(t)}${label}`;
+      newCreateTitle = `${title || ADD_TITLE()}${label}`;
       newUpdateTitle = `${title}${label}`;
     }
     result = routeName ? newUpdateTitle : newCreateTitle;
@@ -72,7 +71,7 @@ export function useSingleTab(props: Props) {
   /** 初始化操作 */
   const handleInit = useCallback(() => {
     const title = handleGetTitle();
-    setTitle(t, title);
+    setTitle(title);
     const newOpenKey = getOpenMenuByRouter(fatherPath);
     if (!isPhone && !isCollapsed) {
       setOpenKeys(newOpenKey);

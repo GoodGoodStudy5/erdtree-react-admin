@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo, useRef, lazy, Suspense } from 'react';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { message } from '@south/message';
 import { getLocalInfo } from '@south/utils';
 import { TOKEN } from '@/utils';
 import { Spin } from 'antd';
+import { $t } from '@/locales';
 
 // 懒加载 Layout 组件，减少首屏加载体积
 const Layout = lazy(() => import('@/layouts'));
@@ -19,7 +19,6 @@ function getTokenSync() {
 }
 
 function Guards() {
-  const { t } = useTranslation();
   const outlet = useOutlet();
   const navigate = useNavigate();
   const location = useLocation();
@@ -71,7 +70,7 @@ function Guards() {
       // 如果是跳转到登录页，显示提示信息
       if (redirectPath.startsWith('/login') && location.pathname !== '/') {
         message.warning({
-          content: t('public.noLoginVisit'),
+          content: $t('public.noLoginVisit'),
           key: 'noLoginVisit',
         });
       }
@@ -85,7 +84,7 @@ function Guards() {
         clearTimeout(timer);
       };
     }
-  }, [shouldRedirect, redirectPath, navigate, location.pathname, t]);
+  }, [shouldRedirect, redirectPath, navigate, location.pathname]);
 
   // 使用 useMemo 缓存 Layout 组件，只在 token 和 isValid 变化时重新渲染
   const layoutElement = useMemo(() => {

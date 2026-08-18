@@ -1,8 +1,8 @@
 import type { ButtonProps } from 'antd';
 import { Button, message } from 'antd';
 import { Icon } from '@iconify/react';
-import { useTranslation } from 'react-i18next';
 import { useClipboard } from '@/hooks';
+import { $t } from '@/locales';
 
 interface Props extends ButtonProps {
   text: string;
@@ -12,17 +12,16 @@ interface Props extends ButtonProps {
 /** 复制按钮, 成功与失败都以全局提示反馈 */
 export function CopyBtn(props: Props) {
   const { text, value } = props;
-  const { t } = useTranslation();
   const [isCopied, error, copyText] = useClipboard();
   const [messageApi, contextHolder] = message.useMessage();
 
   useEffect(() => {
     if (isCopied && !error) {
-      messageApi.success({ content: t('public.copySuccessfully'), key: 'copy' });
+      messageApi.success({ content: $t('public.copySuccessfully'), key: 'copy' });
     }
 
     if (error) {
-      messageApi.warning({ content: error || t('public.copyFailed'), key: 'copy' });
+      messageApi.warning({ content: error || $t('public.copyFailed'), key: 'copy' });
     }
   }, [isCopied, error]);
 
@@ -32,7 +31,7 @@ export function CopyBtn(props: Props) {
       copyText(value);
     } catch (e) {
       console.error(e);
-      messageApi.warning({ content: t('public.copyFailed'), key: 'copy' });
+      messageApi.warning({ content: $t('public.copyFailed'), key: 'copy' });
     }
   };
 

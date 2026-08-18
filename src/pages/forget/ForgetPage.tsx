@@ -6,6 +6,7 @@ import { setTitle } from '@/utils';
 import { message as globalMessage } from '@south/message';
 import { forgetPassword } from '@/servers';
 import Logo from '@/assets/images/logo.svg';
+import { $t, i18n } from '@/locales';
 
 interface ForgetData {
   username: string;
@@ -16,7 +17,6 @@ interface ForgetData {
 }
 
 function ForgetPage() {
-  const { t, i18n } = useTranslation();
   const { search } = useLocation();
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -48,7 +48,7 @@ function ForgetPage() {
 
   // 语言切换修改title
   useEffect(() => {
-    setTitle(t, t('login.resetPassword'));
+    setTitle($t('login.resetPassword'));
   }, [i18n.language]);
 
   /**
@@ -59,7 +59,7 @@ function ForgetPage() {
     // 当密码和确认密码不同时则提示错误
     if (values.newPassword !== values.confirmPassword) {
       return messageApi.warning({
-        content: t('login.confirmPasswordMessage'),
+        content: $t('login.confirmPasswordMessage'),
         key: 'confirmPassword',
       });
     }
@@ -70,7 +70,7 @@ function ForgetPage() {
       if (Number(code) !== 200) return;
 
       globalMessage.success({
-        content: t('login.verificationPassed'),
+        content: $t('login.verificationPassed'),
         key: 'success',
       });
       navigate(`/login${search}`);
@@ -93,7 +93,7 @@ function ForgetPage() {
 
     if (!phone) {
       return messageApi.warning({
-        content: t('public.pleaseEnter', { name: t('login.phoneNumber') }),
+        content: $t('public.pleaseEnter', { name: $t('login.phoneNumber') }),
         key: 'phone',
       });
     }
@@ -102,7 +102,7 @@ function ForgetPage() {
     const phoneReg = /^1[3-9]\d{9}$/;
     if (!phoneReg.test(phone)) {
       return messageApi.warning({
-        content: t('login.phoneNumberError'),
+        content: $t('login.phoneNumberError'),
         key: 'phone',
       });
     }
@@ -155,7 +155,7 @@ function ForgetPage() {
         >
           <div className="pb-30px flex items-center justify-center">
             <img className="mr-2 object-contain" width="32" height="32" src={Logo} alt="LOGO" />
-            <span className="text-22px font-bold tracking-2px">{t('login.resetPassword')}</span>
+            <span className="text-22px font-bold tracking-2px">{$t('login.resetPassword')}</span>
           </div>
           <Form
             form={form}
@@ -167,20 +167,33 @@ function ForgetPage() {
             <Form.Item
               name="username"
               rules={[
-                { required: true, message: t('public.pleaseEnter', { name: t('login.username') }) },
+                {
+                  required: true,
+                  message: $t('public.pleaseEnter', { name: $t('login.username') }),
+                },
               ]}
             >
-              <Input allow-clear="true" placeholder={t('login.username')} autoComplete="username" />
+              <Input
+                allow-clear="true"
+                placeholder={$t('login.username')}
+                autoComplete="username"
+              />
             </Form.Item>
 
             <Form.Item
               name="newPassword"
               rules={[
-                { required: true, message: t('public.pleaseEnter', { name: t('login.password') }) },
-                PASSWORD_RULE(t),
+                {
+                  required: true,
+                  message: $t('public.pleaseEnter', { name: $t('login.password') }),
+                },
+                PASSWORD_RULE(),
               ]}
             >
-              <PasswordStrength placeholder={t('login.password')} autoComplete="current-password" />
+              <PasswordStrength
+                placeholder={$t('login.password')}
+                autoComplete="current-password"
+              />
             </Form.Item>
 
             <Form.Item
@@ -188,13 +201,13 @@ function ForgetPage() {
               rules={[
                 {
                   required: true,
-                  message: t('public.pleaseEnter', { name: t('login.confirmPassword') }),
+                  message: $t('public.pleaseEnter', { name: $t('login.confirmPassword') }),
                 },
-                PASSWORD_RULE(t),
+                PASSWORD_RULE(),
               ]}
             >
               <PasswordStrength
-                placeholder={t('login.confirmPassword')}
+                placeholder={$t('login.confirmPassword')}
                 autoComplete="current-password"
               />
             </Form.Item>
@@ -204,15 +217,15 @@ function ForgetPage() {
               rules={[
                 {
                   required: true,
-                  message: t('public.pleaseEnter', { name: t('login.phoneNumber') }),
+                  message: $t('public.pleaseEnter', { name: $t('login.phoneNumber') }),
                 },
-                { pattern: /^1[3-9]\d{9}$/, message: t('login.phoneNumberError') },
+                { pattern: /^1[3-9]\d{9}$/, message: $t('login.phoneNumberError') },
               ]}
             >
               <InputNumber
                 controls={false}
                 className="!w-full"
-                placeholder={t('login.phoneNumber')}
+                placeholder={$t('login.phoneNumber')}
                 autoComplete="phone"
               />
             </Form.Item>
@@ -223,14 +236,14 @@ function ForgetPage() {
                 rules={[
                   {
                     required: true,
-                    message: t('public.pleaseEnter', { name: t('login.verificationCode') }),
+                    message: $t('public.pleaseEnter', { name: $t('login.verificationCode') }),
                   },
                 ]}
               >
                 <InputNumber
                   controls={false}
                   className="!w-210px"
-                  placeholder={t('login.verificationCode')}
+                  placeholder={$t('login.verificationCode')}
                 />
               </Form.Item>
 
@@ -241,9 +254,9 @@ function ForgetPage() {
                 onClick={onVerificationCode}
               >
                 {verificationTime > 0 ? (
-                  <span>{t('login.reacquire', { time: verificationTime })}</span>
+                  <span>{$t('login.reacquire', { time: verificationTime })}</span>
                 ) : (
-                  t('login.getVerificationCode')
+                  $t('login.getVerificationCode')
                 )}
               </Button>
             </div>
@@ -254,7 +267,7 @@ function ForgetPage() {
               className="w-full mt-5px rounded-5px tracking-2px"
               loading={isLoading}
             >
-              {t('public.confirm')}
+              {$t('public.confirm')}
             </Button>
           </Form>
 
@@ -263,7 +276,7 @@ function ForgetPage() {
             className="w-full mt-12px mb-10px rounded-5px tracking-2px"
             onClick={() => navigate(`/login${search}`)}
           >
-            {t('public.back')}
+            {$t('public.back')}
           </Button>
         </div>
       </div>

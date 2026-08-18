@@ -1,8 +1,8 @@
-import type { TFunction } from 'i18next';
 import type { FormItemProps } from 'antd';
 import type { ComponentProps, ComponentType, BaseFormList } from '#/form';
 import { cloneDeep } from 'lodash';
 import { DATE_FORMAT, TIME_PICKER_FORMAT } from '@/utils';
+import { $t } from '@/locales';
 
 /**
  * 处理子节点的值的属性
@@ -25,13 +25,13 @@ export function handleValuePropName(component: ComponentType): string {
  * 初始化组件自定义属性
  * @param component - 组件名
  */
-export function initCompProps(t: TFunction, component: ComponentType): ComponentProps {
+export function initCompProps(component: ComponentType): ComponentProps {
   switch (component) {
     // 输入框
     case 'Input':
       return {
         allowClear: true,
-        placeholder: t('public.inputPleaseEnter'),
+        placeholder: $t('public.inputPleaseEnter'),
       };
 
     // 下拉框
@@ -39,7 +39,7 @@ export function initCompProps(t: TFunction, component: ComponentType): Component
       return {
         allowClear: true,
         showSearch: true,
-        placeholder: t('public.inputPleaseSelect'),
+        placeholder: $t('public.inputPleaseSelect'),
       };
 
     // 树形下拉框
@@ -47,13 +47,13 @@ export function initCompProps(t: TFunction, component: ComponentType): Component
       return {
         allowClear: true,
         showSearch: true,
-        placeholder: t('public.inputPleaseSelect'),
+        placeholder: $t('public.inputPleaseSelect'),
       };
 
     // 数字框
     case 'InputNumber':
       return {
-        placeholder: t('public.inputPleaseEnter'),
+        placeholder: $t('public.inputPleaseEnter'),
       };
 
     // 勾选框
@@ -67,28 +67,28 @@ export function initCompProps(t: TFunction, component: ComponentType): Component
     // 日期
     case 'DatePicker':
       return {
-        placeholder: t('public.inputPleaseSelect'),
+        placeholder: $t('public.inputPleaseSelect'),
         format: DATE_FORMAT,
       };
 
     // 日期区间
     case 'RangePicker':
       return {
-        placeholder: [t('public.inputPleaseSelect'), t('public.inputPleaseSelect')],
+        placeholder: [$t('public.inputPleaseSelect'), $t('public.inputPleaseSelect')],
         format: [DATE_FORMAT, DATE_FORMAT],
       };
 
     // 时间
     case 'TimePicker':
       return {
-        placeholder: t('public.inputPleaseSelect'),
+        placeholder: $t('public.inputPleaseSelect'),
         format: TIME_PICKER_FORMAT,
       };
 
     // 时间区间
     case 'TimeRangePicker':
       return {
-        placeholder: [t('public.inputPleaseSelect'), t('public.inputPleaseSelect')],
+        placeholder: [$t('public.inputPleaseSelect'), $t('public.inputPleaseSelect')],
         format: [TIME_PICKER_FORMAT, TIME_PICKER_FORMAT],
       };
 

@@ -1,8 +1,8 @@
 import type { BreadcrumbProps } from 'antd';
 import type { NavData } from '@/menus';
 import { useCallback, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/hooks';
+import { i18n } from '@/locales';
 
 interface Props {
   className?: string;
@@ -11,7 +11,6 @@ interface Props {
 
 function Nav(props: Props) {
   const { className, list } = props;
-  const { i18n } = useTranslation();
   // 是否手机端
   const { isPhone } = useCommonStore();
 

@@ -1,9 +1,9 @@
 import '@wangeditor/editor/dist/css/style.css';
 import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
 import { useState, useEffect, type HTMLAttributes } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Editor, Toolbar } from '@wangeditor/editor-for-react';
 import { FILE_API } from '@/utils';
+import { $t } from '@/locales';
 
 /** 富文本编辑器参数 */
 export interface EditorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
@@ -15,7 +15,6 @@ export interface EditorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onCha
 /** 富文本编辑器 */
 export function WangEditor(props: EditorProps) {
   const { value, height, style, className, onChange } = props;
-  const { t } = useTranslation();
 
   // editor 实例
   const [editor, setEditor] = useState<IDomEditor | null>(null);
@@ -25,7 +24,7 @@ export function WangEditor(props: EditorProps) {
 
   // 编辑器配置
   const editorConfig: Partial<IEditorConfig> = {
-    placeholder: t('public.inputPleaseEnter'),
+    placeholder: $t('public.inputPleaseEnter'),
     MENU_CONF: {
       uploadImage: {
         // 上传图片地址

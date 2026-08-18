@@ -5,7 +5,6 @@ import { useCallback, useMemo, memo } from 'react';
 import { Menu } from 'antd';
 import { isUrl } from '@/utils';
 import { Icon } from '@iconify/react';
-import { useTranslation } from 'react-i18next';
 import { useCommonStore } from '@/hooks';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMenuStore, getTabTitle } from '@/stores';
@@ -21,6 +20,7 @@ import {
 import styles from '../index.module.less';
 import Logo from '@/assets/images/logo.svg';
 import { setTitle } from '@/utils';
+import { $t, i18n } from '@/locales';
 
 /**
  * 转换菜单icon格式
@@ -45,7 +45,6 @@ const filterMenuIcon = (menus: SideMenu[]): SideMenu[] => {
 
 function LayoutMenu() {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
   const { pathname } = useLocation();
 
   const { tabs, setActiveKey, addTabs, setNav } = useTabsStore(
@@ -144,7 +143,7 @@ function LayoutMenu() {
 
         // 刷新标题
         const title = getTabTitle(tabs, key);
-        if (title) setTitle(t, title);
+        if (title) setTitle(title);
 
         requestAnimationFrame(() => {
           navigate(key);
@@ -247,7 +246,7 @@ function LayoutMenu() {
       <div className={menuClassName}>
         <div className={logoClassName} onClick={onClickLogo}>
           <img src={Logo} width={30} height={30} className="object-contain" alt="logo" />
-          <span className={titleClassName}>{t('public.currentName')}</span>
+          <span className={titleClassName}>{$t('public.currentName')}</span>
         </div>
 
         <Menu

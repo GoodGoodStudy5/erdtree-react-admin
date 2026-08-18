@@ -1,11 +1,10 @@
 import type { EChartsCoreOption } from 'echarts';
+import { $t } from '@/locales';
 
 function Line() {
-  const { t } = useTranslation();
-
   const option: EChartsCoreOption = {
     title: {
-      text: t('dashboard.effectiveRechargeRatio'),
+      text: $t('dashboard.effectiveRechargeRatio'),
       left: 30,
       top: 5,
     },
@@ -28,7 +27,7 @@ function Line() {
     },
     series: [
       {
-        name: t('dashboard.rechargeAmount'),
+        name: $t('dashboard.rechargeAmount'),
         type: 'line',
         areaStyle: {
           color: '#1890ff',
@@ -40,7 +39,7 @@ function Line() {
         data: [120, 140, 120, 190, 150, 111, 160],
       },
       {
-        name: t('dashboard.usersNumber'),
+        name: $t('dashboard.usersNumber'),
         type: 'line',
         areaStyle: {
           color: '#1890ff',

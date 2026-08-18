@@ -6,13 +6,13 @@ import { debounce } from 'lodash';
 import { Modal, Input } from 'antd';
 import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useKeyStroke } from '@/hooks';
 import { getMenuByKey, getOpenMenuByRouter, searchMenuValue } from '@/menus';
 import { useCommonStore } from '@/hooks';
 import { useMenuStore, useTabsStore } from '@/stores';
 import { SearchResult } from './SearchResult';
 import { SearchFooter } from './SearchFooter';
+import { $t } from '@/locales';
 
 /** 全局搜索弹窗参数 */
 export interface SearchModalProps {
@@ -28,7 +28,6 @@ export function SearchModal(props: Props) {
   const navigate = useNavigate();
   const inputRef = useRef<InputRef>(null);
   const { modalRef } = props;
-  const { t } = useTranslation();
   const { permissions, menuList } = useCommonStore();
   const [value, setValue] = useState(''); // 输入框值
   const [active, setActive] = useState(''); // 选中值
@@ -174,7 +173,7 @@ export function SearchModal(props: Props) {
       <Input
         ref={inputRef}
         value={value}
-        placeholder={t('public.menuSearchPlaceholder')}
+        placeholder={$t('public.menuSearchPlaceholder')}
         allowClear={true}
         prefix={<Icon className="text-lg text-warm-gray-400" icon="ant-design:search-outlined" />}
         onChange={onChange}

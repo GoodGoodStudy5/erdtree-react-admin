@@ -6,6 +6,7 @@ import { message } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { searchList, tableColumns } from './model';
 import { batchDeleteLog, deleteLog, getLogPage } from '@/servers';
+import { $t } from '@/locales';
 
 // 当前行数据
 interface RowData {
@@ -14,7 +15,6 @@ interface RowData {
 }
 
 function LogPage() {
-  const { t } = useTranslation();
   const [isFetch, setFetch] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [searchData, setSearchData] = useState<BaseFormData>({});
@@ -88,7 +88,7 @@ function LogPage() {
       setLoading(true);
       const { code, message } = await deleteLog(id);
       if (Number(code) === 200) {
-        messageApi.success(message || t('public.successfullyDeleted'));
+        messageApi.success(message || $t('public.successfullyDeleted'));
         getPage();
       }
     } finally {
@@ -101,7 +101,7 @@ function LogPage() {
     try {
       if (!selectedRowKeys.length) {
         return messageApi.warning({
-          content: t('public.tableSelectWarning'),
+          content: $t('public.tableSelectWarning'),
           key: 'pleaseSelect',
         });
       }
@@ -109,7 +109,7 @@ function LogPage() {
       const params = { ids: selectedRowKeys };
       const { code, message } = await batchDeleteLog(params);
       if (Number(code) === 200) {
-        messageApi.success(message || t('public.successfullyDeleted'));
+        messageApi.success(message || $t('public.successfullyDeleted'));
         setSelectedRowKeys([]);
         getPage();
       }
@@ -165,7 +165,7 @@ function LogPage() {
   );
 
   // 缓存列配置
-  const columns = useMemo(() => tableColumns(t, optionRender), [t, optionRender]);
+  const columns = useMemo(() => tableColumns(optionRender), [optionRender]);
 
   /** 左侧渲染 */
   const leftContentRender = (
@@ -182,7 +182,7 @@ function LogPage() {
       {contextHolder}
       <BaseCard>
         <BaseSearch
-          list={searchList(t)}
+          list={searchList()}
           data={searchData}
           isLoading={isLoading}
           handleFinish={onSearch}

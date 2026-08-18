@@ -2,9 +2,9 @@ import type { ApiPageSelectProps } from './types';
 import type { DefaultOptionType, SelectProps } from 'antd/es/select';
 import { Select, Spin } from 'antd';
 import { MAX_TAG_COUNT } from './constants';
-import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback, memo } from 'react';
 import { Loading } from './components/Loading';
+import { $t } from '@/locales';
 
 /**
  * @description: 根据API获取分页数据下拉组件
@@ -18,7 +18,6 @@ function ApiPageSelect(props: ApiPageSelectProps) {
     pageSize = 20,
     onSearch,
   } = props;
-  const { t } = useTranslation();
   const [isLoading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(page);
   const [options, setOptions] = useState<DefaultOptionType[]>([]);
@@ -85,8 +84,8 @@ function ApiPageSelect(props: ApiPageSelectProps) {
               if (prev.length) {
                 return prev.concat([
                   {
-                    [props?.fieldNames?.label || 'label']: t('public.noMoreData'),
-                    [props?.fieldNames?.value || 'value']: t('public.noMoreData'),
+                    [props?.fieldNames?.label || 'label']: $t('public.noMoreData'),
+                    [props?.fieldNames?.value || 'value']: $t('public.noMoreData'),
                     disabled: true,
                     className: 'text-center',
                   },
@@ -109,7 +108,6 @@ function ApiPageSelect(props: ApiPageSelectProps) {
       pageSizeKey,
       queryKey,
       pageSize,
-      t,
     ],
   );
 
@@ -176,7 +174,7 @@ function ApiPageSelect(props: ApiPageSelectProps) {
       allowClear
       showSearch
       maxTagCount={MAX_TAG_COUNT}
-      placeholder={t('public.inputPleaseSelect')}
+      placeholder={$t('public.inputPleaseSelect')}
       optionFilterProp={params?.fieldNames?.label || 'label'}
       {...params}
       onSearch={handleSearch}

@@ -1,10 +1,10 @@
-import type { TFunction } from 'i18next';
 import { AuthorizeSelect } from './components';
+import { $t } from '@/locales';
 
 // 搜索数据
-export const searchList = (t: TFunction): BaseSearchList[] => [
+export const searchList = (): BaseSearchList[] => [
   {
-    label: t('public.name'),
+    label: $t('public.name'),
     name: 'name',
     component: 'Input',
   },
@@ -14,7 +14,7 @@ export const searchList = (t: TFunction): BaseSearchList[] => [
  * 表格数据
  * @param optionRender - 渲染操作函数
  */
-export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): TableColumn[] => {
+export const tableColumns = (optionRender: TableOptions<object>): TableColumn[] => {
   return [
     {
       title: 'ID',
@@ -22,27 +22,27 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
       width: 200,
     },
     {
-      title: t('public.name'),
+      title: $t('public.name'),
       dataIndex: 'name',
       width: 200,
     },
     {
-      title: t('system.description'),
+      title: $t('system.description'),
       dataIndex: 'description',
       width: 200,
     },
     {
-      title: t('public.creationTime'),
+      title: $t('public.creationTime'),
       dataIndex: 'createdAt',
       width: 200,
     },
     {
-      title: t('public.updateTime'),
+      title: $t('public.updateTime'),
       dataIndex: 'updatedAt',
       width: 200,
     },
     {
-      title: t('public.operate'),
+      title: $t('public.operate'),
       dataIndex: 'operate',
       width: 200,
       fixed: 'right',
@@ -52,20 +52,20 @@ export const tableColumns = (t: TFunction, optionRender: TableOptions<object>): 
 };
 
 // 新增数据
-export const createList = (t: TFunction, id: string): BaseFormList[] => [
+export const createList = (id: string): BaseFormList[] => [
   {
-    label: t('public.name'),
+    label: $t('public.name'),
     name: 'name',
     rules: FORM_REQUIRED,
     component: 'Input',
   },
   {
-    label: t('system.description'),
+    label: $t('system.description'),
     name: 'description',
     component: 'TextArea',
   },
   {
-    label: t('system.authorize'),
+    label: $t('system.authorize'),
     name: 'authorize',
     rules: FORM_REQUIRED,
     component: 'customize',

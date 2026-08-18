@@ -4,11 +4,11 @@ import type { ColProps, FormInstance } from 'antd';
 import { useEffect } from 'react';
 import { FormProps } from 'antd';
 import { Form } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { getComponent } from './utils/componentMap';
 import { filterEmptyStr, filterFormItem, handleValuePropName } from './utils/helper';
 import { filterDayjs } from '../Dates/utils/helper';
 import { CreateBusiness } from '../Business';
+import { $t } from '@/locales';
 
 // 业务组件在表单能力加载时一次性注册进组件表
 CreateBusiness();
@@ -30,7 +30,6 @@ interface Props extends FormProps {
 export const BaseForm = (props: Props) => {
   const { ref, list, data, form, style, className, children, labelCol, wrapperCol, handleFinish } =
     props;
-  const { t } = useTranslation();
 
   // 清除多余参数
   const formProps: Partial<Props> = { ...props };
@@ -45,13 +44,13 @@ export const BaseForm = (props: Props) => {
   }, [form, props.data]);
 
   const validateMessages = {
-    required: t('public.requiredForm', { label: '${label}' }),
+    required: $t('public.requiredForm', { label: '${label}' }),
     types: {
-      email: t('public.validateEmail', { label: '${label}' }),
-      number: t('public.validateNumber', { label: '${label}' }),
+      email: $t('public.validateEmail', { label: '${label}' }),
+      number: $t('public.validateNumber', { label: '${label}' }),
     },
     number: {
-      range: t('public.validateRange', { label: '${label}', max: '${max}', min: '${min}' }),
+      range: $t('public.validateRange', { label: '${label}', max: '${max}', min: '${min}' }),
     },
   };
 
@@ -83,7 +82,7 @@ export const BaseForm = (props: Props) => {
    */
   const renderFormItem = (item: BaseFormList) => (
     <Form.Item {...filterFormItem(item)} valuePropName={handleValuePropName(item.component)}>
-      {getComponent(t, item, form)}
+      {getComponent(item, form)}
     </Form.Item>
   );
 

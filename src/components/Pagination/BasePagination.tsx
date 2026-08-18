@@ -1,18 +1,16 @@
 import type { PaginationProps } from 'antd';
 import { Pagination } from 'antd';
-import { useTranslation } from 'react-i18next';
 import './index.less';
+import { $t } from '@/locales';
 
 /** 分页器, 总数文案随界面语言切换 */
 export function BasePagination(props: PaginationProps) {
-  const { t } = useTranslation();
-
   /**
    * 显示总数
    * @param total - 总数
    */
   const showTotal = (total?: number): string => {
-    return t('public.totalNum', { num: total || 0 });
+    return $t('public.totalNum', { num: total || 0 });
   };
 
   return (

@@ -1,13 +1,12 @@
 import { Select, type SelectProps } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { MAX_TAG_COUNT } from './constants';
+import { $t } from '@/locales';
 
 /**
  * @description: 基础下拉组件
  */
 export function BaseSelect(props: SelectProps) {
   const { options } = props;
-  const { t } = useTranslation();
 
   const currentOptions =
     options?.map((item) => {
@@ -23,7 +22,7 @@ export function BaseSelect(props: SelectProps) {
       allowClear
       showSearch
       maxTagCount={MAX_TAG_COUNT}
-      placeholder={t('public.inputPleaseSelect')}
+      placeholder={$t('public.inputPleaseSelect')}
       optionFilterProp={props?.fieldNames?.label || 'label'}
       {...props}
       options={currentOptions}

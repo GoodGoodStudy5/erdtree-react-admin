@@ -1,7 +1,7 @@
 import type { ButtonProps } from 'antd';
 import { Button, Popconfirm } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { DeleteOutlined } from '@ant-design/icons';
+import { $t } from '@/locales';
 
 interface Props extends ButtonProps {
   isLoading?: boolean;
@@ -24,7 +24,6 @@ export function DeleteBtn(props: Props) {
     className,
     handleDelete,
   } = props;
-  const { t } = useTranslation();
 
   // 清除自定义属性
   const params: Partial<Props> = { ...props };
@@ -35,8 +34,8 @@ export function DeleteBtn(props: Props) {
 
   return (
     <Popconfirm
-      title={t('public.kindTips')}
-      description={t(
+      title={$t('public.kindTips')}
+      description={$t(
         btnType === 'delete' ? 'public.deleteConfirmMessage' : 'public.batchDeleteConfirmMessage',
         { name: name ? ` ${name} ` : '' },
       )}
@@ -50,7 +49,7 @@ export function DeleteBtn(props: Props) {
         icon={params?.icon || (isIcon && <DeleteOutlined />)}
         loading={!!isLoading || loading}
       >
-        {customizeTitle || btnType === 'delete' ? t('public.delete') : t('public.batchDelete')}
+        {customizeTitle || btnType === 'delete' ? $t('public.delete') : $t('public.batchDelete')}
       </Button>
     </Popconfirm>
   );

@@ -2,14 +2,13 @@ import type { SearchModalProps } from './components/SearchModal';
 import { useRef } from 'react';
 import { Tooltip } from 'antd';
 import { Icon } from '@iconify/react';
-import { useTranslation } from 'react-i18next';
 import { SearchModal } from './components/SearchModal';
+import { $t } from '@/locales';
 
 /**
  * @description: 全局搜索菜单组件
  */
 export function GlobalSearch() {
-  const { t } = useTranslation();
   const modalRef = useRef<SearchModalProps>(null);
 
   /** 切换显示 */
@@ -19,7 +18,7 @@ export function GlobalSearch() {
 
   return (
     <>
-      <Tooltip title={t('public.search')}>
+      <Tooltip title={$t('public.search')}>
         <Icon
           className="flex items-center justify-center text-lg mr-3 cursor-pointer"
           icon="uil-search"

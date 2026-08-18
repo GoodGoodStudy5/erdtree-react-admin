@@ -14,7 +14,7 @@ import '@/assets/css/theme-color.less';
 import '@/utils/icons';
 
 // 国际化i18n
-import './locales/config';
+import '@/locales';
 
 // antd
 import '@/assets/css/antd.less';

@@ -1,10 +1,10 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Icon } from '@iconify/react';
 import { Input, Tooltip, type InputProps } from 'antd';
+import { $t } from '@/locales';
 
 function IconInput(props: InputProps) {
   const { value, onChange } = props;
-  const { t } = useTranslation();
 
   return (
     <div className="flex items-center">
@@ -30,7 +30,7 @@ function IconInput(props: InputProps) {
         <Icon icon={value as string} className="text-16px" />
       </div>
 
-      <Tooltip title={t('systems:menu.helpIcon')}>
+      <Tooltip title={$t('systems:menu.helpIcon')}>
         <div
           className="pl-10px pr-2px cursor-pointer"
           onClick={() => window.open('https://icon-sets.iconify.design', '_blank')}
