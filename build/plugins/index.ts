@@ -1,9 +1,9 @@
 import type { PluginOption } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { timePlugin } from './time';
-import { nojekyllPlugin } from './nojekyll';
-import { autoImportPlugin } from './autoImport';
-import { versionUpdatePlugin } from './version';
+import { timePlugin } from './time.ts';
+import { nojekyllPlugin } from './nojekyll.ts';
+import { autoImportPlugin } from './autoImport.ts';
+import { versionUpdatePlugin } from './version.ts';
 import react from '@vitejs/plugin-react';
 import unocss from 'unocss/vite';
 import legacy from '@vitejs/plugin-legacy';

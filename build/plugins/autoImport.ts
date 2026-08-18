@@ -38,7 +38,7 @@ export const autoImportPlugin = (): PluginOption => {
         // 处理 @/ 开头的路径别名
         if (name.startsWith('@/')) {
           return {
-            from: name.replace('@/', path.resolve(__dirname, 'src/') + '/'),
+            from: name.replace('@/', path.resolve(process.cwd(), 'src/') + '/'),
           };
         }
       },

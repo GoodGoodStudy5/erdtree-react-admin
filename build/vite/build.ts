@@ -1,5 +1,5 @@
 import type { BuildOptions } from 'vite';
-import { splitJSModules } from '../utils/helper';
+import { splitJSModules } from '../utils/helper.ts';
 
 /**
  * @description 分包配置
