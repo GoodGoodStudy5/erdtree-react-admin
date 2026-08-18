@@ -6,8 +6,7 @@ import { message } from '@south/message';
 import { useTranslation } from 'react-i18next';
 import { updatePassword } from '@/servers/login';
 import { PASSWORD_RULE } from '@/utils/config';
-import BaseModal from '@/components/Modal/BaseModal';
-import PasswordStrength from '@/components/PasswordStrength';
+import { BaseModal, PasswordStrength } from '@/components';
 
 export interface PasswordModal {
   open: () => void;

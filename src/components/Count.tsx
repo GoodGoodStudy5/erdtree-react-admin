@@ -7,7 +7,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
   end: number;
 }
 
-function Count(props: Props) {
+export function Count(props: Props) {
   const { prefix, start, end } = props;
   const [num, setNum] = useState(start);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -55,5 +55,3 @@ function Count(props: Props) {
     </span>
   );
 }
-
-export default Count;

@@ -11,7 +11,7 @@ export interface EditorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onCha
   height?: number; // 富文本高度
 }
 
-function WangEditor(props: EditorProps) {
+export function WangEditor(props: EditorProps) {
   const { value, height, style, className, onChange } = props;
   const { t } = useTranslation();
 
@@ -72,5 +72,3 @@ function WangEditor(props: EditorProps) {
     </div>
   );
 }
-
-export default WangEditor;

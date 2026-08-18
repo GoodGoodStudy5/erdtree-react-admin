@@ -6,7 +6,7 @@ import { useFullscreen } from '@/hooks/useFullscreen';
 /**
  * @description: 全屏组件
  */
-function Fullscreen() {
+export function Fullscreen() {
   const { t } = useTranslation();
   const [isFullscreen, toggleFullscreen] = useFullscreen();
 
@@ -25,5 +25,3 @@ function Fullscreen() {
     </Tooltip>
   );
 }
-
-export default Fullscreen;

@@ -75,11 +75,11 @@ lazyComponents.set(
 );
 lazyComponents.set(
   'Upload',
-  lazy(() => import('@/components/Upload/BaseUpload')),
+  lazy(() => import('../../BaseUpload').then((module) => ({ default: module.BaseUpload }))),
 );
 lazyComponents.set(
   'Transfer',
-  lazy(() => import('@/components/Transfer/BaseTransfer')),
+  lazy(() => import('../../BaseTransfer').then((module) => ({ default: module.BaseTransfer }))),
 );
 lazyComponents.set(
   'DatePicker',
@@ -117,7 +117,7 @@ lazyComponents.set(
 );
 lazyComponents.set(
   'RichEditor',
-  lazy(() => import('@/components/WangEditor')),
+  lazy(() => import('../../WangEditor').then((module) => ({ default: module.WangEditor }))),
 );
 
 // 创建一个包装组件，确保在Suspense加载期间也能保持表单数据

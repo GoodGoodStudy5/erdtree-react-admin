@@ -9,7 +9,7 @@ interface Props {
   children?: ReactNode;
 }
 
-function SubmitBottom(props: Props) {
+export function SubmitBottom(props: Props) {
   const { t } = useTranslation();
   const { goBack, handleSubmit, isLoading, children } = props;
 
@@ -42,5 +42,3 @@ function SubmitBottom(props: Props) {
     </div>
   );
 }
-
-export default SubmitBottom;

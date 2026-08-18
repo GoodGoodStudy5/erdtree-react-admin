@@ -1,8 +1,7 @@
 import type { FormProps } from 'antd';
 import { InputNumber, message } from 'antd';
 import { Form, Button, Input } from 'antd';
-import I18n from '@/components/I18n';
-import Theme from '@/components/Theme';
+import { I18n, Theme } from '@/components';
 import { setTitle } from '@/utils/helper';
 import { message as globalMessage } from '@south/message';
 import { forgetPassword } from '@/servers/login';

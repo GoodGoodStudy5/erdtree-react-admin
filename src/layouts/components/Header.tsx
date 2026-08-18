@@ -14,10 +14,7 @@ import {
 } from '@ant-design/icons';
 import Avatar from '@/assets/images/avatar.png';
 import styles from '../index.module.less';
-import Fullscreen from '@/components/Fullscreen';
-import GlobalSearch from '@/components/GlobalSearch';
-import I18n from '@/components/I18n';
-import Theme from '@/components/Theme';
+import { Fullscreen, GlobalSearch, I18n, Theme } from '@/components';
 import UpdatePassword from './UpdatePassword';
 import Nav from './Nav';
 

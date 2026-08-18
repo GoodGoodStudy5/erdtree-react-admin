@@ -6,7 +6,7 @@ interface Props {
   children: ReactNode;
 }
 
-function BaseContent(props: Props) {
+export function BaseContent(props: Props) {
   const { isPermission, children } = props;
 
   return (
@@ -24,5 +24,3 @@ function BaseContent(props: Props) {
     </>
   );
 }
-
-export default BaseContent;

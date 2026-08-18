@@ -1,6 +1,6 @@
 import { Button, Upload, type UploadProps } from 'antd';
 
-function BaseUpload(props: UploadProps) {
+export function BaseUpload(props: UploadProps) {
   const { t } = useTranslation();
   const [getToken] = useToken();
   const token = getToken();
@@ -11,5 +11,3 @@ function BaseUpload(props: UploadProps) {
     </Upload>
   );
 }
-
-export default BaseUpload;

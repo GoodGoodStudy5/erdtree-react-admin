@@ -12,7 +12,7 @@ import { useTabsStore } from '@/stores';
 
 export type Langs = 'zh' | 'en';
 
-function I18n() {
+export function I18n() {
   const { t, i18n } = useTranslation();
   const { pathname, search } = useLocation();
   const { tabs } = useTabsStore(useShallow((state) => state));
@@ -75,5 +75,3 @@ function I18n() {
     </Dropdown>
   );
 }
-
-export default I18n;

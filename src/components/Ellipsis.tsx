@@ -39,7 +39,7 @@ interface Props {
   children: string;
 }
 
-function Ellipsis(props: Props) {
+export function Ellipsis(props: Props) {
   const { tooltip, length, lines, fullWidthRecognition, children } = props;
 
   let content = children;
@@ -70,5 +70,3 @@ function Ellipsis(props: Props) {
     </>
   );
 }
-
-export default Ellipsis;

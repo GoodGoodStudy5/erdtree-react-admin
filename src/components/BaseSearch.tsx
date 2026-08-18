@@ -4,15 +4,11 @@ import { type CSSProperties, type ReactNode, type Ref, useEffect, useState, useM
 import { type FormProps, Button, Col, Flex } from 'antd';
 import { Form } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { filterDayjs } from '@/components/Dates';
+import { filterDayjs } from './Dates';
 import { useCommonStore } from '@/hooks/useCommonStore';
-import { getComponent } from '@/components/Form/utils/componentMap';
+import { getComponent } from './Form/utils/componentMap';
 import { SearchOutlined, ReloadOutlined, DownOutlined } from '@ant-design/icons';
-import {
-  filterEmptyStr,
-  filterFormItem,
-  handleValuePropName,
-} from '@/components/Form/utils/helper';
+import { filterEmptyStr, filterFormItem, handleValuePropName } from './Form/utils/helper';
 
 interface Props extends FormProps {
   list: BaseSearchList[];
@@ -34,7 +30,7 @@ interface Props extends FormProps {
   handleFinish: FormProps['onFinish'];
 }
 
-const BaseSearch = (props: Props) => {
+export const BaseSearch = (props: Props) => {
   const {
     ref,
     list,
@@ -280,5 +276,3 @@ const BaseSearch = (props: Props) => {
     </div>
   );
 };
-
-export default BaseSearch;

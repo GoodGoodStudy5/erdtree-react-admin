@@ -1,6 +1,6 @@
 import { HTMLAttributes } from 'react';
 
-function BaseCard(props: HTMLAttributes<unknown>) {
+export function BaseCard(props: HTMLAttributes<unknown>) {
   const { children, className } = props;
 
   return (
@@ -23,5 +23,3 @@ function BaseCard(props: HTMLAttributes<unknown>) {
     </div>
   );
 }
-
-export default BaseCard;
