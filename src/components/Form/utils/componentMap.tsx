@@ -75,11 +75,11 @@ lazyComponents.set(
 );
 lazyComponents.set(
   'Upload',
-  lazy(() => import('../../BaseUpload').then((module) => ({ default: module.BaseUpload }))),
+  lazy(() => import('../../Upload').then((module) => ({ default: module.BaseUpload }))),
 );
 lazyComponents.set(
   'Transfer',
-  lazy(() => import('../../BaseTransfer').then((module) => ({ default: module.BaseTransfer }))),
+  lazy(() => import('../../Transfer').then((module) => ({ default: module.BaseTransfer }))),
 );
 lazyComponents.set(
   'DatePicker',
