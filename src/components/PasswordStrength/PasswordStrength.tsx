@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { debounce } from 'lodash';
 import { Input } from 'antd';
-import StrengthBar from './components/StrengthBar';
+import { StrengthBar } from './components/StrengthBar';
 
 /**
  * @description: 密码强度组件
  */
-function PasswordStrength(props: InputProps) {
+export function PasswordStrength(props: InputProps) {
   const { value } = props;
   const { t } = useTranslation();
   const [strength, setStrength] = useState(0);
@@ -51,5 +51,3 @@ function PasswordStrength(props: InputProps) {
     </>
   );
 }
-
-export default PasswordStrength;

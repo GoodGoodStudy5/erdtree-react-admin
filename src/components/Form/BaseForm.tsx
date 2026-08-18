@@ -22,7 +22,7 @@ interface Props extends FormProps {
   handleFinish: FormProps['onFinish'];
 }
 
-const BaseForm = (props: Props) => {
+export const BaseForm = (props: Props) => {
   const { ref, list, data, form, style, className, children, labelCol, wrapperCol, handleFinish } =
     props;
   const { t } = useTranslation();
@@ -114,5 +114,3 @@ const BaseForm = (props: Props) => {
     </div>
   );
 };
-
-export default BaseForm;

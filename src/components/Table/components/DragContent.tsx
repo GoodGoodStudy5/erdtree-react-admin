@@ -60,7 +60,7 @@ function SortableItem(props: SortableItemProps) {
 }
 
 // 拖拽组件
-function DragContent(props: DragContentProps) {
+export function DragContent(props: DragContentProps) {
   const { list, handleDragEnd } = props;
 
   /** 拖拽结束操作 */
@@ -81,10 +81,10 @@ function DragContent(props: DragContentProps) {
         items={list.map((item) => item.value)}
         strategy={verticalListSortingStrategy}
       >
-        {list?.map((item, index) => <SortableItem key={item.value} index={index} item={item} />)}
+        {list?.map((item, index) => (
+          <SortableItem key={item.value} index={index} item={item} />
+        ))}
       </SortableContext>
     </DndContext>
   );
 }
-
-export default DragContent;

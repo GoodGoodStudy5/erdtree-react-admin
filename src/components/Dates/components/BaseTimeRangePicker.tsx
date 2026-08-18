@@ -4,7 +4,7 @@ import { stringRang2DayjsRang } from '../utils/helper';
 
 const { RangePicker } = TimePicker;
 
-function BaseTimePicker(props: TimeRangePickerProps) {
+export function BaseTimeRangePicker(props: TimeRangePickerProps) {
   const { value } = props;
   const params = { ...props };
 
@@ -13,5 +13,3 @@ function BaseTimePicker(props: TimeRangePickerProps) {
 
   return <RangePicker {...params} />;
 }
-
-export default BaseTimePicker;

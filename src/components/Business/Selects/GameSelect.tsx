@@ -5,7 +5,7 @@ import { ApiSelect } from '@/components/Selects';
 /**
  * @description: 游戏下拉组件
  */
-function GameSelect(props: SelectProps) {
+export function GameSelect(props: SelectProps) {
   return (
     <>
       <ApiSelect
@@ -17,5 +17,3 @@ function GameSelect(props: SelectProps) {
     </>
   );
 }
-
-export default GameSelect;

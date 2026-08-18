@@ -9,7 +9,7 @@ interface EllipsisTextProps {
   style?: CSSProperties;
 }
 
-const EllipsisText = (props: EllipsisTextProps) => {
+export const EllipsisText = (props: EllipsisTextProps) => {
   const { width, text, color, className = '', style } = props;
   const textRef = useRef<HTMLSpanElement>(null);
   const [isOverflowed, setIsOverflowed] = useState(false);
@@ -53,5 +53,3 @@ const EllipsisText = (props: EllipsisTextProps) => {
 
   return content;
 };
-
-export default EllipsisText;

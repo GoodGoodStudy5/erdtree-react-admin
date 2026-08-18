@@ -4,7 +4,7 @@ import { ScrollContext } from '../utils/state';
 
 type Props = DetailedHTMLProps<HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
 
-function VirtualWrapper(props: Props): ReactNode {
+export function VirtualWrapper(props: Props): ReactNode {
   const { children, ...restProps } = props;
   const { renderLen, start, offsetStart } = useContext(ScrollContext);
   let tempNode = null;
@@ -35,5 +35,3 @@ function VirtualWrapper(props: Props): ReactNode {
     </tbody>
   );
 }
-
-export default VirtualWrapper;

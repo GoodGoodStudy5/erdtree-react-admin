@@ -18,8 +18,8 @@ export const autoImportPlugin = (): PluginOption => {
       '!src/components/Dates/components/**',
       '!src/components/Selects/Api*.tsx',
       '!src/components/Selects/Base*.tsx',
-      // 这些组件目录的 index 只是转发, 组件定义在同名文件内, 登记定义处
-      '!src/components/{Business,GlobalSearch,PasswordStrength,Theme}/index.ts',
+      // 这些组件目录的 index 只是转发, 组件定义在目录内的具名文件, 登记定义处
+      '!src/components/{Business,Copy,Form,GlobalSearch,Modal,Pagination,PasswordStrength,Table,Theme}/index.ts',
       // stores 的 index 只是转发, 类型定义在各 store 文件内, 登记定义处
       'src/stores/**',
       '!src/stores/index.ts',

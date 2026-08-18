@@ -4,7 +4,7 @@ import { Select, Spin } from 'antd';
 import { MAX_TAG_COUNT } from './constants';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback, memo } from 'react';
-import Loading from './components/Loading';
+import { Loading } from './components/Loading';
 
 /**
  * @description: 根据API获取分页数据下拉组件
@@ -190,6 +190,8 @@ function ApiPageSelect(props: ApiPageSelectProps) {
   );
 }
 
-export default memo(ApiPageSelect, (prevProps, nextProps) => {
+const ApiPageSelectMemo = memo(ApiPageSelect, (prevProps, nextProps) => {
   return prevProps.value === nextProps.value && prevProps.api === nextProps.api;
 });
+
+export { ApiPageSelectMemo as ApiPageSelect };

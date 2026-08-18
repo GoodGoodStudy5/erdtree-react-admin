@@ -9,7 +9,7 @@ interface Props extends ButtonProps {
   value: string;
 }
 
-function CopyBtn(props: Props) {
+export function CopyBtn(props: Props) {
   const { text, value } = props;
   const { t } = useTranslation();
   const [isCopied, error, copyText] = useClipboard();
@@ -44,5 +44,3 @@ function CopyBtn(props: Props) {
     </>
   );
 }
-
-export default CopyBtn;

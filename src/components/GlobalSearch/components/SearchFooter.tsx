@@ -2,7 +2,7 @@ import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
 import styles from '../index.module.less';
 
-function SearchFooter() {
+export function SearchFooter() {
   const { t } = useTranslation();
 
   return (
@@ -26,5 +26,3 @@ function SearchFooter() {
     </div>
   );
 }
-
-export default SearchFooter;

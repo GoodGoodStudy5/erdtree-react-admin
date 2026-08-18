@@ -4,7 +4,7 @@ import { Select } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback, memo } from 'react';
 import { MAX_TAG_COUNT } from './constants';
-import Loading from './components/Loading';
+import { Loading } from './components/Loading';
 
 /**
  * @description: 根据API获取数据下拉组件
@@ -74,6 +74,8 @@ function ApiSelect(props: ApiSelectProps) {
   );
 }
 
-export default memo(ApiSelect, (prevProps, nextProps) => {
+const ApiSelectMemo = memo(ApiSelect, (prevProps, nextProps) => {
   return prevProps.value === nextProps.value && prevProps.api === nextProps.api;
 });
+
+export { ApiSelectMemo as ApiSelect };

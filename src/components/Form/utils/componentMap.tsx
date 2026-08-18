@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 import type { ComponentType, BaseFormList } from '#/form';
 import { initCompProps } from './helper';
-import { CreateBusiness } from '@/components/Business';
+import { CreateBusiness } from '../../Business';
 import type { FormInstance, InputProps } from 'antd';
 import { Input, Spin } from 'antd';
 import { type KeyboardEvent, lazy, Suspense } from 'react';
@@ -43,11 +43,11 @@ lazyComponents.set(
 );
 lazyComponents.set(
   'Select',
-  lazy(() => import('@/components/Selects/BaseSelect')),
+  lazy(() => import('../../Selects').then((module) => ({ default: module.BaseSelect }))),
 );
 lazyComponents.set(
   'TreeSelect',
-  lazy(() => import('@/components/Selects/BaseTreeSelect')),
+  lazy(() => import('../../Selects').then((module) => ({ default: module.BaseTreeSelect }))),
 );
 lazyComponents.set(
   'Checkbox',
@@ -83,37 +83,37 @@ lazyComponents.set(
 );
 lazyComponents.set(
   'DatePicker',
-  lazy(() => import('@/components/Dates').then((module) => ({ default: module.BaseDatePicker }))),
+  lazy(() => import('../../Dates').then((module) => ({ default: module.BaseDatePicker }))),
 );
 lazyComponents.set(
   'RangePicker',
-  lazy(() => import('@/components/Dates').then((module) => ({ default: module.BaseRangePicker }))),
+  lazy(() => import('../../Dates').then((module) => ({ default: module.BaseRangePicker }))),
 );
 lazyComponents.set(
   'TimePicker',
-  lazy(() => import('@/components/Dates').then((module) => ({ default: module.BaseTimePicker }))),
+  lazy(() => import('../../Dates').then((module) => ({ default: module.BaseTimePicker }))),
 );
 lazyComponents.set(
   'TimeRangePicker',
-  lazy(() =>
-    import('@/components/Dates').then((module) => ({ default: module.BaseTimeRangePicker })),
-  ),
+  lazy(() => import('../../Dates').then((module) => ({ default: module.BaseTimeRangePicker }))),
 );
 lazyComponents.set(
   'ApiSelect',
-  lazy(() => import('@/components/Selects/ApiSelect')),
+  lazy(() => import('../../Selects').then((module) => ({ default: module.ApiSelect }))),
 );
 lazyComponents.set(
   'ApiTreeSelect',
-  lazy(() => import('@/components/Selects/ApiTreeSelect')),
+  lazy(() => import('../../Selects').then((module) => ({ default: module.ApiTreeSelect }))),
 );
 lazyComponents.set(
   'ApiPageSelect',
-  lazy(() => import('@/components/Selects/ApiPageSelect')),
+  lazy(() => import('../../Selects').then((module) => ({ default: module.ApiPageSelect }))),
 );
 lazyComponents.set(
   'PasswordStrength',
-  lazy(() => import('@/components/PasswordStrength')),
+  lazy(() =>
+    import('../../PasswordStrength').then((module) => ({ default: module.PasswordStrength })),
+  ),
 );
 lazyComponents.set(
   'RichEditor',

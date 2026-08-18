@@ -6,7 +6,7 @@ interface Props extends ButtonProps {
   isLoading?: boolean;
 }
 
-function UpdateBtn(props: Props) {
+export function UpdateBtn(props: Props) {
   const { isLoading, loading, className } = props;
   const { t } = useTranslation();
 
@@ -25,5 +25,3 @@ function UpdateBtn(props: Props) {
     </Button>
   );
 }
-
-export default UpdateBtn;

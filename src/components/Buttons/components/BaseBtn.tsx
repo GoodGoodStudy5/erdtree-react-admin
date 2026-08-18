@@ -7,7 +7,7 @@ interface Props extends ButtonProps {
   children?: ReactNode;
 }
 
-function BaseBtn(props: Props) {
+export function BaseBtn(props: Props) {
   const { isLoading, loading, children, className } = props;
 
   // 清除自定义属性
@@ -25,5 +25,3 @@ function BaseBtn(props: Props) {
     </Button>
   );
 }
-
-export default BaseBtn;

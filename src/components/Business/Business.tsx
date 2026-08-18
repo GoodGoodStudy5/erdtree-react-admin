@@ -7,10 +7,12 @@ export type BusinessComponents = 'GameSelect' | 'PartnerSelect';
 export function CreateBusiness() {
   addComponent(
     'GameSelect',
-    lazy(() => import('./Selects/GameSelect')),
+    lazy(() => import('./Selects/GameSelect').then((module) => ({ default: module.GameSelect }))),
   );
   addComponent(
     'PartnerSelect',
-    lazy(() => import('./Selects/PartnerSelect')),
+    lazy(() =>
+      import('./Selects/PartnerSelect').then((module) => ({ default: module.PartnerSelect })),
+    ),
   );
 }

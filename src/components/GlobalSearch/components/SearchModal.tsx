@@ -11,8 +11,8 @@ import { useKeyStroke } from '@/hooks/useKeyStroke';
 import { getMenuByKey, getOpenMenuByRouter, searchMenuValue } from '@/menus/utils/helper';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { useMenuStore, useTabsStore } from '@/stores';
-import SearchResult from './SearchResult';
-import SearchFooter from './SearchFooter';
+import { SearchResult } from './SearchResult';
+import { SearchFooter } from './SearchFooter';
 
 export interface SearchModalProps {
   toggle: () => void;
@@ -22,7 +22,7 @@ interface Props {
   modalRef: Ref<SearchModalProps>;
 }
 
-function SearchModal(props: Props) {
+export function SearchModal(props: Props) {
   const navigate = useNavigate();
   const inputRef = useRef<InputRef>(null);
   const { modalRef } = props;
@@ -183,5 +183,3 @@ function SearchModal(props: Props) {
     </Modal>
   );
 }
-
-export default SearchModal;

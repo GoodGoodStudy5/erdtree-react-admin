@@ -3,7 +3,7 @@ import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import './index.less';
 
-function BasePagination(props: PaginationProps) {
+export function BasePagination(props: PaginationProps) {
   const { t } = useTranslation();
 
   /**
@@ -31,5 +31,3 @@ function BasePagination(props: PaginationProps) {
     </div>
   );
 }
-
-export default BasePagination;

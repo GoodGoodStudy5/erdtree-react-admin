@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { THEME_KEY } from '@/utils/config';
 import './index.module.less';
 
-function Theme() {
+export function Theme() {
   const { t } = useTranslation();
   const themeCache = (localStorage.getItem(THEME_KEY) || 'light') as ThemeType;
   const [theme, setTheme] = useState<ThemeType>(themeCache);
@@ -93,5 +93,3 @@ function Theme() {
     </Tooltip>
   );
 }
-
-export default Theme;

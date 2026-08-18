@@ -5,7 +5,7 @@ import { reducer } from '../utils/reducer';
 import { isNumber } from '@/utils/is';
 import { ScrollContext } from '../utils/state';
 import { throttle } from 'lodash';
-import VirtualWrapper from '../components/VirtualWrapper';
+import { VirtualWrapper } from '../components/VirtualWrapper';
 
 const initialState: InitTableState = {
   rowHeight: 46, // 行高度
@@ -201,7 +201,7 @@ interface Props {
   total: number;
 }
 
-export default function useVirtualTable(props: Props) {
+export function useVirtualTable(props: Props) {
   const { height, rowHeight, total } = props;
   scrollY = height;
   initialState.rowHeight = rowHeight;

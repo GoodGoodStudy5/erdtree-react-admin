@@ -5,7 +5,7 @@ import { MAX_TAG_COUNT } from './constants';
 /**
  * @description: 基础下拉组件
  */
-function BaseSelect(props: SelectProps) {
+export function BaseSelect(props: SelectProps) {
   const { options } = props;
   const { t } = useTranslation();
 
@@ -30,5 +30,3 @@ function BaseSelect(props: SelectProps) {
     />
   );
 }
-
-export default BaseSelect;

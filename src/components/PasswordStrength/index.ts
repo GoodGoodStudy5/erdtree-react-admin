@@ -1,1 +1,1 @@
-export { default } from './PasswordStrength';
+export * from './PasswordStrength';

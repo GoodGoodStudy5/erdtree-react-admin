@@ -3,7 +3,7 @@ import React from 'react';
 import { Resizable } from 'react-resizable';
 
 /** 自定义拖拽  */
-function ResizableTitle(
+export function ResizableTitle(
   props: React.HTMLAttributes<unknown> & {
     onResize: (e: React.SyntheticEvent<Element>, data: ResizeCallbackData) => void;
     width: number;
@@ -34,5 +34,3 @@ function ResizableTitle(
     </Resizable>
   );
 }
-
-export default ResizableTitle;

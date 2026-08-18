@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-function LoadingComponent() {
+export function LoadingComponent() {
   const { t } = useTranslation();
   const [num, setNum] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -42,5 +42,3 @@ function LoadingComponent() {
     </div>
   );
 }
-
-export default LoadingComponent;

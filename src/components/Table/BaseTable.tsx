@@ -9,10 +9,10 @@ import { EMPTY_VALUE } from '@/utils/config';
 import { useCommonStore } from '@/hooks/useCommonStore';
 import { PlusOutlined, RedoOutlined } from '@ant-design/icons';
 import { getTableHeight, handleRowHeight, filterTableColumns } from './utils/helper';
-import ResizableTitle from './components/ResizableTitle';
-import useVirtualTable from './hooks/useVirtual';
-import TableFilter from './components/TableFilter';
-import EllipsisText from './components/EllipsisText';
+import { ResizableTitle } from './components/ResizableTitle';
+import { useVirtualTable } from './hooks/useVirtual';
+import { TableFilter } from './components/TableFilter';
+import { EllipsisText } from './components/EllipsisText';
 import './index.less';
 
 type Components = TableProps<object>['components'];
@@ -33,7 +33,7 @@ interface Props extends Omit<TableProps<object>, 'bordered'> {
   onCreate?: () => void;
 }
 
-function BaseTable(props: Props) {
+export function BaseTable(props: Props) {
   const {
     isLoading,
     isVirtual,
@@ -343,5 +343,3 @@ function BaseTable(props: Props) {
     </div>
   );
 }
-
-export default BaseTable;

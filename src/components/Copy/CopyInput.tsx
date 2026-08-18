@@ -5,7 +5,7 @@ import { useClipboard } from '@/hooks/useClipboard';
 
 const { Search } = Input;
 
-function CopyInput(props: InputProps) {
+export function CopyInput(props: InputProps) {
   const { t } = useTranslation();
   const [messageApi, contextHolder] = message.useMessage();
   const [isCopied, error, copyText] = useClipboard();
@@ -46,5 +46,3 @@ function CopyInput(props: InputProps) {
     </>
   );
 }
-
-export default CopyInput;

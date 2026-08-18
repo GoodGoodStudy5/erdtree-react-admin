@@ -3,7 +3,7 @@ import type { DatePickerProps } from 'antd';
 import { DatePicker } from 'antd';
 import { string2Dayjs } from '../utils/helper';
 
-function BaseDatePicker(props: DatePickerProps) {
+export function BaseDatePicker(props: DatePickerProps) {
   const { value } = props;
   const params = { ...props };
 
@@ -12,5 +12,3 @@ function BaseDatePicker(props: DatePickerProps) {
 
   return <DatePicker {...params} />;
 }
-
-export default BaseDatePicker;

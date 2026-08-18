@@ -2,7 +2,7 @@ import { TreeSelect, type TreeSelectProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { MAX_TAG_COUNT } from './constants';
 
-function BaseTreeSelect(props: TreeSelectProps) {
+export function BaseTreeSelect(props: TreeSelectProps) {
   const { treeData } = props;
   const { t } = useTranslation();
 
@@ -27,5 +27,3 @@ function BaseTreeSelect(props: TreeSelectProps) {
     />
   );
 }
-
-export default BaseTreeSelect;

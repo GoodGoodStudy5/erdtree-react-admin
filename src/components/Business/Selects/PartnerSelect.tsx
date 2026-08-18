@@ -5,7 +5,7 @@ import { ApiSelect } from '@/components/Selects';
 /**
  * @description: 合作公司下拉组件
  */
-function PartnerSelect(props: SelectProps) {
+export function PartnerSelect(props: SelectProps) {
   return (
     <ApiSelect
       {...props}
@@ -15,5 +15,3 @@ function PartnerSelect(props: SelectProps) {
     />
   );
 }
-
-export default PartnerSelect;

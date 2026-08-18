@@ -3,7 +3,7 @@ import { useState, memo } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { TableColumn } from '#/public';
-import DragContent from './DragContent';
+import { DragContent } from './DragContent';
 
 /**
  * 表格字段筛选
@@ -177,8 +177,10 @@ function TableFilter(props: Props) {
   );
 }
 
-export default memo(TableFilter, (prevProps, nextProps) => {
+const TableFilterMemo = memo(TableFilter, (prevProps, nextProps) => {
   return (
     prevProps.columns === nextProps.columns && prevProps.cacheColumns === nextProps.cacheColumns
   );
 });
+
+export { TableFilterMemo as TableFilter };

@@ -12,7 +12,7 @@ interface Props extends ButtonProps {
   handleDelete: () => void;
 }
 
-function DeleteBtn(props: Props) {
+export function DeleteBtn(props: Props) {
   const {
     isLoading,
     loading,
@@ -54,5 +54,3 @@ function DeleteBtn(props: Props) {
     </Popconfirm>
   );
 }
-
-export default DeleteBtn;

@@ -4,7 +4,7 @@ import { stringRang2DayjsRang } from '../utils/helper';
 
 const { RangePicker } = DatePicker;
 
-function BaseRangePicker(props: RangePickerProps) {
+export function BaseRangePicker(props: RangePickerProps) {
   const { value } = props;
   const params = { ...props };
 
@@ -13,5 +13,3 @@ function BaseRangePicker(props: RangePickerProps) {
 
   return <RangePicker {...params} />;
 }
-
-export default BaseRangePicker;

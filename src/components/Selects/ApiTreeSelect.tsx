@@ -4,7 +4,7 @@ import { TreeSelect } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useState, memo } from 'react';
 import { MAX_TAG_COUNT } from './constants';
-import Loading from './components/Loading';
+import { Loading } from './components/Loading';
 
 /**
  * @description: 根据API获取数据下拉树形组件
@@ -74,6 +74,8 @@ function ApiTreeSelect(props: ApiTreeSelectProps) {
   );
 }
 
-export default memo(ApiTreeSelect, (prevProps, nextProps) => {
+const ApiTreeSelectMemo = memo(ApiTreeSelect, (prevProps, nextProps) => {
   return prevProps.value === nextProps.value && prevProps.api === nextProps.api;
 });
+
+export { ApiTreeSelectMemo as ApiTreeSelect };

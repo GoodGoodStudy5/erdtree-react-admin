@@ -14,7 +14,7 @@ interface Props {
   changActive: (value: string) => void; // 更改选中值
 }
 
-function SearchResult(props: Props) {
+export function SearchResult(props: Props) {
   const { list, active, onCancel, changActive } = props;
   const { t, i18n } = useTranslation();
   const { permissions, menuList } = useCommonStore();
@@ -100,5 +100,3 @@ function SearchResult(props: Props) {
     </>
   );
 }
-
-export default SearchResult;
