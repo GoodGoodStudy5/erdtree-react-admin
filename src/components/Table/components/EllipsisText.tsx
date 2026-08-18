@@ -9,6 +9,7 @@ interface EllipsisTextProps {
   style?: CSSProperties;
 }
 
+/** 表格单元格文本, 超出列宽时省略并以气泡展示全文 */
 export const EllipsisText = (props: EllipsisTextProps) => {
   const { width, text, color, className = '', style } = props;
   const textRef = useRef<HTMLSpanElement>(null);

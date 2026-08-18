@@ -4,6 +4,7 @@ import { ScrollContext } from '../utils/state';
 
 type Props = DetailedHTMLProps<HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
 
+/** 虚拟滚动的行容器, 只渲染可视区内的行 */
 export function VirtualWrapper(props: Props): ReactNode {
   const { children, ...restProps } = props;
   const { renderLen, start, offsetStart } = useContext(ScrollContext);

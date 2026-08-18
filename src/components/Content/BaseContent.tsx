@@ -6,6 +6,7 @@ interface Props {
   children: ReactNode;
 }
 
+/** 页面内容容器. isPermission 为 false 时以无权限页替代内容 */
 export function BaseContent(props: Props) {
   const { isPermission, children } = props;
 

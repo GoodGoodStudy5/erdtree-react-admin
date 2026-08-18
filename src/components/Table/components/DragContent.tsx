@@ -60,6 +60,7 @@ function SortableItem(props: SortableItemProps) {
 }
 
 // 拖拽组件
+/** 列筛选面板里的可拖拽行, 拖动即调整列顺序 */
 export function DragContent(props: DragContentProps) {
   const { list, handleDragEnd } = props;
 

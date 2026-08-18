@@ -14,6 +14,7 @@ import { useMenuStore, useTabsStore } from '@/stores';
 import { SearchResult } from './SearchResult';
 import { SearchFooter } from './SearchFooter';
 
+/** 全局搜索弹窗参数 */
 export interface SearchModalProps {
   toggle: () => void;
 }
@@ -22,6 +23,7 @@ interface Props {
   modalRef: Ref<SearchModalProps>;
 }
 
+/** 全局搜索弹窗, 输入关键字后按菜单名匹配 */
 export function SearchModal(props: Props) {
   const navigate = useNavigate();
   const inputRef = useRef<InputRef>(null);

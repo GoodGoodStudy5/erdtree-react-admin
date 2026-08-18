@@ -1,5 +1,6 @@
 import { HTMLAttributes } from 'react';
 
+/** 铺满容器的内容卡片, 内容超出时卡片内部滚动 */
 export function BaseCard(props: HTMLAttributes<unknown>) {
   const { children, className } = props;
 

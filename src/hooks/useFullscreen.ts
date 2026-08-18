@@ -1,6 +1,7 @@
 import { usePublicStore } from '@/stores';
 import { useCommonStore } from './useCommonStore';
 
+/** 页面全屏的进入与退出 */
 export function useFullscreen() {
   const { isFullscreen } = useCommonStore();
   const setFullscreen = usePublicStore((state) => state.setFullscreen);

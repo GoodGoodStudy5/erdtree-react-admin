@@ -12,6 +12,7 @@ interface Props extends ButtonProps {
   handleDelete: () => void;
 }
 
+/** 删除按钮, 点击后二次确认. btnType 区分单条与批量, isIcon 切换为图标形态 */
 export function DeleteBtn(props: Props) {
   const {
     isLoading,

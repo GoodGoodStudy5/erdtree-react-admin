@@ -3,6 +3,7 @@ import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import './index.less';
 
+/** 分页器, 总数文案随界面语言切换 */
 export function BasePagination(props: PaginationProps) {
   const { t } = useTranslation();
 

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { THEME_KEY } from '@/utils';
 import './index.module.less';
 
+/** 明暗主题切换入口, 选择结果落 localStorage */
 export function Theme() {
   const { t } = useTranslation();
   const themeCache = (localStorage.getItem(THEME_KEY) || 'light') as ThemeType;

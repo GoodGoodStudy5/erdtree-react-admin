@@ -8,7 +8,6 @@ import { DragContent } from './DragContent';
 /**
  * 表格字段筛选
  */
-
 export interface CheckboxList {
   label: string;
   value: string;

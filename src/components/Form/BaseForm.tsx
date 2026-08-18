@@ -26,6 +26,7 @@ interface Props extends FormProps {
   handleFinish: FormProps['onFinish'];
 }
 
+/** 声明式表单, 按 list 描述渲染各表单项 */
 export const BaseForm = (props: Props) => {
   const { ref, list, data, form, style, className, children, labelCol, wrapperCol, handleFinish } =
     props;

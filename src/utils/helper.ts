@@ -49,7 +49,6 @@ export function valueToLabel(value: string | number | boolean, arr: Constant[]):
  * 获取url中的全部参数
  * @param search - url参数
  */
-
 export function getUrlAllParam(search: string): Record<string, string> {
   if (!search) return {};
   // 去除首个字符串问号
@@ -86,6 +85,7 @@ export function getUrlParam(search: string, key: string) {
  * @param obj - 传入对象
  */
 type EmptyData = Record<string, unknown>;
+/** 剔除对象里的空值 (undefined / null / 空串), 用于查询参数拼装 */
 export function filterEmptyValue(obj: EmptyData): EmptyData {
   const res: EmptyData = {};
 
@@ -126,6 +126,7 @@ export function filterEmptyValue(obj: EmptyData): EmptyData {
 interface RecursiveChildren<T> {
   children?: T[];
 }
+/** 按回调逐层改写树形数据, children 层级结构原样保留 */
 export function recursiveData<T extends RecursiveChildren<T>, U>(
   data: T[],
   callback: (data: T) => U,

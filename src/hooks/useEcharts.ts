@@ -39,6 +39,7 @@ import type {
 import { LabelLayout, UniversalTransition } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
 
+/** 项目用到的 ECharts 图表配置联合类型 */
 export type ECOption = echarts.ComposeOption<
   | BarSeriesOption
   | LineSeriesOption

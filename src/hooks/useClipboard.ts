@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 
 type CopyHandler = (text: string) => Promise<boolean>;
 
+/** 复制文本到剪贴板, 返回 [是否复制成功, 当前内容, 执行复制] */
 export function useClipboard(): [boolean, string, CopyHandler] {
   const [isCopied, setIsCopied] = useState(false);
   const [error, setError] = useState('');

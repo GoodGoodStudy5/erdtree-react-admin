@@ -17,6 +17,7 @@ interface UserState {
   clearInfo: () => void;
 }
 
+/** 登录用户信息与页面权限 */
 export const useUserStore = create<UserState>()(
   devtools(
     (set) => ({

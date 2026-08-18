@@ -7,6 +7,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
   end: number;
 }
 
+/** 数字滚动动画, 从 start 递增到 end */
 export function Count(props: Props) {
   const { prefix, start, end } = props;
   const [num, setNum] = useState(start);

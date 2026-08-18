@@ -37,6 +37,7 @@ let scrollY: number | string = 0;
  * 表格渲染
  * @param props - 传递值
  */
+// eslint-disable-next-line react-refresh/only-export-components
 const VirtualTable = memo(
   function VirtualTable(props: VirtualTableProps) {
     const { style, children, ...rest } = props;
@@ -155,7 +156,7 @@ const VirtualTable = memo(
 
     return (
       <div
-        className="virtualTable"
+        className="virtual-table"
         ref={wrapTableRef}
         style={{
           width: '100%',
@@ -201,6 +202,7 @@ interface Props {
   total: number;
 }
 
+/** 表格虚拟滚动, 按容器高度算出可视行区间 */
 export function useVirtualTable(props: Props) {
   const { height, rowHeight, total } = props;
   scrollY = height;

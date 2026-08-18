@@ -5,12 +5,14 @@ import { useTranslation } from 'react-i18next';
 import { Editor, Toolbar } from '@wangeditor/editor-for-react';
 import { FILE_API } from '@/utils';
 
+/** 富文本编辑器参数 */
 export interface EditorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   value: string; // 富文本内容
   onChange: (value: string) => void; // 处理更改内容
   height?: number; // 富文本高度
 }
 
+/** 富文本编辑器 */
 export function WangEditor(props: EditorProps) {
   const { value, height, style, className, onChange } = props;
   const { t } = useTranslation();

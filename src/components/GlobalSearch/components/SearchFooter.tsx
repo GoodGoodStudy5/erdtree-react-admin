@@ -2,6 +2,7 @@ import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
 import styles from '../index.module.less';
 
+/** 全局搜索弹窗底部的快捷键提示 */
 export function SearchFooter() {
   const { t } = useTranslation();
 

@@ -5,6 +5,7 @@ import { useClipboard } from '@/hooks';
 
 const { Search } = Input;
 
+/** 带复制按钮的输入框, 成功与失败都以全局提示反馈 */
 export function CopyInput(props: InputProps) {
   const { t } = useTranslation();
   const [messageApi, contextHolder] = message.useMessage();

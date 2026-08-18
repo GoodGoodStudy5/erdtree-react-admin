@@ -9,6 +9,7 @@ interface Props extends ButtonProps {
   value: string;
 }
 
+/** 复制按钮, 成功与失败都以全局提示反馈 */
 export function CopyBtn(props: Props) {
   const { text, value } = props;
   const { t } = useTranslation();

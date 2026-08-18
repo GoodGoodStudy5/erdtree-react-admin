@@ -27,6 +27,7 @@ export enum colors {
   purple = 'purple',
 }
 
+/** 枚举选项的统一结构. value / label 供下拉与表格回显, type 与 color 控制标签样式 */
 export interface Constant extends Omit<DefaultOptionType, 'children'> {
   value: string | number;
   label: string;

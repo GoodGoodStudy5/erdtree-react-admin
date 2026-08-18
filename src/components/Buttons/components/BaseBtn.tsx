@@ -7,6 +7,7 @@ interface Props extends ButtonProps {
   children?: ReactNode;
 }
 
+/** 主色按钮, isLoading 与 antd 的 loading 任一为真即进入加载态 */
 export function BaseBtn(props: Props) {
   const { isLoading, loading, children, className } = props;
 

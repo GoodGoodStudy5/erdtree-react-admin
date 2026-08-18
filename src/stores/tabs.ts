@@ -6,6 +6,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { LANG } from '@/utils';
 
+/** 标签页数据, key 即路由路径 */
 export interface TabsData extends Omit<TabPaneProps, 'tab'> {
   key: string;
   label: React.ReactNode;
@@ -43,6 +44,7 @@ interface TabsState {
   closeAllTab: () => void;
 }
 
+/** 标签页导航状态: 已打开的标签、当前激活项、最大化与关闭锁 */
 export const useTabsStore = create<TabsState>()(
   devtools(
     persist(

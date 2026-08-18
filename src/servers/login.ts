@@ -1,6 +1,6 @@
 import { request } from '@/utils';
 
-// 接口传入数据
+/** 登录接口入参 */
 export interface LoginData {
   username: string;
   password: string;
@@ -20,7 +20,7 @@ interface Roles {
   id: string;
 }
 
-// 接口返回数据
+/** 登录接口返回: 令牌、用户信息、页面权限与角色 */
 export interface LoginResult {
   token: string;
   user: User;

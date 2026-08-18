@@ -15,6 +15,7 @@ interface MenuState {
   setMenuList: (menuList: SideMenu[]) => void;
 }
 
+/** 侧边菜单数据与折叠、展开状态 */
 export const useMenuStore = create<MenuState>()(
   devtools(
     (set) => ({

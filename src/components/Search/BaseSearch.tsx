@@ -30,6 +30,7 @@ interface Props extends FormProps {
   handleFinish: FormProps['onFinish'];
 }
 
+/** 声明式搜索栏, type 为 grid 时按网格排布 */
 export const BaseSearch = (props: Props) => {
   const {
     ref,

@@ -1,211 +1,41 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+规则由工具强制，违反时报错会说明原因与改法。**这里不复述规则** —— 规则的事实来源是配置文件，复述一遍只会在改规则时变成过期副本。
 
-## Commands
+## 规则住在哪
 
-### Development
-```bash
-pnpm dev              # Start dev server (Vite with host flag)
-pnpm build            # Production build (TypeScript + Vite)
-pnpm build:dev        # Development build
-pnpm build:test       # Test environment build
-```
+| 管什么 | 配置 |
+| --- | --- |
+| index 只能是门面、页面文件命名、跨目录导出必须带 TSDoc | `eslint.config.js` |
+| 目录边界、页面引用方向、循环依赖 | `.dependency-cruiser.mjs` |
+| 样式规范 | `packages/stylelintConfig/index.mjs` |
+| 提交格式、校验分档 | `.husky/`、`package.json` 的 scripts |
 
-### Code Quality
-```bash
-pnpm lint             # ESLint with auto-fix
-pnpm lint:stylelint   # Stylelint for CSS/Less
-pnpm prettier         # Format code with Prettier
-```
+改规则去改配置，不用回来改这份文档。
 
-### Package Management
-```bash
-pnpm install -w       # Install dependencies (use -w for monorepo root)
-pnpm i <package> -w   # Install new dependencies at workspace root
-```
+## 判据：工具执行结果，但说不出理由
 
-### Git
-```bash
-npx husky install     # Reinstall husky hooks if commit fails
-```
+**页面本体用页面语义名（`MenuPage.tsx`）而非统一名（`page.tsx`）** —— 判据是文件名能否自证是哪个页面。统一命名被否决过：N 个页面改成同一个新名字，标签栏和报错堆栈里照样认不出，痛点原样留存。
 
-## Project Architecture
+**PascalCase 等于「不参与路由」** —— 页面本体名字各不相同、无法预先枚举，路由排除只能靠形态规则。代价是这条约定是隐式的：页面目录下写小写文件名会意外多出一条路由，由文件命名规则兜住。
 
-This is a monorepo-based React admin application using pnpm workspaces, built with Vite, TypeScript, React 19, Ant Design, and Zustand.
+**index 分公共门面与机制入口两种** —— 页面 index 只为满足路由生成对 `index` 这个文件名的依赖，不承担对外职责，所以约束比公共门面更严（只允许一行转发），且除 `src/router` 外不得引用。
 
-### Monorepo Structure
-- **Root**: Main application in `src/`
-- **packages/**: Shared workspace packages
-  - `@south/request`: HTTP request wrapper
-  - `@south/message`: Global messaging component
-  - `@south/utils`: Shared utilities
-  - `@south/stylelint`: Stylelint configuration
+**组件一律具名导出** —— default 允许引用方随意改名，同一个组件在不同文件里能叫不同名字；具名把名字钉在定义处。页面本体例外保持 default，因为 `React.lazy` 只认它。
 
-When installing new dependencies, use `pnpm i <package> -w` to install at the workspace root.
+**不要求 `@param` / `@returns`** —— 参数契约已由 Props 与函数签名声明，写了只是类型的重复副本。
 
-### Automatic Route Generation
-Routes are automatically generated from the `src/pages/` directory structure using `vite glob`:
+## 工具管不到的
 
-```typescript
-// src/router/utils/config.ts
-export const ROUTER_EXCLUDE = [
-  'login', 'forget', 'components', 'utils', 'lib', 'hooks',
-  'model.tsx', '404.tsx'
-];
-```
+- **注释写用途与边界，不复述名字。** 反例 `/** token 名称 */`，正例 `/** 登录令牌在 localStorage 中的键名 */`。无法工具化，靠 review。
+- **新增接口文件后手写 `src/servers/index.ts` 的转发** —— 门面无法按目录通配。
+- **取状态用 `useCommonStore()`**，它用 `useShallow` 合并各 store 避免多余重渲染；绕过它直接订阅要有明确理由。
+- **权限两级各自独立** —— 页面级来自登录接口，控制能否进入；菜单级由菜单数据的 `rule` 控制可见性，不带 `rule` 视为始终可见。
+- **禁止吞异常** —— 不能用空 `catch`、只打日志、或只清理状态而不通知调用方。可恢复错误显式恢复，恢复失败继续上抛。
+- **同一功能点的补充修复用 `--amend` 合并**，不留「完成 + 修复」的重复提交。
 
-**Route rules:**
-- File path `src/pages/dashboard/index.tsx` → route `/dashboard`
-- File path `src/pages/dashboard/index.tsx` → route `/`
-- Dynamic routes use `[param]` syntax: `src/pages/user/[id].tsx` → route `/user/:id`
-- All `index.tsx` files have `/index` removed from the route path
+## 已知边界
 
-Route configuration is in `src/router/components/Router.tsx` using `handleRoutes()` helper.
-
-### State Management (Zustand)
-Stores are in `src/stores/`:
-- `useUserStore`: User info, permissions, authentication
-- `useMenuStore`: Menu state, collapse state, open keys
-- `useTabsStore`: Tab navigation, active tabs
-- `usePublicStore`: Global app state (theme, fullscreen, refresh)
-
-**Important**: Use `useCommonStore()` hook from `src/hooks/useCommonStore.ts` which combines all stores with `useShallow` for optimized re-renders:
-
-```typescript
-const { permissions, theme, menuList, tabs } = useCommonStore();
-```
-
-### Permission System
-Two-level permission system:
-
-1. **Page-level permissions** (from `/user/login` or `/user/refresh-permissions`):
-   - Stored in `useUserStore` as `permissions` array
-   - Controls if user can access a page
-
-2. **Menu-level permissions** (from `/menu/list`):
-   - `rule` field in menu data controls menu visibility
-   - If no `rule` is returned, menu always shows
-
-**Usage in pages:**
-```typescript
-const pagePermission: PagePermission = {
-  page: checkPermission('/xxx', permissions),
-  create: checkPermission('/xxx/create', permissions),
-  update: checkPermission('/xxx/update', permissions),
-  delete: checkPermission('/xxx/delete', permissions),
-};
-```
-
-See `src/pages/system/menu/index.tsx` for reference.
-
-### Menu Configuration
-Two menu modes available (configured in `src/hooks/useCommonStore.ts`):
-
-1. **Dynamic menu** (default): From `/menu/list` API
-2. **Static menu**: Set `menuList = defaultMenus` using `import { defaultMenus } from '@/menus'`
-
-### Component Architecture
-All common components are in `src/components/`:
-
-**Naming convention**: Public/secondary wrappers use `Base` prefix (e.g., `BaseTable`, `BaseForm`, `BaseModal`).
-
-**Key components:**
-- `BaseTable`: Enhanced table with virtual scrolling, column filtering, resizable columns, zebra striping
-- `BaseForm`: Form builder with component mapping
-- `BaseModal`: Modal wrapper with loading states
-- `BaseCard`, `BaseContent`: Layout containers
-
-### Form Component System
-Forms use a declarative `BaseFormList` schema:
-
-```typescript
-const createList: BaseFormList[] = [
-  {
-    label: 'Name',
-    name: 'name',
-    rules: FORM_REQUIRED,
-    component: 'Input',  // Mapped in components/Form/utils/componentMap.tsx
-  }
-];
-```
-
-Supported components are mapped in `src/components/Form/utils/componentMap.tsx`.
-
-### API Structure
-APIs are in `src/servers/` organized by feature:
-
-```typescript
-import { request } from '@/utils/request';
-
-enum API {
-  URL = '/xxx',
-}
-
-export function getXXXPage(data: PaginationData) {
-  return request.get<PageServerResult<T>>(`${API.URL}/page`, { params: data });
-}
-```
-
-### Build Configuration
-- Vite plugins in `build/plugins/index.ts`
-- React SWC for fast compilation
-- UnoCSS for atomic CSS
-- Legacy plugin for browser compatibility (production only)
-- Auto-import plugin configured in `build/plugins/autoImport.ts`
-
-### Code Snippets
-VS Code snippets are in `.vscode/south.code-snippets`:
-- `demoPage`: Complete page with table, pagination, CRUD
-- `demoModel`: Model file with search/form/table columns
-- `demoApi`: API file with CRUD functions
-- `demoOptionPage`: Single-page edit/create form
-- `loadHook`, `fetchhook`, `pagehook`, `apiFn`: Utility snippets
-
-### KeepAlive
-The app uses `keepalive-for-react` for tab caching. Key hooks:
-- `useEffectOnActive()`: Trigger when tab becomes active
-- `useSingleTab()`: Configure single-page tabs
-
-### Internationalization
-Uses `react-i18next` with `i18next-browser-languagedetector` and `i18next-http-backend`.
-Translations in `src/locales/{zh,en}/` by feature.
-
-## Important Patterns
-
-### Creating a New Page
-1. Create folder in `src/pages/` (e.g., `src/pages/log/`)
-2. Create `model.ts` - enter `demoModel` snippet
-3. Create API in `src/servers/log.ts` - enter `demoApi` snippet
-4. Create `index.tsx` - enter `demoPage` snippet
-
-### Component Re-rendering
-The project uses `useShallow` from Zustand to prevent unnecessary re-renders. Always prefer `useCommonStore()` over direct store access in components.
-
-### Virtual Scrolling Tables
-Enable with `isVirtual` prop on `BaseTable`. Automatically calculates height and uses react-window for performance.
-
-### Icon System
-Uses Iconify with `@iconify/react`. Browse icons at https://icon-sets.iconify.design/
-Install "Iconify IntelliSense" extension for inline preview and autocomplete.
-
-### Git Commit Convention
-Commits must follow conventional format enforced by husky:
-- `feat`: New feature
-- `fix`: Bug fix
-- `perf`: Performance optimization
-- `refactor`: Code refactoring
-- `style`: Code style
-- `docs`: Documentation
-- `chore`: Dependency/config changes
-- `test`: Tests
-- `types`: TypeScript types
-
-Example: `git commit -m "feat: add user management"`
-
-If commits fail, run `npx husky install` and retry.
-
-### TypeScript Configuration
-- `@/*` → `src/*`
-- `#/*` → `types/*`
-- Strict mode enabled with unused locals/variables checking
+- **依赖图不含自动导入的边** —— `unplugin-auto-import` 注入的符号在构建期才产生依赖，校验通过不等于运行时无环。
+- **循环依赖只报运行时的** —— 纯类型环编译期就被擦除，规则已排除。首次接入时 18 个环里 17 个是这种假环。
+- **`packages/` 不在 index 规则辖区** —— 那里的 `src/index.ts` 是 npm 包入口（对应 package.json 的 `exports`），与目录门面不是一回事。

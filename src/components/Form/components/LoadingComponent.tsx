@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
+/** 表单项懒加载期间的占位 */
 export function LoadingComponent() {
   const { t } = useTranslation();
   const [num, setNum] = useState(0);

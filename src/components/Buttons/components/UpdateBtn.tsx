@@ -6,6 +6,7 @@ interface Props extends ButtonProps {
   isLoading?: boolean;
 }
 
+/** 保存按钮, 文案随界面语言切换 */
 export function UpdateBtn(props: Props) {
   const { isLoading, loading, className } = props;
   const { t } = useTranslation();

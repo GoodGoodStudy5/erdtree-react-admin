@@ -1,6 +1,7 @@
 import { getFirstMenu, getMenuByKey } from '@/menus';
 import { Button } from 'antd';
 
+/** 无权限占位, 提供回首页入口. 既作为 /403 页面, 也作为内容区的无权限替代 */
 export function Forbidden() {
   const navigate = useNavigate();
   const { t } = useTranslation();

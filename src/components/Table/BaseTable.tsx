@@ -33,6 +33,7 @@ interface Props extends Omit<TableProps<object>, 'bordered'> {
   onCreate?: () => void;
 }
 
+/** 表格, 支持虚拟滚动、列筛选、列宽拖拽与斑马纹 */
 export function BaseTable(props: Props) {
   const {
     isLoading,

@@ -20,8 +20,11 @@ interface ApiPageParam extends Omit<ApiParam, 'params'> {
   };
 }
 
+/** 远程数据下拉的参数 */
 export type ApiSelectProps = ApiParam & SelectProps;
 
+/** 远程数据树形下拉的参数 */
 export type ApiTreeSelectProps = ApiParam & TreeSelectProps;
 
+/** 滚动分页加载下拉的参数 */
 export type ApiPageSelectProps = ApiPageParam & SelectProps;

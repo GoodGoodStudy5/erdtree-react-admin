@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
 
 // 区间值
 type EventValue<T> = T | null;
+/** 日期区间值, 两端各自允许为空 */
 export type RangeValue<T> = [EventValue<T>, EventValue<T>] | null;
 
 /**

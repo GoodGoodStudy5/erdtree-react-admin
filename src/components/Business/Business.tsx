@@ -1,6 +1,6 @@
 import { addComponent } from '../Form/utils/componentMap';
 
-// 自定义组件名
+/** 业务组件在表单注册表中的可选类型名 */
 export type BusinessComponents = 'GameSelect' | 'PartnerSelect';
 
 /** 组件注入 */

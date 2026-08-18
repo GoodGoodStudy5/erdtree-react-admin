@@ -1,6 +1,7 @@
 import { type TableProps } from 'antd';
 import { useState } from 'react';
 
+/** 列筛选状态: 哪些列显示、顺序如何 */
 export function useFiler() {
   const [isLock, setLock] = useState(true);
 

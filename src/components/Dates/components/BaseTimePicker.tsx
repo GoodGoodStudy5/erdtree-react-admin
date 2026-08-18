@@ -2,6 +2,7 @@ import type { TimePickerProps } from 'antd';
 import { TimePicker } from 'antd';
 import { string2Dayjs } from '../utils/helper';
 
+/** 时间选择器, 字符串时间自动转 dayjs 后回填 */
 export function BaseTimePicker(props: TimePickerProps) {
   const { value } = props;
   const params = { ...props };

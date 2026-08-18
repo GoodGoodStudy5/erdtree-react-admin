@@ -4,6 +4,7 @@
 import { type FormInstance } from 'antd';
 import { getUrlAllParam } from '@/utils';
 
+/** 用 URL 参数回填搜索表单, 使分享链接与刷新后仍保留查询条件 */
 export const useSearchUrlParams = (form: FormInstance) => {
   const [, setSearchParams] = useSearchParams();
   const { pathname, search } = useLocation();

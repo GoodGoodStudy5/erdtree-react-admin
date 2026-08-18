@@ -3,10 +3,12 @@ import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import checkFile from 'eslint-plugin-check-file';
+import jsdoc from 'eslint-plugin-jsdoc';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  // 构建产物不参与校验, 包的 dist 在任意层级都要排除
+  { ignores: ['**/dist/**'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
@@ -145,6 +147,35 @@ export default tseslint.config(
       // 官方hooks校验
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'off',
+    },
+  },
+  {
+    // 跨目录可见的能力自带说明书, 调用方读一行签名即可, 不必点进实现
+    files: [
+      'src/components/**/*.{ts,tsx}',
+      'src/hooks/**/*.ts',
+      'src/utils/**/*.ts',
+      'src/servers/**/*.ts',
+      'src/stores/**/*.ts',
+      'src/menus/**/*.ts',
+    ],
+    plugins: { jsdoc },
+    rules: {
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          require: { FunctionDeclaration: false },
+          // 注释附着在 export 语句上, 选择器必须落在 ExportNamedDeclaration 本身,
+          // 落到子节点会把已写好的注释判为缺失
+          contexts: [
+            'ExportNamedDeclaration[declaration.type="FunctionDeclaration"]',
+            'ExportNamedDeclaration[declaration.type="VariableDeclaration"]',
+            'ExportNamedDeclaration[declaration.type="TSInterfaceDeclaration"]',
+            'ExportNamedDeclaration[declaration.type="TSTypeAliasDeclaration"]',
+            'ExportNamedDeclaration[declaration.type="TSEnumDeclaration"]',
+          ],
+        },
+      ],
     },
   },
   {

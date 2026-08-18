@@ -3,6 +3,7 @@ import type { RefObject } from 'react';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
+/** 主题取值 */
 export type ThemeType = 'dark' | 'light';
 
 interface PublicState {
@@ -23,6 +24,7 @@ interface PublicState {
   setAliveRef: (ref: RefObject<KeepAliveRef | null>) => void;
 }
 
+/** 全局界面状态: 主题、刷新标记、KeepAlive 引用 */
 export const usePublicStore = create<PublicState>()(
   devtools(
     (set) => ({

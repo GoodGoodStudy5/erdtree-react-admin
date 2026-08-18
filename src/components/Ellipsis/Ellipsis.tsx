@@ -39,6 +39,7 @@ interface Props {
   children: string;
 }
 
+/** 文字超长省略, 按全角宽度截断而非字符个数 */
 export function Ellipsis(props: Props) {
   const { tooltip, length, lines, fullWidthRecognition, children } = props;
 

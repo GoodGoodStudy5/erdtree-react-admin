@@ -1,3 +1,4 @@
+/** 表格内部状态 */
 export interface InitTableState {
   rowHeight: number;
   curScrollTop: number;
@@ -6,6 +7,7 @@ export interface InitTableState {
   total: number;
 }
 
+/** 表格状态变更入参 */
 export interface TableAction extends Partial<InitTableState> {
   type: 'changeScroll' | 'reset';
 }

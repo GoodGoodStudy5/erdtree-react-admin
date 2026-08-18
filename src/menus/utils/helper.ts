@@ -150,6 +150,7 @@ export function searchMenuValue(data: SearchMenuProps): SideMenu[] {
   return result;
 }
 
+/** 面包屑与标签页共用的层级标题, 按当前语言取 labelZh 或 labelEn */
 export interface NavData {
   label: string;
   labelZh: string;

@@ -8,6 +8,7 @@ interface Props {
   onChange: (value: string[]) => void;
 }
 
+/** 穿梭框, 受控于 value 与 onChange */
 export function BaseTransfer(props: Props) {
   const { value } = props;
   const [targetKeys, setTargetKeys] = useState(value || []);

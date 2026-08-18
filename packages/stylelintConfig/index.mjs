@@ -24,6 +24,10 @@ export default {
       customSyntax: 'postcss-less',
       extends: ['stylelint-config-recommended-less'],
       files: ['*.less', '**/*.less'],
+      rules: {
+        // CSS Modules 用 :global 穿透局部作用域
+        'selector-pseudo-class-no-unknown': [true, { ignorePseudoClasses: ['global'] }],
+      },
     },
   ],
   plugins: [

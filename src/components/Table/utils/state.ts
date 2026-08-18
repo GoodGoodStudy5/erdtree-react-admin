@@ -11,6 +11,7 @@ interface ScrollContextProps {
   totalLen: number;
 }
 
+/** 虚拟滚动上下文, 向行容器传递滚动位置与行高 */
 export const ScrollContext = createContext<ScrollContextProps>({
   dispatch: undefined,
   renderLen: 1,

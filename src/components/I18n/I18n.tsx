@@ -10,8 +10,10 @@ import { setTitle } from '@/utils';
 import { getTabTitle } from '@/stores';
 import { useTabsStore } from '@/stores';
 
+/** 界面语言取值 */
 export type Langs = 'zh' | 'en';
 
+/** 语言切换入口 */
 export function I18n() {
   const { t, i18n } = useTranslation();
   const { pathname, search } = useLocation();

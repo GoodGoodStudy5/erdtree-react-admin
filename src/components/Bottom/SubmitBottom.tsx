@@ -9,6 +9,7 @@ interface Props {
   children?: ReactNode;
 }
 
+/** 表单页底部的提交与返回操作条 */
 export function SubmitBottom(props: Props) {
   const { t } = useTranslation();
   const { goBack, handleSubmit, isLoading, children } = props;

@@ -14,6 +14,7 @@ interface Props {
   changActive: (value: string) => void; // 更改选中值
 }
 
+/** 全局搜索结果列表, 支持上下键选中与回车跳转 */
 export function SearchResult(props: Props) {
   const { list, active, onCancel, changActive } = props;
   const { t, i18n } = useTranslation();

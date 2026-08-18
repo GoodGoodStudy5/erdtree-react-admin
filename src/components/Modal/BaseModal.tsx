@@ -14,6 +14,7 @@ interface Props extends Omit<ModalProps, 'onCancel'> {
   onCancel: () => void;
 }
 
+/** 弹窗, 支持标题栏拖拽与全屏, 移动端自动铺满 */
 export function BaseModal(props: Props) {
   const { width, children, wrapClassName, onCancel, isLoading = false } = props;
   const { t } = useTranslation();

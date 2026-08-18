@@ -4,6 +4,7 @@ interface Props {
 
 const arr = new Array(5).fill(0).map((_, index) => index + 1);
 
+/** 密码强度条, 按强度等级着色 */
 export function StrengthBar(props: Props) {
   const { strength } = props;
 

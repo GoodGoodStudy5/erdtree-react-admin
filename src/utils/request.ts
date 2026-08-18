@@ -5,7 +5,7 @@ import { creteRequest } from '@south/request';
 const prefixUrl = import.meta.env.VITE_BASE_URL as string;
 const baseURL = process.env.NODE_ENV !== 'development' ? prefixUrl : '/api';
 
-// 业务侧统一请求实例（get/post/put/patch/delete/sse）
+/** 业务侧统一请求实例, 已内置令牌注入与权限过期跳转 */
 export const request = creteRequest(baseURL, TOKEN, {
   // 权限过期处理：自动兼容 HashRouter 与 BrowserRouter。
   // HashRouter 路由在 hash（形如 "#/ai-refund/workbench"），改 hash 后需 reload；

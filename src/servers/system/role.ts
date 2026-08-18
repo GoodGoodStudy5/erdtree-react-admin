@@ -69,10 +69,12 @@ export interface PermissionData extends DataNode {
   type: number;
   children?: PermissionData[];
 }
+/** 角色授权树. treeData 是全部可选权限, defaultCheckedKeys 是该角色已有的 */
 export interface PermissionResult {
   treeData: PermissionData[];
   defaultCheckedKeys: Key[];
 }
+/** 获取角色的授权树与已勾选项 */
 export function getRolePermission(data: object) {
   return request.get<PermissionResult>(`${API.URL}/authorize`, { params: data });
 }
