@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import checkFile from 'eslint-plugin-check-file';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -165,6 +166,20 @@ export default tseslint.config(
           selector: 'ExportDefaultDeclaration > :not(Identifier)',
           message: 'index 的 default 导出必须先在具名文件中声明再转发',
         },
+      ],
+    },
+  },
+  {
+    // 路由生成把 PascalCase 视为"不参与路由", 命名走小写会让页面多出一条路由
+    files: ['src/pages/**/*.tsx'],
+    // index 与 model 是机制文件, 403 / 404 错误页沿用扁平数字命名
+    ignores: ['src/pages/**/index.tsx', 'src/pages/**/model.tsx', 'src/pages/40[0-9].tsx'],
+    plugins: { 'check-file': checkFile },
+    rules: {
+      'check-file/filename-naming-convention': [
+        'error',
+        { 'src/pages/**/*.tsx': 'PASCAL_CASE' },
+        { ignoreMiddleExtensions: true },
       ],
     },
   },
