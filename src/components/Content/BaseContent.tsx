@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import Forbidden from '@/pages/403';
+import { Forbidden } from '../Forbidden';
 
 interface Props {
   isPermission?: boolean;

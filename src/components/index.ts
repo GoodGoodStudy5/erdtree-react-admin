@@ -7,6 +7,7 @@ export * from './Copy';
 export * from './Count';
 export * from './Dates';
 export * from './Ellipsis';
+export * from './Forbidden';
 export * from './Form';
 export * from './Fullscreen';
 export * from './GlobalSearch';

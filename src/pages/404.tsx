@@ -3,7 +3,6 @@ import { getMenuList } from '@/servers';
 import { getUserRefreshPermissions } from '@/servers';
 import { useMenuStore, useUserStore } from '@/stores';
 import { Button } from 'antd';
-import styles from './all.module.less';
 
 function NotFound() {
   const navigate = useNavigate();
@@ -77,7 +76,7 @@ function NotFound() {
 
   return (
     <div className="absolute left-50% top-50% -translate-x-1/2 -translate-y-1/2 text-center">
-      <h1 className={`${styles.animation} w-full text-6rem font-bold`}>404</h1>
+      <h1 className="animate-shake w-full text-6rem font-bold">404</h1>
       <p className="w-full text-20px font-bold mt-15px">{t('public.notFindMessage')}</p>
       <Button className="mt-25px margin-auto" onClick={goIndex}>
         {t('public.returnHome')}

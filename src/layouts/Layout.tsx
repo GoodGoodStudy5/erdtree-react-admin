@@ -17,7 +17,7 @@ import nprogress from 'nprogress';
 import Menu from './components/Menu';
 import Header from './components/Header';
 import Tabs from './components/Tabs';
-import Forbidden from '@/pages/403';
+import { Forbidden } from '@/components';
 import ErrorBoundary from './components/ErrorBoundary';
 import styles from './index.module.less';
 
