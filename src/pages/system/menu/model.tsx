@@ -2,8 +2,7 @@ import type { TFunction } from 'i18next';
 import { MENU_ACTIONS, MENU_STATUS, MENU_TYPES } from '@/utils/constants';
 import { getMenuList } from '@/servers/system/menu';
 import { Icon } from '@iconify/react';
-import IconInput from './components/IconInput';
-import StateSwitch from './components/StateSwitch';
+import { IconInput, StateSwitch } from './components';
 
 // 搜索数据
 export const searchList = (t: TFunction): BaseSearchList[] => [

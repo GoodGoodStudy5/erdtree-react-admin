@@ -1,9 +1,7 @@
 import { searchList } from './model';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { getDataTrends } from '@/servers/dashboard';
-import Bar from './components/Bar';
-import Line from './components/Line';
-import Block from './components/Block';
+import { Bar, Line, Block } from './components';
 
 // 初始化搜索
 const initSearch = {

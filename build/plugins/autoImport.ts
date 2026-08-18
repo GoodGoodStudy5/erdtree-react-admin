@@ -10,6 +10,9 @@ export const autoImportPlugin = (): PluginOption => {
     dirs: [
       'src/hooks/**',
       'src/components/**',
+      // 一级目录门面只是转发, 能力定义在各功能目录内, 登记定义处
+      '!src/hooks/index.ts',
+      '!src/components/index.ts',
       // 这几处的符号同时由功能目录的 index 导出, 只登记 index 一处
       '!src/components/Buttons/components/**',
       '!src/components/Dates/components/**',

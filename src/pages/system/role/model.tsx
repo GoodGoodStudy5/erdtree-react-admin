@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import AuthorizeSelect from './components/AuthorizeSelect';
+import { AuthorizeSelect } from './components';
 
 // 搜索数据
 export const searchList = (t: TFunction): BaseSearchList[] => [
