@@ -34,6 +34,8 @@ export default {
   closeOther: '关闭其他',
   closeLeft: '关闭左侧',
   closeRight: '关闭右侧',
+  pinTab: '固定标签',
+  unpinTab: '取消固定',
   confirm: '确认',
   cancel: '取消',
   operate: '操作',

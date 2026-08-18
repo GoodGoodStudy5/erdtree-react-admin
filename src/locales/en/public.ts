@@ -34,6 +34,8 @@ export default {
   closeOther: 'Close other',
   closeLeft: 'Close left',
   closeRight: 'Close right',
+  pinTab: 'Pin tab',
+  unpinTab: 'Unpin tab',
   confirm: 'Confirm',
   cancel: 'Cancel',
   operate: 'operate',
