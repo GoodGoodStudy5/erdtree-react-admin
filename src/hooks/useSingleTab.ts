@@ -1,8 +1,8 @@
-import type { TabsData } from '@/stores/tabs';
+import type { TabsData } from '@/stores';
 import { useTranslation } from 'react-i18next';
-import { getMenuByKey, getMenuName, getOpenMenuByRouter } from '@/menus/utils/helper';
-import { ADD_TITLE, EDIT_TITLE } from '@/utils/config';
-import { setTitle } from '@/utils/helper';
+import { getMenuByKey, getMenuName, getOpenMenuByRouter } from '@/menus';
+import { ADD_TITLE, EDIT_TITLE } from '@/utils';
+import { setTitle } from '@/utils';
 import { useCommonStore } from './useCommonStore';
 import { useLocation } from 'react-router-dom';
 import { useCallback, useEffect } from 'react';

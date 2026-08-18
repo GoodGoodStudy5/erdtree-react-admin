@@ -10,7 +10,7 @@ import {
   getUserById,
   getUserPage,
   updateUser,
-} from '@/servers/system/user';
+} from '@/servers';
 
 // 当前行数据
 interface RowData {

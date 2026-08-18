@@ -1,6 +1,6 @@
 import type { SelectProps } from 'antd';
-import { getGames } from '@/servers/platform/game';
-import { ApiSelect } from '@/components/Selects';
+import { getGames } from '@/servers';
+import { ApiSelect } from '../../Selects';
 
 /**
  * @description: 游戏下拉组件

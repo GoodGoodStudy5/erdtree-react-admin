@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { amountFormatter } from '@/utils/helper';
+import { amountFormatter } from '@/utils';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   prefix?: string;

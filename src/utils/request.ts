@@ -1,4 +1,4 @@
-import { TOKEN } from '@/utils/config';
+import { TOKEN } from './config';
 import { creteRequest } from '@south/request';
 
 // 生成环境所用的接口

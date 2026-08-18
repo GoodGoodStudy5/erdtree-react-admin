@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Form } from 'antd';
 import { message } from '@south/message';
 import { useTranslation } from 'react-i18next';
-import { updatePassword } from '@/servers/login';
-import { PASSWORD_RULE } from '@/utils/config';
+import { updatePassword } from '@/servers';
+import { PASSWORD_RULE } from '@/utils';
 import { BaseModal, PasswordStrength } from '@/components';
 
 export interface PasswordModal {

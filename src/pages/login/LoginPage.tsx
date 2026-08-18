@@ -1,16 +1,16 @@
-import type { LoginData } from './model';
+import type { LoginData } from '@/servers';
 import type { FormProps } from 'antd';
 import { Checkbox, message } from 'antd';
 import { Form, Button, Input } from 'antd';
 import { I18n, Theme } from '@/components';
-import { login } from '@/servers/login';
+import { login } from '@/servers';
 import { LOGIN_EXPIRED_MSG } from '@south/request';
-import { setTitle } from '@/utils/helper';
-import { getMenuList } from '@/servers/system/menu';
-import { getUserRefreshPermissions } from '@/servers/system/user';
+import { setTitle } from '@/utils';
+import { getMenuList } from '@/servers';
+import { getUserRefreshPermissions } from '@/servers';
 import { encryption, decryption } from '@south/utils';
-import { getFirstMenu } from '@/menus/utils/helper';
-import { cancelAllRequest } from '@/utils/request';
+import { getFirstMenu } from '@/menus';
+import { cancelAllRequest } from '@/utils';
 import Logo from '@/assets/images/logo.svg';
 
 const CHECK_REMEMBER = 'remember_me';

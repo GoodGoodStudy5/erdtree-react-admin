@@ -1,4 +1,4 @@
-import type { PermissionData } from '@/servers/system/role';
+import type { PermissionData } from '@/servers';
 import { Checkbox, Spin } from 'antd';
 import { type Key, useState, useCallback } from 'react';
 import { Icon } from '@iconify/react';

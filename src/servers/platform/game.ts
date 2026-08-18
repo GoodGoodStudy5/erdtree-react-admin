@@ -1,4 +1,4 @@
-import { request } from '@/utils/request';
+import { request } from '@/utils';
 
 enum API {
   COMMON_URL = '/authority/common',

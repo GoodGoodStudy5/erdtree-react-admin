@@ -1,7 +1,6 @@
 import type { TFunction } from 'i18next';
 import type { ComponentType, BaseFormList } from '#/form';
 import { initCompProps } from './helper';
-import { CreateBusiness } from '../../Business';
 import type { FormInstance, InputProps } from 'antd';
 import { Input, Spin } from 'antd';
 import { type KeyboardEvent, lazy, Suspense } from 'react';
@@ -292,4 +291,3 @@ export function deleteComponent(name: ComponentType): void {
 }
 
 // 业务组件注入
-CreateBusiness();

@@ -3,8 +3,8 @@ import { Fragment } from 'react';
 import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useCommonStore } from '@/hooks/useCommonStore';
-import { getMenuByKey, getOpenMenuByRouter } from '@/menus/utils/helper';
+import { useCommonStore } from '@/hooks';
+import { getMenuByKey, getOpenMenuByRouter } from '@/menus';
 import { useMenuStore, useTabsStore } from '@/stores';
 
 interface Props {

@@ -4,13 +4,7 @@ import { Button, Drawer, Form, type FormInstance, message, Spin } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { searchList, createList, tableColumns } from './model';
-import {
-  getRolePage,
-  getRoleById,
-  createRole,
-  updateRole,
-  deleteRole,
-} from '@/servers/system/role';
+import { getRolePage, getRoleById, createRole, updateRole, deleteRole } from '@/servers';
 
 // 当前行数据
 interface RowData {

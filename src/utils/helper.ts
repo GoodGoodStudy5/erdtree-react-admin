@@ -1,7 +1,7 @@
 import type { ArrayData } from '#/public';
 import type { Constant } from './constants';
 import type { TFunction } from 'i18next';
-import { TITLE_SUFFIX } from '@/utils/config';
+import { TITLE_SUFFIX } from './config';
 
 /**
  * 首字母大写

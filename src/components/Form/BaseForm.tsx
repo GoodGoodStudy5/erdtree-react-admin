@@ -8,6 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { getComponent } from './utils/componentMap';
 import { filterEmptyStr, filterFormItem, handleValuePropName } from './utils/helper';
 import { filterDayjs } from '../Dates/utils/helper';
+import { CreateBusiness } from '../Business';
+
+// 业务组件在表单能力加载时一次性注册进组件表
+CreateBusiness();
 
 interface Props extends FormProps {
   list: BaseFormList[];

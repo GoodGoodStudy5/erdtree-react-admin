@@ -1,8 +1,8 @@
 import type { BreadcrumbProps } from 'antd';
-import type { NavData } from '@/menus/utils/helper';
+import type { NavData } from '@/menus';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCommonStore } from '@/hooks/useCommonStore';
+import { useCommonStore } from '@/hooks';
 
 interface Props {
   className?: string;

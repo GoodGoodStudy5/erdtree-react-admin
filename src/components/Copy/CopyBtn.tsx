@@ -2,7 +2,7 @@ import type { ButtonProps } from 'antd';
 import { Button, message } from 'antd';
 import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
-import { useClipboard } from '@/hooks/useClipboard';
+import { useClipboard } from '@/hooks';
 
 interface Props extends ButtonProps {
   text: string;

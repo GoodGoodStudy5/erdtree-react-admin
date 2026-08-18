@@ -17,7 +17,7 @@ nprogress.configure({ showSpinner: false });
 // antd主题
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
-import { useCommonStore } from '@/hooks/useCommonStore';
+import { useCommonStore } from '@/hooks';
 
 function AppRouter() {
   const { i18n } = useTranslation();

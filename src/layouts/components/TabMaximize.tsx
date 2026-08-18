@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react';
-import { useCommonStore } from '@/hooks/useCommonStore';
+import { useCommonStore } from '@/hooks';
 import { useTabsStore } from '@/stores';
 
 function TabMaximize() {

@@ -3,12 +3,12 @@ import type { SideMenu } from '#/public';
 import type { ItemType, MenuItemType } from 'antd/es/menu/interface';
 import { useCallback, useMemo, memo } from 'react';
 import { Menu } from 'antd';
-import { isUrl } from '@/utils/is';
+import { isUrl } from '@/utils';
 import { Icon } from '@iconify/react';
 import { useTranslation } from 'react-i18next';
-import { useCommonStore } from '@/hooks/useCommonStore';
+import { useCommonStore } from '@/hooks';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useMenuStore } from '@/stores';
+import { useMenuStore, getTabTitle } from '@/stores';
 import { useShallow } from 'zustand/react/shallow';
 import {
   filterMenus,
@@ -17,11 +17,10 @@ import {
   getOpenMenuByRouter,
   handleFilterMenus,
   splitPath,
-} from '@/menus/utils/helper';
+} from '@/menus';
 import styles from '../index.module.less';
 import Logo from '@/assets/images/logo.svg';
-import { getTabTitle } from '../utils/helper';
-import { setTitle } from '@/utils/helper';
+import { setTitle } from '@/utils';
 
 /**
  * 转换菜单icon格式

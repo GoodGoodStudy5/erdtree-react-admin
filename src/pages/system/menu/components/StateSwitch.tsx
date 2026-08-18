@@ -1,4 +1,4 @@
-import { changeMenuState } from '@/servers/system/menu';
+import { changeMenuState } from '@/servers';
 import { message, Popconfirm, Switch } from 'antd';
 import { useState } from 'react';
 

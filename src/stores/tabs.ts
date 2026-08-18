@@ -1,9 +1,10 @@
 import type { TabPaneProps } from 'antd';
-import type { NavData } from '@/menus/utils/helper';
+import type { NavData } from '@/menus';
 import type { KeepAliveRef } from 'keepalive-for-react';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { LANG } from '@/utils';
 
 export interface TabsData extends Omit<TabPaneProps, 'tab'> {
   key: string;
@@ -230,3 +231,24 @@ export const useTabsStore = create<TabsState>()(
     },
   ),
 );
+
+/**
+ * 通过路由获取标签名
+ * @param tabs - 标签
+ * @param path - 路由路径
+ */
+export const getTabTitle = (tabs: TabsData[], path: string): string => {
+  const lang = localStorage.getItem(LANG);
+
+  for (let i = 0; i < tabs?.length; i++) {
+    const item = tabs[i];
+
+    if (item.key === path) {
+      const { label, labelEn, labelZh } = item;
+      const result = lang === 'en' ? labelEn : labelZh || label;
+      return result as string;
+    }
+  }
+
+  return '';
+};

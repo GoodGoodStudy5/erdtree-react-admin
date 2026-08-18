@@ -1,4 +1,4 @@
-import { getFirstMenu, getMenuByKey } from '@/menus/utils/helper';
+import { getFirstMenu, getMenuByKey } from '@/menus';
 import { Button } from 'antd';
 import styles from './all.module.less';
 

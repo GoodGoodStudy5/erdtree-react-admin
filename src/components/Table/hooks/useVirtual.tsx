@@ -2,7 +2,7 @@ import type { InitTableState } from '../utils/reducer';
 import type { CSSProperties, ReactNode } from 'react';
 import { useEffect, useReducer, useRef, useMemo, memo } from 'react';
 import { reducer } from '../utils/reducer';
-import { isNumber } from '@/utils/is';
+import { isNumber } from '@/utils';
 import { ScrollContext } from '../utils/state';
 import { throttle } from 'lodash';
 import { VirtualWrapper } from '../components/VirtualWrapper';

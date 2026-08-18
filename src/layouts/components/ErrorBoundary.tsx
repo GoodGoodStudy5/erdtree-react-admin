@@ -2,9 +2,9 @@ import { Component, ErrorInfo, ReactNode } from 'react';
 import { Button, Result, Tooltip } from 'antd';
 import { LogoutOutlined, MessageOutlined, RedoOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useUserStore } from '@/stores/user';
-import { createLog } from '@/servers/system/log';
-import { useLogout } from '@/hooks/useLogout';
+import { useUserStore } from '@/stores';
+import { createLog } from '@/servers';
+import { useLogout } from '@/hooks';
 
 interface Props {
   children: ReactNode;

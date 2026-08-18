@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
-import { MENU_STATUS } from '@/utils/constants';
-import { getUserPage } from '@/servers/system/user';
-import { getRoleList } from '@/servers/system/role';
+import { MENU_STATUS } from '@/utils';
+import { getUserPage } from '@/servers';
+import { getRoleList } from '@/servers';
 
 const otherSearch: BaseSearchList[] = [];
 

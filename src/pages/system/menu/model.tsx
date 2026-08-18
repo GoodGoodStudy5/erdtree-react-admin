@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
-import { MENU_ACTIONS, MENU_STATUS, MENU_TYPES } from '@/utils/constants';
-import { getMenuList } from '@/servers/system/menu';
+import { MENU_ACTIONS, MENU_STATUS, MENU_TYPES } from '@/utils';
+import { getMenuList } from '@/servers';
 import { Icon } from '@iconify/react';
 import { IconInput, StateSwitch } from './components';
 

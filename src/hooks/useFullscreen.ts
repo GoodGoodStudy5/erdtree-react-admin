@@ -1,4 +1,4 @@
-import { usePublicStore } from '@/stores/public';
+import { usePublicStore } from '@/stores';
 import { useCommonStore } from './useCommonStore';
 
 export function useFullscreen() {

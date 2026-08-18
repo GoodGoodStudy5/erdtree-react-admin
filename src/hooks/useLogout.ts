@@ -1,5 +1,5 @@
 import { useShallow } from 'zustand/shallow';
-import { cancelAllRequest } from '@/utils/request';
+import { cancelAllRequest } from '@/utils';
 
 /**
  * 获取常用的状态数据

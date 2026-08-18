@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFirstMenu } from '@/menus/utils/helper';
-import { useCommonStore } from '@/hooks/useCommonStore';
+import { getFirstMenu } from '@/menus';
+import { useCommonStore } from '@/hooks';
 
 function HomePage() {
   const { permissions, menuList } = useCommonStore();

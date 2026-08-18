@@ -1,6 +1,6 @@
-import { getFirstMenu, getMenuByKey } from '@/menus/utils/helper';
-import { getMenuList } from '@/servers/system/menu';
-import { getUserRefreshPermissions } from '@/servers/system/user';
+import { getFirstMenu, getMenuByKey } from '@/menus';
+import { getMenuList } from '@/servers';
+import { getUserRefreshPermissions } from '@/servers';
 import { useMenuStore, useUserStore } from '@/stores';
 import { Button } from 'antd';
 import styles from './all.module.less';

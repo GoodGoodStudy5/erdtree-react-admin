@@ -1,6 +1,6 @@
 import type { ApiFn, BaseFormList } from '#/form';
 import type { TFunction } from 'i18next';
-import { getPartnerDemo } from '@/servers/platform/partner';
+import { getPartnerDemo } from '@/servers';
 
 // 搜索数据
 export const searchList = (t: TFunction): BaseFormList[] => [

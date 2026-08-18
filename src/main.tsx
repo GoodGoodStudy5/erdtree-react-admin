@@ -25,8 +25,8 @@ import 'dayjs/locale/zh-cn';
 dayjs.locale('zh-cn');
 
 // 性能监控
-import { initPerformanceMonitoring } from '@/utils/performance';
-import { initSentry } from '@/utils/sentry';
+import { initPerformanceMonitoring } from '@/utils';
+import { initSentry } from '@/utils';
 
 // 初始化全局错误处理（防止应用崩溃和自动刷新）- 必须同步执行
 if (typeof window !== 'undefined') {

@@ -11,7 +11,7 @@ import {
   updateMenu,
   deleteMenu,
   batchDeleteMenu,
-} from '@/servers/system/menu';
+} from '@/servers';
 
 // 当前行数据
 interface RowData {

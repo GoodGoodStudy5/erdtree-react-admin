@@ -3,7 +3,7 @@ import type { MenuProps } from 'antd';
 import { useRef, memo } from 'react';
 import { App, Dropdown } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useCommonStore } from '@/hooks/useCommonStore';
+import { useCommonStore } from '@/hooks';
 import { useMenuStore } from '@/stores';
 import {
   MenuFoldOutlined,

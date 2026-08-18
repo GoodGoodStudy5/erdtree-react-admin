@@ -1,6 +1,6 @@
 import type { TableColumn } from '#/public';
 import type { SizeType } from 'antd/es/config-provider/SizeContext';
-import { EMPTY_VALUE } from '@/utils/config';
+import { EMPTY_VALUE } from '@/utils';
 import { cloneDeep } from 'lodash';
 
 /** 计算表格高度 */

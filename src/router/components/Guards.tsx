@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { message } from '@south/message';
 import { getLocalInfo } from '@south/utils';
-import { TOKEN } from '@/utils/config';
+import { TOKEN } from '@/utils';
 import { Spin } from 'antd';
 
 // 懒加载 Layout 组件，减少首屏加载体积

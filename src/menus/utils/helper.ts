@@ -1,7 +1,7 @@
 import type { SideMenu } from '#/public';
-import type { Langs } from '@/components/I18n';
+import type { Langs } from '@/components';
 import { cloneDeep } from 'lodash';
-import { LANG } from '@/utils/config';
+import { LANG } from '@/utils';
 
 /**
  * 根据路由获取展开菜单数组

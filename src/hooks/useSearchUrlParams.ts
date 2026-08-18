@@ -2,7 +2,7 @@
  * 将搜索参数带入url中
  */
 import { type FormInstance } from 'antd';
-import { getUrlAllParam } from '@/utils/helper';
+import { getUrlAllParam } from '@/utils';
 
 export const useSearchUrlParams = (form: FormInstance) => {
   const [, setSearchParams] = useSearchParams();

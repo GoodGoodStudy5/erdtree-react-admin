@@ -1,7 +1,7 @@
 import type { InputProps } from 'antd';
 import { Input, message } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useClipboard } from '@/hooks/useClipboard';
+import { useClipboard } from '@/hooks';
 
 const { Search } = Input;
 

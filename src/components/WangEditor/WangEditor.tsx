@@ -3,7 +3,7 @@ import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/edit
 import { useState, useEffect, type HTMLAttributes } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Editor, Toolbar } from '@wangeditor/editor-for-react';
-import { FILE_API } from '@/utils/config';
+import { FILE_API } from '@/utils';
 
 export interface EditorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   value: string; // 富文本内容

@@ -1,6 +1,6 @@
 import { searchList } from './model';
 import { useEffectOnActive } from 'keepalive-for-react';
-import { getDataTrends } from '@/servers/dashboard';
+import { getDataTrends } from '@/servers';
 import { Bar, Line, Block } from './components';
 
 // 初始化搜索

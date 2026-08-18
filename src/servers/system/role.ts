@@ -1,6 +1,6 @@
 import type { Key, ReactNode } from 'react';
 import type { DataNode } from 'antd/es/tree';
-import { request } from '@/utils/request';
+import { request } from '@/utils';
 
 enum API {
   URL = '/system/role',

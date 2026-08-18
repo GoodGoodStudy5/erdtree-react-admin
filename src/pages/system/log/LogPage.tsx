@@ -5,7 +5,7 @@ import { useEffectOnActive } from 'keepalive-for-react';
 import { message } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { searchList, tableColumns } from './model';
-import { batchDeleteLog, deleteLog, getLogPage } from '@/servers/system/log';
+import { batchDeleteLog, deleteLog, getLogPage } from '@/servers';
 
 // 当前行数据
 interface RowData {

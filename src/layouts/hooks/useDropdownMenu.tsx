@@ -7,7 +7,7 @@ import {
   VerticalAlignTopOutlined,
   VerticalAlignMiddleOutlined,
 } from '@ant-design/icons';
-import { useCommonStore } from '@/hooks/useCommonStore';
+import { useCommonStore } from '@/hooks';
 import { useTabsStore } from '@/stores';
 import { useShallow } from 'zustand/shallow';
 

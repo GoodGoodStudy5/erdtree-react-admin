@@ -1,5 +1,5 @@
-import type { LoginResult } from '@/pages/login/model';
-import { request } from '@/utils/request';
+import type { LoginResult } from '../login';
+import { request } from '@/utils';
 
 enum API {
   URL = '/system/user',

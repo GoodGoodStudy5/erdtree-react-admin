@@ -5,7 +5,7 @@ import { type FormProps, Button, Col, Flex } from 'antd';
 import { Form } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { filterDayjs } from '../Dates';
-import { useCommonStore } from '@/hooks/useCommonStore';
+import { useCommonStore } from '@/hooks';
 import { getComponent } from '../Form/utils/componentMap';
 import { SearchOutlined, ReloadOutlined, DownOutlined } from '@ant-design/icons';
 import { filterEmptyStr, filterFormItem, handleValuePropName } from '../Form/utils/helper';
