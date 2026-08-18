@@ -64,12 +64,15 @@ const ROUTER_EXCLUDE_REGEX = new RegExp(
   'i',
 );
 
+// 页面本体与组件采用 PascalCase 命名, 只有小写的 index 承接路由
+const PASCAL_CASE_TSX_REGEX = /\/[A-Z][^/]*\.tsx$/;
+
 /**
  * 匹配路由是否在排查名单中
  * @param path - 路径
  */
 function handleRouterExclude(path: string): boolean {
-  return ROUTER_EXCLUDE_REGEX.test(path);
+  return ROUTER_EXCLUDE_REGEX.test(path) || PASCAL_CASE_TSX_REGEX.test(path);
 }
 
 /**

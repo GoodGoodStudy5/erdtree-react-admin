@@ -19,7 +19,7 @@ const { defaultAlgorithm, darkAlgorithm } = theme;
 
 import { useCommonStore } from '@/hooks/useCommonStore';
 
-function Page() {
+function AppRouter() {
   const { i18n } = useTranslation();
   const { theme } = useCommonStore();
 
@@ -59,4 +59,4 @@ function Page() {
   );
 }
 
-export default Page;
+export default AppRouter;
