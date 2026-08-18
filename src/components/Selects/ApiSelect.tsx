@@ -3,7 +3,7 @@ import type { DefaultOptionType } from 'antd/es/select';
 import { Select } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback, memo } from 'react';
-import { MAX_TAG_COUNT } from './index';
+import { MAX_TAG_COUNT } from './constants';
 import Loading from './components/Loading';
 
 /**

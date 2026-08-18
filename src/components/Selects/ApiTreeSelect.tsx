@@ -3,7 +3,7 @@ import type { ApiTreeSelectProps } from './types';
 import { TreeSelect } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useState, memo } from 'react';
-import { MAX_TAG_COUNT } from './index';
+import { MAX_TAG_COUNT } from './constants';
 import Loading from './components/Loading';
 
 /**

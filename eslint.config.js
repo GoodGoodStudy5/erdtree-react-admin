@@ -146,4 +146,39 @@ export default tseslint.config(
       'react-hooks/exhaustive-deps': 'off',
     },
   },
+  {
+    // index 是目录门面, 只声明对外开放什么, 实现放同目录的具名文件
+    files: ['src/**/index.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'Program > :not(ImportDeclaration, ExportNamedDeclaration, ExportAllDeclaration, ExportDefaultDeclaration)',
+          message: 'index 只能做 re-export, 实现请放到同目录的具名文件',
+        },
+        {
+          selector: 'ExportNamedDeclaration[declaration]',
+          message: 'index 只能转发已有符号, 不能在此声明变量、函数或类型',
+        },
+        {
+          selector: 'ExportDefaultDeclaration > :not(Identifier)',
+          message: 'index 的 default 导出必须先在具名文件中声明再转发',
+        },
+      ],
+    },
+  },
+  {
+    // 页面 index 是路由机制入口, 不是公共门面, 只转发同目录的页面本体
+    files: ['src/pages/**/index.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Program > :not(ExportNamedDeclaration)',
+          message: '页面 index 只能写 export { default } from "./<页面名>Page"',
+        },
+      ],
+    },
+  },
 );

@@ -15,6 +15,8 @@ export const autoImportPlugin = (): PluginOption => {
       '!src/components/Dates/components/**',
       '!src/components/Selects/Api*.tsx',
       '!src/components/Selects/Base*.tsx',
+      // 这些组件目录的 index 只是转发, 组件定义在同名文件内, 登记定义处
+      '!src/components/{Business,Count,Ellipsis,Fullscreen,GlobalSearch,I18n,PasswordStrength,Theme,WangEditor}/index.ts',
       // stores 的 index 只是转发, 类型定义在各 store 文件内, 登记定义处
       'src/stores/**',
       '!src/stores/index.ts',

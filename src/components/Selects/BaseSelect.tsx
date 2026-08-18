@@ -1,6 +1,6 @@
 import { Select, type SelectProps } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { MAX_TAG_COUNT } from './index';
+import { MAX_TAG_COUNT } from './constants';
 
 /**
  * @description: 基础下拉组件

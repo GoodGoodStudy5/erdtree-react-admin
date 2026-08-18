@@ -1,7 +1,7 @@
 import type { ApiPageSelectProps } from './types';
 import type { DefaultOptionType, SelectProps } from 'antd/es/select';
 import { Select, Spin } from 'antd';
-import { MAX_TAG_COUNT } from './index';
+import { MAX_TAG_COUNT } from './constants';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback, memo } from 'react';
 import Loading from './components/Loading';

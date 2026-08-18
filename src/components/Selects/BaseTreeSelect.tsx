@@ -1,6 +1,6 @@
 import { TreeSelect, type TreeSelectProps } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { MAX_TAG_COUNT } from './index';
+import { MAX_TAG_COUNT } from './constants';
 
 function BaseTreeSelect(props: TreeSelectProps) {
   const { treeData } = props;
