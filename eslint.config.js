@@ -6,6 +6,37 @@ import checkFile from 'eslint-plugin-check-file';
 import jsdoc from 'eslint-plugin-jsdoc';
 import tseslint from 'typescript-eslint';
 
+/**
+ * flat config 的规则选项是整体替换而非合并, 所以每个用到 no-restricted-syntax 的块
+ * 都要把该生效的选择器重新列全, 否则后写的块会把先写的整条盖掉.
+ */
+
+/** 外壳的 modalProps 只能展开到 antd Modal 系载体 */
+const NO_MODAL_PROPS_ON_OTHER_CARRIER = [
+  {
+    selector:
+      'JSXOpeningElement:not([name.name=/^(Modal|BaseModal|ModalShell)$/]) > JSXSpreadAttribute[argument.property.name="modalProps"]',
+    message: 'modalProps 只能展开到 antd Modal 系载体, 其余载体请显式接 submit / close',
+  },
+  {
+    selector:
+      'JSXOpeningElement:not([name.name=/^(Modal|BaseModal|ModalShell)$/]) > JSXSpreadAttribute[argument.name="modalProps"]',
+    message: 'modalProps 只能展开到 antd Modal 系载体, 其余载体请显式接 submit / close',
+  },
+];
+
+/** 命令式底座取代了 ref 契约: open 的参数由 props 推导, 不再从 ref 类型反推 */
+const NO_IMPERATIVE_HANDLE = {
+  selector: 'CallExpression[callee.name="useImperativeHandle"]',
+  message: '弹窗改走命令式, 不要用 useImperativeHandle 暴露 open()',
+};
+
+/** 页面本体不再自己管弹窗开关 */
+const NO_SHELL_IN_PAGE = {
+  selector: 'JSXOpeningElement[name.name=/^(BaseModal|ModalShell)$/]',
+  message: '页面本体不要直接渲染弹窗外壳, 把弹窗抽成独立组件, 页面只用 open()',
+};
+
 export default tseslint.config(
   // 构建产物不参与校验, 包的 dist 在任意层级都要排除
   // .design / .scratch 是设计草稿与工作区, 不进版本库, 也不受工程规范约束
@@ -145,6 +176,8 @@ export default tseslint.config(
           // caughtErrorsIgnorePattern: '^_',
         },
       ],
+      // 见文件顶部常量的说明
+      'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER],
       // 官方hooks校验
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'off',
@@ -197,6 +230,43 @@ export default tseslint.config(
         {
           selector: 'ExportDefaultDeclaration > :not(Identifier)',
           message: 'index 的 default 导出必须先在具名文件中声明再转发',
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/pages/**/*.tsx', 'src/layouts/**/*.tsx'],
+    rules: {
+      'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER, NO_IMPERATIVE_HANDLE],
+    },
+  },
+  {
+    // 页面本体: 三条规则都要列全, 后写的块会整条覆盖先写的
+    files: ['src/pages/**/*Page.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...NO_MODAL_PROPS_ON_OTHER_CARRIER,
+        NO_IMPERATIVE_HANDLE,
+        NO_SHELL_IN_PAGE,
+      ],
+    },
+  },
+  {
+    // 挂载点只此一处, 其余地方拿不到也不该拿
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/router/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@south/components',
+              importNames: ['ModalOutlet'],
+              message: 'ModalOutlet 是挂载点, 只有 src/router 可以引用',
+            },
+          ],
         },
       ],
     },
