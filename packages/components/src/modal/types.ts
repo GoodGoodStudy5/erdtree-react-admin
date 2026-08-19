@@ -1,5 +1,6 @@
 import type { ComponentProps, ComponentType, ReactNode } from 'react';
-import type { ModalProps } from 'antd';
+import type { FormInstance, ModalProps } from 'antd';
+import type { BaseModalProps } from './BaseModal';
 
 /**
  * 可被命令式调起的弹窗组件, 约定是把 ModalControl 混进自己的 props.
@@ -41,14 +42,13 @@ export type CloseReason = 'userRequest';
 /** 外壳层接管的 antd Modal 字段. 提交期间要禁止关闭, 故取消按钮与遮罩键盘也在内 */
 export type ShellOwnedModalProps = Pick<
   ModalProps,
-  | 'open'
-  | 'confirmLoading'
-  | 'onOk'
-  | 'onCancel'
-  | 'cancelButtonProps'
-  | 'maskClosable'
-  | 'keyboard'
->;
+  'open' | 'confirmLoading' | 'cancelButtonProps' | 'maskClosable' | 'keyboard'
+> & {
+  /** 收窄成无参 —— 外壳不转发原生事件, 调用方也用不到 */
+  onOk: () => void;
+  /** 收窄成无参, 同上 */
+  onCancel: () => void;
+};
 
 /** useModalShell 的入参 */
 export type UseModalShellOptions<R> = {
@@ -75,7 +75,7 @@ export type UseModalShellResult = {
 };
 
 /** ModalShell 的 props. control 是类型连通的关键, 不能改走 context */
-export type ModalShellProps<R> = Omit<ModalProps, keyof ShellOwnedModalProps> & {
+export type ModalShellProps<R> = Omit<BaseModalProps, keyof ShellOwnedModalProps> & {
   /** 直接把弹窗组件自己的 props 传进来, R 由此反推 */
   control: ModalControl<R>;
   /** 返回值即业务结果 */
@@ -85,10 +85,20 @@ export type ModalShellProps<R> = Omit<ModalProps, keyof ShellOwnedModalProps> & 
   children?: ReactNode;
 };
 
-/** ModalForm 的 props. V 从 onSubmit 的参数标注推出, R 从 control 推出 */
-export type ModalFormProps<V, R> = Omit<ModalShellProps<R>, 'onOk'> & {
+/** useModalForm 的入参 */
+export type UseModalFormOptions<V, R> = {
   /** 收到已通过校验的表单值, 返回值即业务结果 */
   onSubmit: (values: V) => R | Promise<R>;
+  /** 提交失败时接管异常. 不传则重抛 */
+  onError?: (error: unknown) => void;
+};
+
+/** useModalForm 的产出. 在外壳产出之上多给 form 实例与提交回调 */
+export type UseModalFormResult<V> = UseModalShellResult & {
+  /** 与表单共用的实例 */
+  form: FormInstance<V>;
+  /** 接到裸 antd Form 的 onFinish, 或自带 Form 的表单组件的提交回调上 */
+  handleFinish: (values: V) => void;
 };
 
 /** 命令式入口的签名. 自由函数, 不依赖 React 上下文, 实现必须 satisfies 它 */
@@ -118,5 +128,8 @@ export type UseModalShellFn = <R>(
 /** 外壳组件的签名 */
 export type ModalShellFn = <R>(props: ModalShellProps<R>) => ReactNode;
 
-/** 表单外壳组件的签名 */
-export type ModalFormFn = <V, R>(props: ModalFormProps<V, R>) => ReactNode;
+/** 表单弹窗 hook 的签名 */
+export type UseModalFormFn = <V, R>(
+  control: ModalControl<R>,
+  options: UseModalFormOptions<V, R>,
+) => UseModalFormResult<V>;

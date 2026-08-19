@@ -10,11 +10,12 @@
  * 断言一律走 expectType 而非局部变量, 因为项目开了 noUnusedLocals.
  */
 import type { DrawerProps, ModalProps } from 'antd';
+import { Form } from 'antd';
 import type { ReactNode } from 'react';
 import type {
   CreateModalSetFn,
   ModalControl,
-  ModalFormFn,
+  UseModalFormFn,
   ModalShellFn,
   OpenFn,
   UseCloseGuardFn,
@@ -24,14 +25,23 @@ import type {
 /** 断言实参可赋给 T. 类型不符则编译期报错 */
 declare function expectType<T>(value: T): void;
 
-declare const open: OpenFn;
-declare const createModalSet: CreateModalSetFn;
-declare const useCloseGuard: UseCloseGuardFn;
-declare const useModalShell: UseModalShellFn;
-declare const ModalShell: ModalShellFn;
-declare const ModalForm: ModalFormFn;
+// 用真实现而非占位声明, 否则实现与契约仍可能各走各的
+import { BaseModal } from './BaseModal';
+import { ModalShell } from './ModalShell';
+import { createModalSet, open } from './open';
+import { useCloseGuard } from './useCloseGuard';
+import { useModalForm } from './useModalForm';
+import { useModalShell } from './useModalShell';
 
-declare function BaseModal(props: ModalProps & { isLoading?: boolean }): ReactNode;
+// 实现必须符合契约里导出的签名. 任一处漂移这里先红
+const _open = open satisfies OpenFn;
+const _createModalSet = createModalSet satisfies CreateModalSetFn;
+const _useCloseGuard = useCloseGuard satisfies UseCloseGuardFn;
+const _useModalShell = useModalShell satisfies UseModalShellFn;
+const _ModalShell = ModalShell satisfies ModalShellFn;
+const _useModalForm = useModalForm satisfies UseModalFormFn;
+void [_open, _createModalSet, _useCloseGuard, _useModalShell, _ModalShell, _useModalForm];
+
 declare function Drawer(props: DrawerProps): ReactNode;
 declare function Modal(props: ModalProps): ReactNode;
 
@@ -211,20 +221,22 @@ type UserForm = { username: string; age: number };
 declare function submitUser(values: UserForm): Promise<User>;
 
 function ModalUserForm(props: { id?: string } & ModalControl<User>) {
+  const { form, handleFinish, modalProps } = useModalForm<UserForm, User>(props, {
+    onSubmit: (values) => submitUser(values),
+  });
   return (
-    <ModalForm control={props} title="编辑用户" onSubmit={(values: UserForm) => submitUser(values)}>
-      表单项
-    </ModalForm>
+    <BaseModal {...modalProps} title="编辑用户">
+      <Form form={form} onFinish={handleFinish}>
+        表单项
+      </Form>
+    </BaseModal>
   );
 }
 
 function ModalUserFormBad(props: { id?: string } & ModalControl<User>) {
-  return (
-    // @ts-expect-error 外层交付 User, onSubmit 却返回 number
-    <ModalForm control={props} title="编辑用户" onSubmit={async (_values: UserForm) => 42}>
-      表单项
-    </ModalForm>
-  );
+  // @ts-expect-error 外层交付 User, onSubmit 却返回 number
+  const { modalProps } = useModalForm<UserForm, User>(props, { onSubmit: async () => 42 });
+  return <BaseModal {...modalProps} title="编辑用户" />;
 }
 
 // ── 关闭原因只走组件内部 ──────────────────────────────────────

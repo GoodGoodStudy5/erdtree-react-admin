@@ -7,6 +7,7 @@ import Login from '@/pages/login';
 import Forget from '@/pages/forget';
 import NotFound from '@/pages/404';
 import Guards from './Guards';
+import { ModalOutlet } from '@south/components';
 
 const pages = import.meta.glob('../../pages/**/*.tsx', { eager: false }) as RouteModules;
 
@@ -75,7 +76,13 @@ function App() {
     return newRoutes;
   }, []);
 
-  return <>{useRoutes(routes)}</>;
+  return (
+    <>
+      {useRoutes(routes)}
+      {/* 挂在路由树内, 切语言时随整树重挂载, 弹窗里的文案才跟得上 */}
+      <ModalOutlet />
+    </>
+  );
 }
 
 export default App;
