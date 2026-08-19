@@ -1,91 +1,54 @@
-import type { FormProps } from 'antd/es/form/Form';
-import { Ref, useImperativeHandle } from 'react';
-import { useState } from 'react';
+import type { ModalControl } from '@south/components';
 import { Form } from 'antd';
+import { BaseModal, ModalAbort, useModalForm } from '@south/components';
 import { message } from '@south/message';
 import { updatePassword } from '@/servers';
 import { PASSWORD_RULE } from '@/utils';
-import { BaseModal, PasswordStrength } from '@/components';
+import { PasswordStrength } from '@/components';
 import { $t } from '@/locales';
 
-export interface PasswordModal {
-  open: () => void;
+interface FormValues {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
-interface Props {
-  passwordRef: Ref<PasswordModal>;
-}
-
-function UpdatePassword(props: Props) {
-  const { passwordRef } = props;
-  const [form] = Form.useForm();
-  const [handleLogout] = useLogout();
-  const [isOpen, setOpen] = useState(false);
-  const [isLoading, setLoading] = useState(false);
-
-  // 抛出外部方法
-  useImperativeHandle(passwordRef, () => ({
-    open: () => {
-      setOpen(true);
-    },
-  }));
-
-  /** 点击模态框确定 */
-  const onOk = () => {
-    form?.submit();
-  };
-
-  /** 关闭模态框 */
-  const onClose = () => {
-    setOpen(false);
-    form?.resetFields();
-  };
-
-  /**
-   * 提交表单
-   * @param values - 表单值
-   */
-  const onFinish: FormProps['onFinish'] = async (values) => {
-    // 当密码和确认密码不同时则提示错误
+/**
+ * 修改密码.
+ * 只负责改密码本身, 改完是否登出由调用方决定 —— 弹窗不该替应用决定全局登录状态.
+ */
+export function UpdatePassword(props: ModalControl<boolean>) {
+  /** 提交修改 */
+  const onSubmit = async (values: FormValues) => {
+    // 两次输入不一致是用户笔误, 提示后停在原地, 不算异常
     if (values.newPassword !== values.confirmPassword) {
-      return message.warning({
+      message.warning({
         content: $t('login.confirmPasswordMessage'),
         key: 'confirmPassword',
       });
+      throw new ModalAbort('confirm password mismatch');
     }
-    try {
-      setLoading(true);
-      const { code, message: messageInfo } = await updatePassword(values);
-      if (Number(code) === 200) {
-        onClose();
-        message.success(messageInfo);
-        handleLogout();
-      }
-    } finally {
-      setLoading(false);
-    }
+
+    const { code, message: messageInfo } = await updatePassword(values);
+    // 请求层已经弹过错误提示, 这里抛出只为让弹窗停在原地
+    if (Number(code) !== 200) throw new Error(messageInfo || 'update password failed');
+
+    message.success(messageInfo);
+    return true;
   };
 
+  const { form, handleFinish, modalProps } = useModalForm<FormValues, boolean>(props, {
+    onSubmit,
+  });
+
   return (
-    <BaseModal
-      title={$t('public.changePassword')}
-      open={isOpen}
-      confirmLoading={isLoading}
-      onOk={onOk}
-      onCancel={() => onClose()}
-    >
-      <Form
-        name="UpdatePassword"
-        form={form}
-        labelWrap
-        labelCol={{ span: 5 }}
-        wrapperCol={{ span: 19 }}
-        onFinish={onFinish}
-        autoComplete="off"
-      >
+    <BaseModal {...modalProps} title={$t('public.changePassword')}>
+      <Form form={form} onFinish={handleFinish} labelWrap autoComplete="off">
         <Form.Item
           label={$t('login.oldPassword')}
           name="oldPassword"
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 19 }}
           rules={[
             { required: true, message: $t('public.pleaseEnter', { name: $t('login.password') }) },
             PASSWORD_RULE(),
@@ -96,6 +59,8 @@ function UpdatePassword(props: Props) {
         <Form.Item
           label={$t('login.newPassword')}
           name="newPassword"
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 19 }}
           rules={[
             { required: true, message: $t('public.pleaseEnter', { name: $t('login.password') }) },
             PASSWORD_RULE(),
@@ -103,10 +68,11 @@ function UpdatePassword(props: Props) {
         >
           <PasswordStrength />
         </Form.Item>
-
         <Form.Item
           label={$t('login.confirmPassword')}
           name="confirmPassword"
+          labelCol={{ span: 5 }}
+          wrapperCol={{ span: 19 }}
           rules={[
             {
               required: true,
@@ -121,5 +87,3 @@ function UpdatePassword(props: Props) {
     </BaseModal>
   );
 }
-
-export default UpdatePassword;

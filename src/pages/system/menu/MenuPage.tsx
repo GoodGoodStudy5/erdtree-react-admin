@@ -1,17 +1,12 @@
 import type { BaseFormData } from '#/form';
 import type { PagePermission } from '#/public';
-import { Button, Form, type FormInstance, message, Popconfirm } from 'antd';
+import { Button, message, Popconfirm } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
-import { searchList, createList, tableColumns } from './model';
-import {
-  getMenuPage,
-  getMenuById,
-  createMenu,
-  updateMenu,
-  deleteMenu,
-  batchDeleteMenu,
-} from '@/servers';
+import { open } from '@south/components';
+import { searchList, tableColumns } from './model';
+import { MenuEditModal } from './MenuEditModal';
+import { getMenuPage, deleteMenu, batchDeleteMenu } from '@/servers';
 import { $t, i18n } from '@/locales';
 
 // 当前行数据
@@ -22,21 +17,9 @@ interface RowData {
   labelEn: string;
 }
 
-// 初始化新增数据
-const initCreate = {
-  state: 1,
-  order: 0,
-};
-
 function MenuPage() {
-  const createFormRef = useRef<FormInstance>(null);
   const [isFetch, setFetch] = useState(false);
-  const [isCreateOpen, setCreateOpen] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [isCreateLoading, setCreateLoading] = useState(false);
-  const [createTitle, setCreateTitle] = useState(ADD_TITLE());
-  const [createId, setCreateId] = useState('');
-  const [createData, setCreateData] = useState<BaseFormData>(initCreate);
   const [searchData, setSearchData] = useState<BaseFormData>({});
   const [page, setPage] = useState(INIT_PAGINATION.page);
   const [pageSize, setPageSize] = useState(INIT_PAGINATION.pageSize);
@@ -44,8 +27,6 @@ function MenuPage() {
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
-  const [form] = Form.useForm();
-  const type = Form.useWatch('type', form);
   const { permissions } = useCommonStore();
 
   // 权限前缀
@@ -104,14 +85,11 @@ function MenuPage() {
    * 点击新增
    * @param record - 当前行数据
    */
-  const onCreate = (record?: RowData) => {
-    const id = record?.id;
+  const onCreate = async (record?: RowData) => {
+    // 在某个菜单下新增时, 默认落到它的下一层
     let type = record?.id ? record?.type : undefined;
     if (type && type < 3) type = type + 1;
-    setCreateOpen(true);
-    setCreateTitle(ADD_TITLE());
-    setCreateId('');
-    setCreateData({ ...initCreate, parentId: id, type });
+    if (await open(MenuEditModal, { parentId: record?.id, type })) getPage();
   };
 
   /**
@@ -119,47 +97,7 @@ function MenuPage() {
    * @param id - 唯一值
    */
   const onUpdate = async (id: string) => {
-    try {
-      setCreateOpen(true);
-      setCreateTitle(EDIT_TITLE(id));
-      setCreateId(id);
-      setCreateLoading(true);
-      const { code, data } = await getMenuById(id);
-      if (Number(code) !== 200) return;
-      setCreateData(data);
-    } finally {
-      setCreateLoading(false);
-    }
-  };
-
-  /** 表单提交 */
-  const createSubmit = () => {
-    createFormRef?.current?.submit();
-  };
-
-  /** 关闭新增/修改弹窗 */
-  const closeCreate = () => {
-    setCreateOpen(false);
-  };
-
-  /**
-   * 新增/编辑提交
-   * @param values - 表单返回数据
-   */
-  const handleCreate = async (values: BaseFormData) => {
-    try {
-      setCreateLoading(true);
-      const functions = () => (createId ? updateMenu(createId, values) : createMenu(values));
-      const { code, message } = await functions();
-      if (Number(code) !== 200) return;
-      messageApi.success(message || $t('public.successfulOperation'));
-      setCreateOpen(false);
-      getPage();
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setCreateLoading(false);
-    }
+    if (await open(MenuEditModal, { id })) getPage();
   };
 
   /**
@@ -306,26 +244,6 @@ function MenuPage() {
           onChange={onChangePagination}
         />
       </BaseCard>
-
-      <BaseModal
-        width={600}
-        title={createTitle}
-        open={isCreateOpen}
-        style={{ top: 20 }}
-        confirmLoading={isCreateLoading}
-        onOk={createSubmit}
-        onCancel={closeCreate}
-      >
-        <BaseForm
-          ref={createFormRef}
-          form={form}
-          list={createList(createId, type)}
-          data={createData}
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 19 }}
-          handleFinish={handleCreate}
-        />
-      </BaseModal>
     </BaseContent>
   );
 }

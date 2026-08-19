@@ -1,6 +1,6 @@
-import type { PasswordModal } from './UpdatePassword';
 import type { MenuProps } from 'antd';
-import { useRef, memo } from 'react';
+import { memo } from 'react';
+import { open } from '@south/components';
 import { App, Dropdown } from 'antd';
 import { useCommonStore } from '@/hooks';
 import { useMenuStore } from '@/stores';
@@ -14,7 +14,7 @@ import {
 import Avatar from '@/assets/images/avatar.png';
 import styles from '../index.module.less';
 import { Fullscreen, GlobalSearch, I18n, Theme } from '@/components';
-import UpdatePassword from './UpdatePassword';
+import { UpdatePassword } from './UpdatePassword';
 import Nav from './Nav';
 import { $t } from '@/locales';
 
@@ -24,8 +24,6 @@ function Header() {
   const [handleLogout] = useLogout();
   const { modal } = App.useApp();
   const { isCollapsed, isMaximize, username, nav } = useCommonStore();
-  // 是否窗口最大化
-  const passwordRef = useRef<PasswordModal>(null);
   const toggleCollapsed = useMenuStore((state) => state.toggleCollapsed);
 
   // 下拉菜单内容
@@ -46,7 +44,7 @@ function Header() {
   const onClick: MenuProps['onClick'] = (e) => {
     switch (e.key as MenuKey) {
       case 'password':
-        passwordRef.current?.open();
+        onUpdatePassword();
         break;
 
       case 'logout':
@@ -59,6 +57,12 @@ function Header() {
   };
 
   /** 退出登录 */
+  /** 改密码. 改成功后登出由这里决定, 弹窗只管改密码本身 */
+  const onUpdatePassword = async () => {
+    const isChanged = await open(UpdatePassword);
+    if (isChanged) handleLogout();
+  };
+
   const onLogout = () => {
     modal.confirm({
       title: $t('public.kindTips'),
@@ -127,8 +131,6 @@ function Header() {
 
         {rightRender}
       </header>
-
-      <UpdatePassword passwordRef={passwordRef} />
     </>
   );
 }

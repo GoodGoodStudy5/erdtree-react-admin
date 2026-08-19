@@ -1,16 +1,11 @@
 import type { Key, TableRowSelection } from 'antd/es/table/interface';
-import { type FormInstance, Form, message } from 'antd';
+import { Form, message } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
-import { createList, searchList, tableColumns } from './model';
-import {
-  batchDeleteUser,
-  createUser,
-  deleteUser,
-  getUserById,
-  getUserPage,
-  updateUser,
-} from '@/servers';
+import { open } from '@south/components';
+import { searchList, tableColumns } from './model';
+import { UserEditModal } from './UserEditModal';
+import { batchDeleteUser, deleteUser, getUserPage } from '@/servers';
 import { $t } from '@/locales';
 
 // 当前行数据
@@ -19,28 +14,16 @@ interface RowData {
   username: string;
 }
 
-// 初始化新增数据
-const initCreate = {
-  status: 1,
-};
-
 function UserPage() {
-  const createFormRef = useRef<FormInstance>(null);
   const [messageApi, contextHolder] = message.useMessage();
   const [isFetch, setFetch] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [isCreateLoading, setCreateLoading] = useState(false);
-  const [isCreateOpen, setCreateOpen] = useState(false);
-  const [createTitle, setCreateTitle] = useState(ADD_TITLE());
-  const [createId, setCreateId] = useState('');
-  const [createData, setCreateData] = useState<BaseFormData>(initCreate);
   const [searchData, setSearchData] = useState<BaseFormData>({});
   const [page, setPage] = useState(INIT_PAGINATION.page);
   const [pageSize, setPageSize] = useState(INIT_PAGINATION.pageSize);
   const [total, setTotal] = useState(0);
   const [tableData, setTableData] = useState<BaseFormData[]>([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
-  const [form] = Form.useForm();
   const [searchForm] = Form.useForm();
   const [handleSetSearchParams] = useSearchUrlParams(searchForm);
 
@@ -100,11 +83,8 @@ function UserPage() {
   };
 
   /** 点击新增 */
-  const onCreate = () => {
-    setCreateOpen(true);
-    setCreateTitle(ADD_TITLE());
-    setCreateId('');
-    setCreateData(initCreate);
+  const onCreate = async () => {
+    if (await open(UserEditModal)) getPage();
   };
 
   /**
@@ -112,45 +92,7 @@ function UserPage() {
    * @param id - 唯一值
    */
   const onUpdate = async (id: string) => {
-    try {
-      setCreateOpen(true);
-      setCreateTitle(EDIT_TITLE(id));
-      setCreateId(id);
-      setCreateLoading(true);
-      const { code, data } = await getUserById(id);
-      if (Number(code) !== 200) return;
-      setCreateData(data);
-    } finally {
-      setCreateLoading(false);
-    }
-  };
-
-  /** 表格提交 */
-  const createSubmit = () => {
-    createFormRef.current?.submit();
-  };
-
-  /** 关闭新增/修改弹窗 */
-  const closeCreate = () => {
-    setCreateOpen(false);
-  };
-
-  /**
-   * 新增/编辑提交
-   * @param values - 表单返回数据
-   */
-  const handleCreate = async (values: BaseFormData) => {
-    try {
-      setCreateLoading(true);
-      const functions = () => (createId ? updateUser(createId, values) : createUser(values));
-      const { code, message } = await functions();
-      if (Number(code) !== 200) return;
-      messageApi.success(message || $t('public.successfulOperation'));
-      setCreateOpen(false);
-      getPage();
-    } finally {
-      setCreateLoading(false);
-    }
+    if (await open(UserEditModal, { id })) getPage();
   };
 
   /**
@@ -288,23 +230,6 @@ function UserPage() {
           onChange={onChangePagination}
         />
       </BaseCard>
-
-      <BaseModal
-        title={createTitle}
-        open={isCreateOpen}
-        confirmLoading={isCreateLoading}
-        onOk={createSubmit}
-        onCancel={closeCreate}
-      >
-        <BaseForm
-          form={form}
-          ref={createFormRef}
-          list={createList(!createId)}
-          labelCol={{ span: 4 }}
-          data={createData}
-          handleFinish={handleCreate}
-        />
-      </BaseModal>
     </BaseContent>
   );
 }
