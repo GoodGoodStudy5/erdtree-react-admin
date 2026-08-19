@@ -19,6 +19,25 @@ const { defaultAlgorithm, darkAlgorithm } = theme;
 
 import { useCommonStore } from '@/hooks';
 
+/**
+ * 侧边栏常驻深色, 不跟随明暗主题 —— 导航与内容分属两个平面, 边界始终清楚.
+ * 各态只差一档白色透明度, 底色调深调浅时不必逐个重配.
+ */
+const SIDER_MENU_TOKEN = {
+  darkItemBg: '#1b2029',
+  darkPopupBg: '#1b2029',
+  darkSubMenuItemBg: 'transparent',
+  darkItemColor: 'rgba(255, 255, 255, 0.62)',
+  darkGroupTitleColor: 'rgba(255, 255, 255, 0.32)',
+  darkItemHoverBg: 'rgba(255, 255, 255, 0.06)',
+  darkItemHoverColor: 'rgba(255, 255, 255, 0.92)',
+  darkItemSelectedBg: 'rgba(96, 165, 250, 0.18)',
+  darkItemSelectedColor: '#93c5fd',
+  itemHeight: 40,
+  itemBorderRadius: 8,
+  itemMarginInline: 10,
+};
+
 function AppRouter() {
   const { i18n } = useTranslation();
   const { theme } = useCommonStore();
@@ -43,6 +62,7 @@ function AppRouter() {
   const themeConfig = useMemo(
     () => ({
       algorithm: [theme === 'dark' ? darkAlgorithm : defaultAlgorithm],
+      components: { Menu: SIDER_MENU_TOKEN },
     }),
     [theme],
   );

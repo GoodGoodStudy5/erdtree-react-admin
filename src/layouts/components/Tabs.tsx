@@ -77,6 +77,11 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
     [tabs],
   );
 
+  const pinnedKeys = useMemo(
+    () => new Set(tabs.filter((tab) => tab.pinned).map((tab) => tab.key)),
+    [tabs],
+  );
+
   /**
    * 添加标签
    */
@@ -258,6 +263,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
                 <DraggableTabNode
                   data-node-key={key}
                   key={key}
+                  className={pinnedKeys.has(key) ? styles['tab-pinned'] : undefined}
                   onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
                     e.preventDefault();
                     setContextMenuKey(key);
@@ -286,7 +292,16 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         </SortableContext>
       </DndContext>
     ),
-    [sensor, tabs, onDragEnd, dropdownItems, onDropdownClick, contextMenuVisible, contextMenuKey],
+    [
+      sensor,
+      tabs,
+      pinnedKeys,
+      onDragEnd,
+      dropdownItems,
+      onDropdownClick,
+      contextMenuVisible,
+      contextMenuKey,
+    ],
   );
 
   // 操作按钮渲染
@@ -324,6 +339,8 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         flex
         items-center
         justify-between
+        px-8px
+        py-3px
         mr-2
         transition-all
         ${isMaximize ? styles['con-maximize'] : ''}
@@ -334,7 +351,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
         {tabs.length > 0 ? (
           <Tabs
             hideAdd
-            className={`h-30px py-0 ${styles['layout-tabs']}`}
+            className={styles['layout-tabs']}
             items={tabs}
             onChange={onChange}
             activeKey={activeKey}
@@ -343,22 +360,9 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
             onEdit={onEdit}
             renderTabBar={renderTabBar}
             tabBarExtraContent={
-              <div className="flex">
+              <div className="flex items-center gap-2px">
                 {tabOptions.map((item, index) => (
-                  <div
-                    key={index}
-                    className={`
-                      left-divide-tab
-                      change
-                      divide-solid
-                      w-36px
-                      h-36px
-                      hover:opacity-70
-                      flex
-                      place-content-center
-                      items-center
-                    `}
-                  >
+                  <div key={index} className={`change ${styles['tab-op']}`}>
                     {item.element}
                   </div>
                 ))}

@@ -7,11 +7,12 @@ import type { Transform } from '@dnd-kit/utilities';
 export interface DraggableTabPaneProps {
   'data-node-key': string;
   children: React.ReactNode;
+  className?: string;
   onContextMenu?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }
 
 const DraggableTabNode: FC<DraggableTabPaneProps> = (props) => {
-  const { 'data-node-key': key, children, onContextMenu } = props;
+  const { 'data-node-key': key, children, className, onContextMenu } = props;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: key,
   });
@@ -29,6 +30,7 @@ const DraggableTabNode: FC<DraggableTabPaneProps> = (props) => {
   return (
     <div
       ref={setNodeRef}
+      className={className}
       style={style}
       {...attributes}
       {...restListeners}

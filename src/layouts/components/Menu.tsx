@@ -224,6 +224,7 @@ function LayoutMenu() {
       px-5
       py-2
       cursor-pointer
+      ${styles['menu-logo']}
       ${isCollapsed ? 'justify-center' : ''}
     `,
     [isCollapsed],

@@ -1,3 +1,5 @@
+@import url('./default.less');
+
 /* 斑马线:开始 */
 .theme-primary {
   .zebra {
@@ -26,7 +28,7 @@
 
 .theme-dark {
   .border-bottom {
-    border-bottom: 1px solid #383838 !important;
+    border-bottom: 1px solid @dark-divider !important;
   }
 
   .bordered {
@@ -36,7 +38,7 @@
   }
 
   .left-divide-tab {
-    border-left: 1px solid #383838 !important;
+    border-left: 1px solid @dark-divider !important;
   }
 
   .breadcrumb-separator {

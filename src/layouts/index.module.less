@@ -28,7 +28,30 @@
   bottom: 0;
   left: 0;
   width: @layout-left !important;
-  background-color: #000;
+  // 右缘垫一条比底色亮的线, 接住侧栏与内容区的明暗落差
+  background-color: @sider-bg;
+  box-shadow: inset -1px 0 0 @sider-edge;
+
+  // 当前所在页的标识挪到左缘, 主色在整条侧栏里只出现这一次
+  :global(.ant-menu-item-selected) {
+    position: relative;
+  }
+
+  :global(.ant-menu-item-selected::before) {
+    position: absolute;
+    top: 50%;
+    left: -10px;
+    width: 3px;
+    height: 18px;
+    content: '';
+    background: @sider-active-bar;
+    border-radius: 0 3px 3px 0;
+    transform: translateY(-50%);
+  }
+}
+
+.menu-logo {
+  box-shadow: inset 0 -1px 0 @sider-edge;
 }
 
 .menu-close {
@@ -68,20 +91,155 @@
   opacity: 0 !important;
 }
 
-.layout-tabs {
-  :global(.ant-tabs-tab-active) {
-    background-color: #1d4ed8 !important;
+// 覆盖 antd 卡片标签的内建外观. 选择器带上 .ant-tabs-card 与 .ant-tabs-top 两个变体类,
+// 并多嵌一层 .ant-tabs-nav, 特异性才高过 antd 自身的变体规则, 从而不必靠 !important 争夺层叠
+.layout-tabs:global(.ant-tabs-card.ant-tabs-top) {
+  :global(.ant-tabs-nav) {
+    margin: 0;
+
+    &::before {
+      display: none;
+    }
+
+    :global(.ant-tabs-nav-list) {
+      gap: 2px;
+      align-items: center;
+    }
+
+    :global(.ant-tabs-tab) {
+      height: 28px;
+      padding: 0 8px 0 10px;
+      margin: 0;
+      color: @tab-color;
+      background: transparent;
+      border: 0;
+      border-radius: 8px;
+      transition:
+        background-color 0.15s,
+        color 0.15s;
+    }
+
+    :global(.ant-tabs-tab:hover) {
+      color: @primary-color;
+      background: @tab-hover-bg;
+    }
+
+    :global(.ant-tabs-tab-active) {
+      color: @tab-active-color;
+      background: @tab-active-bg;
+    }
+
+    :global(.ant-tabs-tab-btn) {
+      display: inline-flex;
+      align-items: center;
+      font-size: 13px;
+      color: inherit;
+    }
+
+    :global(.ant-tabs-tab-active .ant-tabs-tab-btn) {
+      font-weight: 500;
+    }
+
+    // 圆点标记当前停留的页面
+    :global(.ant-tabs-tab-btn::before) {
+      flex: none;
+      width: 5px;
+      height: 5px;
+      margin-right: 6px;
+      content: '';
+      background: currentcolor;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    :global(.ant-tabs-tab-active .ant-tabs-tab-btn::before) {
+      opacity: 1;
+    }
+
+    // 关闭入口悬停或停留在该页面时才显形, 避免每个标签都常挂一个叉
+    :global(.ant-tabs-tab-remove) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      min-width: 16px;
+      height: 16px;
+      padding: 0;
+      margin: 0 -2px 0 2px;
+      font-size: 10px;
+      color: inherit;
+      border-radius: 4px;
+      opacity: 0;
+      transition:
+        opacity 0.15s,
+        background-color 0.15s;
+    }
+
+    :global(.ant-tabs-tab:hover .ant-tabs-tab-remove),
+    :global(.ant-tabs-tab-active .ant-tabs-tab-remove) {
+      opacity: 0.55;
+    }
+
+    :global(.ant-tabs-tab .ant-tabs-tab-remove:hover) {
+      background: rgb(0 0 0 / 10%);
+      opacity: 1;
+    }
+
+    // 固定的标签没有关闭入口, 用图钉说明原因
+    .tab-pinned :global(.ant-tabs-tab-btn::before) {
+      width: 12px;
+      height: 12px;
+      margin-right: 5px;
+      background: currentcolor;
+      border-radius: 0;
+      opacity: 0.6;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16 3v2l-1 1v5l3 3v2h-5v6l-1 1-1-1v-6H6v-2l3-3V6L8 5V3z'/%3E%3C/svg%3E")
+        no-repeat center / contain;
+    }
+  }
+}
+
+.tab-op {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  border-radius: 7px;
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: @tab-hover-bg;
+  }
+}
+
+// 暗色规则比同名浅色规则多一个 .theme-dark, 特异性自然更高
+:global(.theme-dark) {
+  .layout-tabs:global(.ant-tabs-card.ant-tabs-top) {
+    :global(.ant-tabs-nav) {
+      :global(.ant-tabs-tab) {
+        color: @dark-tab-color;
+      }
+
+      :global(.ant-tabs-tab:hover) {
+        color: @dark-tab-hover-color;
+        background: @dark-tab-hover-bg;
+      }
+
+      :global(.ant-tabs-tab-active) {
+        color: @dark-tab-active-color;
+        background: @dark-tab-active-bg;
+      }
+
+      :global(.ant-tabs-tab .ant-tabs-tab-remove:hover) {
+        background: rgb(255 255 255 / 16%);
+      }
+    }
   }
 
-  :global(.ant-tabs-tab-active .ant-tabs-tab-btn) {
-    color: #fff !important;
-  }
-
-  :global(.ant-tabs-tab-active .ant-tabs-tab-remove) {
-    color: #fff !important;
-  }
-
-  :global(.ant-tabs-tab) {
-    padding: 5px 16px 8px !important;
+  .tab-op:hover {
+    background: @dark-tab-hover-bg;
   }
 }
