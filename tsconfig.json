@@ -23,7 +23,7 @@
       "#/*": ["types/*"]
     }
   },
-  "include": ["src", "packages/*", "types/**/*.d.ts"],
+  "include": ["src", "packages/*/src", "types/**/*.d.ts"],
   "exclude": ["dist", "node_modules", "cypress"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
