@@ -48,6 +48,14 @@ export default {
       to: { path: '^src/pages/' },
     },
     {
+      name: 'no-package-to-src',
+      comment:
+        'packages 是与本应用无关的可复用包, 依赖 src 会把它绑死在这个应用上. 需要的东西请由调用方注入, 或下沉到包内自足',
+      severity: 'error',
+      from: { path: '^packages/' },
+      to: { path: '^src/' },
+    },
+    {
       name: 'no-circular',
       comment: '运行时循环依赖. 纯类型环已排除, 报出来的都是真环, 需要打断其中一条边',
       severity: 'error',

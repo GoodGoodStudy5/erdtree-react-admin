@@ -50,6 +50,9 @@ importers:
       '@iconify-json/uil':
         specifier: ^1.2.3
         version: 1.2.3
+      '@south/components':
+        specifier: workspace:^
+        version: link:packages/components
       '@south/message':
         specifier: workspace:^
         version: link:packages/message
@@ -237,6 +240,8 @@ importers:
       web-vitals:
         specifier: ^6.1.1
         version: 6.1.1
+
+  packages/components: {}
 
   packages/message: {}
 

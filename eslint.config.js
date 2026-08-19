@@ -8,7 +8,8 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   // 构建产物不参与校验, 包的 dist 在任意层级都要排除
-  { ignores: ['**/dist/**'] },
+  // .design / .scratch 是设计草稿与工作区, 不进版本库, 也不受工程规范约束
+  { ignores: ['**/dist/**', '.design/**', '.scratch/**'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
