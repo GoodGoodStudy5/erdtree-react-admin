@@ -1,5 +1,5 @@
 import { BaseModal } from './BaseModal';
-import { useModalInstance } from './instance';
+import { useModalInstance } from './adapter';
 import type { ModalShellProps } from './types';
 import { useModalShell } from './useModalShell';
 

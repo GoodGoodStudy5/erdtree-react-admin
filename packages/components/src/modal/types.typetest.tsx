@@ -28,7 +28,7 @@ declare function expectType<T>(value: T): void;
 // 用真实现而非占位声明, 否则实现与契约仍可能各走各的
 import { BaseModal } from './BaseModal';
 import { ModalShell } from './ModalShell';
-import { createModalSet, open } from './open';
+import { createModalSet, open } from './adapter';
 import { useCloseGuard } from './useCloseGuard';
 import { useModalForm } from './useModalForm';
 import { useModalShell } from './useModalShell';

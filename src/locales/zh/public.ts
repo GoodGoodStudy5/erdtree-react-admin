@@ -66,6 +66,7 @@ export default {
   refreshPage: '刷新页面',
   returnHome: '返回首页',
   pageErrorTitle: '页面出现错误',
+  loadDetailFailed: '详情加载失败, 无法编辑',
   reloadPageMsg: '发现新内容，自动更新中...',
   pagepageErrorSubTitle: '抱歉，页面出现了错误，无法正常显示内容。',
   notPermissionMessage: '当前页面无法访问，可能没权限或已删除!',

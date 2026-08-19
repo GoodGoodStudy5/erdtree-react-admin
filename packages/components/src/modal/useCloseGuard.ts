@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useModalInstance } from './instance';
+import { useModalInstance } from './adapter';
 import type { CloseReason, UseCloseGuardFn } from './types';
 
 /**

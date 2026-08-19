@@ -1,16 +1,13 @@
+export { ModalOutlet, createModalSet, open, useModalInstance } from './adapter';
+export type { ModalInstance, ModalInstanceApi } from './adapter';
 export { BaseModal } from './BaseModal';
 export type { BaseModalProps } from './BaseModal';
 export { ModalAbort, isModalAbort } from './abort';
-export { ModalOutlet } from './ModalOutlet';
 export { ModalShell } from './ModalShell';
-export { createModalSet, open } from './open';
 export { useCloseGuard } from './useCloseGuard';
 export { useIsPhone } from './useIsPhone';
-export { useModalInstance } from './instance';
 export { useModalForm } from './useModalForm';
 export { useModalShell } from './useModalShell';
-export type { ModalInstanceApi } from './instance';
-export type { ModalInstance } from './store';
 export type {
   ModalComponent,
   ModalControl,

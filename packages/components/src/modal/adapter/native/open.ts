@@ -1,5 +1,5 @@
 import { modalStore } from './store';
-import type { CreateModalSetFn, ModalComponent, OpenFn } from './types';
+import type { CreateModalSetFn, ModalComponent, OpenFn } from '../../types';
 
 /**
  * 命令式调起弹窗. 自由函数而非 hook, 所以工具函数、store action、请求拦截器里都能直接调.

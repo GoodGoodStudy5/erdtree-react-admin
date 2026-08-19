@@ -1,7 +1,14 @@
 import type { FormInstance } from 'antd';
 import { Form } from 'antd';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { ModalAbort } from './abort';
+
+/**
+ * form.submit() 之后等 onFinish 的上限.
+ * 校验已在前一步过了, 正常情况下这一步几乎立即完成; 设上限只为杜绝一种死局 ——
+ * 表单组件因故走了 onFinishFailed 时 onFinish 永不触发, 那样 loading 卡死且弹窗因 busy 再也关不掉.
+ */
+const SUBMIT_SETTLE_TIMEOUT = 10_000;
 import type { ModalControl, UseModalFormOptions, UseModalFormResult } from './types';
 import { useModalShell } from './useModalShell';
 
@@ -23,12 +30,18 @@ export function useModalForm<V, R>(
     null,
   );
   const { onSubmit, onError } = options;
+  const submitRef = useRef<() => void>(() => undefined);
 
   const handleFinish = useCallback(
     (values: V) => {
       const task = pending.current;
       pending.current = null;
-      if (!task) return;
+      if (!task) {
+        // 表单内回车会直接触发 onFinish, 此时还没有等待中的提交.
+        // 转交外壳走完整流程, 否则这一次提交会被无声丢弃
+        submitRef.current();
+        return;
+      }
       void (async () => {
         try {
           task.resolve(await onSubmit(values));
@@ -40,20 +53,41 @@ export function useModalForm<V, R>(
     [onSubmit],
   );
 
-  const onOk = useCallback(() => {
-    return new Promise<R>((resolve, reject) => {
+  const onOk = useCallback(async () => {
+    try {
       // 先自行校验: 不过就地中止, 否则表单组件多半只 console.warn, 提交态会一直挂着
-      form
-        .validateFields()
-        .then(() => {
-          pending.current = { resolve, reject };
-          form.submit();
-        })
-        .catch(() => reject(new ModalAbort('form validation failed')));
+      await form.validateFields();
+    } catch {
+      throw new ModalAbort('form validation failed');
+    }
+
+    // 再走一趟 form.submit(), 才能拿到表单组件自己处理过的值(如 dayjs 转字符串)
+    return new Promise<R>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        pending.current = null;
+        reject(new Error('form submit did not settle: onFinish was never called'));
+      }, SUBMIT_SETTLE_TIMEOUT);
+
+      pending.current = {
+        resolve: (value) => {
+          clearTimeout(timer);
+          resolve(value);
+        },
+        reject: (error) => {
+          clearTimeout(timer);
+          reject(error);
+        },
+      };
+      form.submit();
     });
   }, [form]);
 
   const shell = useModalShell(control, { onOk, onError });
+
+  // 渲染期不能写 ref, 放到提交后同步
+  useEffect(() => {
+    submitRef.current = shell.submit;
+  });
 
   return { form: form as FormInstance<V>, handleFinish, ...shell };
 }

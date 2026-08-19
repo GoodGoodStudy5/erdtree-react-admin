@@ -70,13 +70,16 @@ function AppRouter() {
   );
 
   // @south/components 自带英文兜底, 这里把它换成本应用的语种
-  const modalLocale = {
-    Modal: {
-      maximize: $t('public.maximize'),
-      exitMaximized: $t('public.exitMaximized'),
-      close: $t('public.close'),
-    },
-  };
+  const modalLocale = useMemo(
+    () => ({
+      Modal: {
+        maximize: $t('public.maximize'),
+        exitMaximized: $t('public.exitMaximized'),
+        close: $t('public.close'),
+      },
+    }),
+    [currentLanguage],
+  );
 
   return (
     <Router>

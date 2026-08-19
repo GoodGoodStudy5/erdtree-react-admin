@@ -1,4 +1,4 @@
-import type { CloseReason, ModalComponent } from './types';
+import type { CloseReason, ModalComponent } from '../../types';
 
 /**
  * 载体不上报"退场动画已结束"时的兜底移除延时.

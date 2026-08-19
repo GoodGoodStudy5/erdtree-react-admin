@@ -1,6 +1,6 @@
 import type { BaseFormData } from '#/form';
 import type { ModalControl } from '@south/components';
-import { message } from 'antd';
+import { Result, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { BaseModal, useModalForm } from '@south/components';
 import { BaseForm } from '@/components';
@@ -22,6 +22,7 @@ export function UserEditModal(props: Props) {
   const [messageApi, contextHolder] = message.useMessage();
   const [data, setData] = useState<BaseFormData>(INIT_DATA);
   const [isLoading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   const { form, handleFinish, modalProps } = useModalForm<object, boolean>(props, {
     onSubmit: async (raw) => {
@@ -43,8 +44,12 @@ export function UserEditModal(props: Props) {
     const fetchDetail = async () => {
       try {
         setLoading(true);
-        const { code, data: detail } = await getUserById(id);
-        if (Number(code) !== 200) return;
+        const { code, data: detail, message: messageInfo } = await getUserById(id);
+        // 详情拉不到就不能编辑: 空表单提交会把已有数据抹成空
+        if (Number(code) !== 200) {
+          setLoadError(messageInfo || $t('public.loadDetailFailed'));
+          return;
+        }
         setData(detail);
       } finally {
         setLoading(false);
@@ -54,15 +59,23 @@ export function UserEditModal(props: Props) {
   }, [id]);
 
   return (
-    <BaseModal {...modalProps} title={id ? EDIT_TITLE(id) : ADD_TITLE()} isLoading={isLoading}>
+    <BaseModal
+      {...modalProps}
+      okButtonProps={{ disabled: !!loadError }}
+      title={id ? EDIT_TITLE(id) : ADD_TITLE()}
+      isLoading={isLoading}
+    >
       {contextHolder}
-      <BaseForm
-        form={form}
-        list={createList(!id)}
-        data={data}
-        labelCol={{ span: 4 }}
-        handleFinish={handleFinish}
-      />
+      {loadError && <Result status="error" title={loadError} />}
+      {!loadError && (
+        <BaseForm
+          form={form}
+          list={createList(!id)}
+          data={data}
+          labelCol={{ span: 4 }}
+          handleFinish={handleFinish}
+        />
+      )}
     </BaseModal>
   );
 }

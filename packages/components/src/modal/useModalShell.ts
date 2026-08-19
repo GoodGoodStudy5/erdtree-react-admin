@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { isModalAbort } from './abort';
-import { useModalInstance } from './instance';
+import { useModalInstance } from './adapter';
 import type { UseModalShellFn } from './types';
 
 /**
@@ -44,19 +44,19 @@ export const useModalShell: UseModalShellFn = (control, options) => {
     else cancel();
   }, [cancel, instance]);
 
-  const modalProps = useMemo(
-    () => ({
+  const modalProps = useMemo(() => {
+    const base = {
       open: instance ? instance.visible : true,
       confirmLoading,
       onOk: submit,
       onCancel: close,
-      // 提交中禁止关闭: antd 的 confirmLoading 只管确定按钮, 这三样得自己接管
-      cancelButtonProps: confirmLoading ? { disabled: true } : undefined,
-      maskClosable: confirmLoading ? false : undefined,
-      keyboard: confirmLoading ? false : undefined,
-    }),
-    [close, confirmLoading, instance, submit],
-  );
+    };
+    // 非提交态不能给出这三个键. 展开时键存在即便值是 undefined 也会盖掉载体自己的默认值 ——
+    // BaseModal 默认禁止点遮罩关闭, 给一个 undefined 就把它打回 antd 的默认(可关)
+    if (!confirmLoading) return base;
+    // 提交中禁止关闭: antd 的 confirmLoading 只管确定按钮, 这三样得自己接管
+    return { ...base, cancelButtonProps: { disabled: true }, maskClosable: false, keyboard: false };
+  }, [close, confirmLoading, instance, submit]);
 
   return { confirmLoading, submit, close, modalProps };
 };

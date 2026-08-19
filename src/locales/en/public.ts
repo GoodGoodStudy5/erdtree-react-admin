@@ -66,6 +66,7 @@ export default {
   refreshPage: 'Refresh page',
   returnHome: 'Return home',
   pageErrorTitle: 'Page error',
+  loadDetailFailed: 'Failed to load details, editing is unavailable',
   reloadPageMsg: 'New content found, automatically updating...',
   pagepageErrorSubTitle:
     'Sorry, an error has occurred on this page and the content cannot be displayed properly.',

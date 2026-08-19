@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { CloseReason } from './types';
+import type { CloseReason } from '../../types';
 
 /** 当前弹窗实例的把手. 由挂载点注入, 供外壳层与 useCloseGuard 取用 */
 export type ModalInstanceApi = {

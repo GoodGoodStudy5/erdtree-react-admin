@@ -43,12 +43,17 @@ export function UpdatePassword(props: ModalControl<boolean>) {
 
   return (
     <BaseModal {...modalProps} title={$t('public.changePassword')}>
-      <Form form={form} onFinish={handleFinish} labelWrap autoComplete="off">
+      <Form
+        form={form}
+        onFinish={handleFinish}
+        labelWrap
+        labelCol={{ span: 5 }}
+        wrapperCol={{ span: 19 }}
+        autoComplete="off"
+      >
         <Form.Item
           label={$t('login.oldPassword')}
           name="oldPassword"
-          labelCol={{ span: 5 }}
-          wrapperCol={{ span: 19 }}
           rules={[
             { required: true, message: $t('public.pleaseEnter', { name: $t('login.password') }) },
             PASSWORD_RULE(),
@@ -59,8 +64,6 @@ export function UpdatePassword(props: ModalControl<boolean>) {
         <Form.Item
           label={$t('login.newPassword')}
           name="newPassword"
-          labelCol={{ span: 5 }}
-          wrapperCol={{ span: 19 }}
           rules={[
             { required: true, message: $t('public.pleaseEnter', { name: $t('login.password') }) },
             PASSWORD_RULE(),
@@ -71,8 +74,6 @@ export function UpdatePassword(props: ModalControl<boolean>) {
         <Form.Item
           label={$t('login.confirmPassword')}
           name="confirmPassword"
-          labelCol={{ span: 5 }}
-          wrapperCol={{ span: 19 }}
           rules={[
             {
               required: true,

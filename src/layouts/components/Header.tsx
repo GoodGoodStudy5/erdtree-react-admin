@@ -56,13 +56,13 @@ function Header() {
     }
   };
 
-  /** 退出登录 */
   /** 改密码. 改成功后登出由这里决定, 弹窗只管改密码本身 */
   const onUpdatePassword = async () => {
     const isChanged = await open(UpdatePassword);
     if (isChanged) handleLogout();
   };
 
+  /** 退出登录 */
   const onLogout = () => {
     modal.confirm({
       title: $t('public.kindTips'),
