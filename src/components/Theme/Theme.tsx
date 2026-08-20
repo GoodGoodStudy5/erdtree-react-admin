@@ -12,7 +12,7 @@ import { $t } from '@/locales';
 export function Theme() {
   const themeCache = (localStorage.getItem(THEME_KEY) || 'light') as ThemeType;
   const [theme, setTheme] = useState<ThemeType>(themeCache);
-  const setThemeValue = usePublicStore((state) => state.setThemeValue);
+  const { setThemeValue } = usePublicStore.getState();
 
   useEffect(() => {
     if (!themeCache) {

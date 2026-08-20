@@ -8,7 +8,6 @@ import { Icon } from '@iconify/react';
 import { useCommonStore, useNavigateProgress } from '@/hooks';
 import { useLocation } from 'react-router-dom';
 import { useMenuStore, getTabTitle } from '@/stores';
-import { useShallow } from 'zustand/react/shallow';
 import {
   filterMenus,
   getFirstMenu,
@@ -46,24 +45,12 @@ function LayoutMenu() {
   const navigate = useNavigateProgress();
   const { pathname } = useLocation();
 
-  const { tabs, setActiveKey, addTabs, setNav } = useTabsStore(
-    useShallow((state) => ({
-      tabs: state.tabs,
-      setActiveKey: state.setActiveKey,
-      addTabs: state.addTabs,
-      setNav: state.setNav,
-    })),
-  );
+  const tabs = useTabsStore((state) => state.tabs);
+  const { setActiveKey, addTabs, setNav } = useTabsStore.getState();
 
   const { isMaximize, isCollapsed, isPhone, openKeys, selectedKeys, permissions, menuList } =
     useCommonStore();
-  const { toggleCollapsed, setSelectedKeys, setOpenKeys } = useMenuStore(
-    useShallow((state) => ({
-      toggleCollapsed: state.toggleCollapsed,
-      setSelectedKeys: state.setSelectedKeys,
-      setOpenKeys: state.setOpenKeys,
-    })),
-  );
+  const { toggleCollapsed, setSelectedKeys, setOpenKeys } = useMenuStore.getState();
 
   // 菜单展开与选中项以 store 为唯一来源, 全局搜索等入口也从这里驱动菜单
   const currentOpenKeys = openKeys || [];

@@ -5,7 +5,7 @@ import { useTabsStore } from '@/stores';
 function TabMaximize() {
   // 是否窗口最大化
   const { isMaximize } = useCommonStore();
-  const toggleMaximize = useTabsStore((state) => state.toggleMaximize);
+  const { toggleMaximize } = useTabsStore.getState();
 
   /** 点击最大化/最小化 */
   const onClick = () => {

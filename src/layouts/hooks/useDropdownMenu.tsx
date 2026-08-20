@@ -36,7 +36,7 @@ export function useDropdownMenu(props: Props) {
   const { pathname } = useLocation();
   const { tabs, isMaximize } = useCommonStore();
   const { closeLeft, closeOther, closeRight, closeTabs, toggleMaximize, toggleTabPin } =
-    useTabsStore((state) => state);
+    useTabsStore.getState();
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
   const navigate = useNavigateProgress();
 

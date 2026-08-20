@@ -7,10 +7,9 @@ import { cancelAllRequest } from '@/utils';
 export const useLogout = () => {
   const [, , removeToken] = useToken();
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
-  const { closeAllTab, setActiveKey } = useTabsStore((state) => state);
-  const setPermissions = useUserStore((state) => state.setPermissions);
-  const setMenuList = useMenuStore((state) => state.setMenuList);
-  const clearInfo = useUserStore((state) => state.clearInfo);
+  const { closeAllTab, setActiveKey } = useTabsStore.getState();
+  const { setPermissions, clearInfo } = useUserStore.getState();
+  const { setMenuList } = useMenuStore.getState();
   const navigate = useNavigate();
 
   /** 退出登录 */

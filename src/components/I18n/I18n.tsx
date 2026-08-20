@@ -3,7 +3,6 @@ import { Dropdown } from 'antd';
 import { Icon } from '@iconify/react';
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useShallow } from 'zustand/react/shallow';
 import { LANG, setTitle } from '@/utils';
 import { getTabTitle, useTabsStore } from '@/stores';
 import { i18n } from '@/locales';
@@ -14,7 +13,7 @@ export type Langs = 'zh' | 'en';
 /** 语言切换入口 */
 export function I18n() {
   const { pathname, search } = useLocation();
-  const { tabs } = useTabsStore(useShallow((state) => state));
+  const tabs = useTabsStore((state) => state.tabs);
 
   useEffect(() => {
     const lang = localStorage.getItem(LANG);

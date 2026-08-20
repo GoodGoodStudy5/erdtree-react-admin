@@ -17,8 +17,8 @@ interface Props {
 export function SearchResult(props: Props) {
   const { list, active, onCancel, changActive } = props;
   const { permissions, menuList } = useCommonStore();
-  const { addTabs, setActiveKey } = useTabsStore((state) => state);
-  const setOpenKeys = useMenuStore((state) => state.setOpenKeys);
+  const { addTabs, setActiveKey } = useTabsStore.getState();
+  const { setOpenKeys } = useMenuStore.getState();
   const navigate = useNavigateProgress();
   // 获取当前语言
   const currentLanguage = i18n.language;

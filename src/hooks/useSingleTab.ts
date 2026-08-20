@@ -24,9 +24,9 @@ interface Props {
 export function useSingleTab(props: Props) {
   const { fatherPath, zhTitle, enTitle, name } = props;
   const { pathname, search } = useLocation();
-  const { setOpenKeys, setSelectedKeys } = useMenuStore((state) => state);
+  const { setOpenKeys, setSelectedKeys } = useMenuStore.getState();
   const { isPhone, isCollapsed, menuList, permissions } = useCommonStore();
-  const { addTabs, setNav, setActiveKey } = useTabsStore((state) => state);
+  const { addTabs, setNav, setActiveKey } = useTabsStore.getState();
 
   /** 获取路由对应名称 */
   const getNameByRoute = (): string => {

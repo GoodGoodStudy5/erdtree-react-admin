@@ -39,9 +39,9 @@ function LoginPage() {
   const [messageApi, contextHolder] = message.useMessage();
   const { search } = useLocation();
   const { permissions } = useCommonStore();
-  const setMenuList = useMenuStore((state) => state.setMenuList);
-  const setThemeValue = usePublicStore((state) => state.setThemeValue);
-  const { setPermissions, setUserInfo } = useUserStore((state) => state);
+  const { setMenuList } = useMenuStore.getState();
+  const { setThemeValue } = usePublicStore.getState();
+  const { setPermissions, setUserInfo } = useUserStore.getState();
   const themeCache = (localStorage.getItem(THEME_KEY) || 'light') as ThemeType;
 
   useEffect(() => {

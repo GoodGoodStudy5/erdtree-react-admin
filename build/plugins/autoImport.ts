@@ -27,7 +27,6 @@ export const autoImportPlugin = (): PluginOption => {
       'react',
       // react-router-dom 已完整 re-export react-router, 同时登记会让共用 hook 重复注册
       'react-router-dom',
-      'react-i18next',
       { from: 'react', imports: ['FC'], type: true },
     ],
     dts: 'types/autoImports.d.ts',

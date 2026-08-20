@@ -7,9 +7,9 @@ import { $t } from '@/locales';
 function NotFound() {
   const navigate = useNavigate();
   const { permissions, menuList } = useCommonStore();
-  const { setMenuList } = useMenuStore();
-  const { setPermissions, setUserInfo } = useUserStore();
-  const { addTabs, setActiveKey } = useTabsStore();
+  const { setMenuList } = useMenuStore.getState();
+  const { setPermissions, setUserInfo } = useUserStore.getState();
+  const { addTabs, setActiveKey } = useTabsStore.getState();
 
   /** 获取用户权限 */
   const fetchPermissions = async (): Promise<string[]> => {

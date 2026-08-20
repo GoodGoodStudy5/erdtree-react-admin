@@ -6,7 +6,7 @@ import { $t } from '@/locales';
 export function Forbidden() {
   const navigate = useNavigate();
   const { permissions, menuList } = useCommonStore();
-  const { addTabs, setActiveKey } = useTabsStore();
+  const { addTabs, setActiveKey } = useTabsStore.getState();
 
   /** 跳转首页 */
   const goIndex = () => {

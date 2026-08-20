@@ -142,6 +142,23 @@ const API_NAMING = [
   },
 ];
 
+/** 弹窗挂载点只允许路由层引用 */
+const NO_MODAL_OUTLET = {
+  name: '@south/components',
+  importNames: ['ModalOutlet'],
+  message: 'ModalOutlet 是挂载点, 只有 src/router 可以引用',
+};
+
+/**
+ * 语言变化只由路由出口订阅一次, 切语言时整树重挂载, 各处直接调用的 $t 借此重新取值.
+ * 多处订阅会让部分文案更新, 部分留在旧语言.
+ */
+const NO_USE_TRANSLATION = {
+  name: 'react-i18next',
+  importNames: ['useTranslation'],
+  message: '国际化直接 import { $t } from "@/locales", 语言订阅只在 AppRouter 一处',
+};
+
 /** 页面本体不再自己管弹窗开关 */
 const NO_SHELL_IN_PAGE = {
   selector: 'JSXOpeningElement[name.name=/^(BaseModal|ModalShell)$/]',
@@ -394,18 +411,15 @@ export default tseslint.config(
     files: ['src/**/*.{ts,tsx}'],
     ignores: ['src/router/**'],
     rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [
-            {
-              name: '@south/components',
-              importNames: ['ModalOutlet'],
-              message: 'ModalOutlet 是挂载点, 只有 src/router 可以引用',
-            },
-          ],
-        },
-      ],
+      'no-restricted-imports': ['error', { paths: [NO_MODAL_OUTLET, NO_USE_TRANSLATION] }],
+    },
+  },
+  {
+    // 语言订阅只此一处; 挂载点在本目录内合法, 故只重列语言这一条
+    files: ['src/router/**/*.{ts,tsx}'],
+    ignores: ['src/router/AppRouter.tsx'],
+    rules: {
+      'no-restricted-imports': ['error', { paths: [NO_USE_TRANSLATION] }],
     },
   },
   {

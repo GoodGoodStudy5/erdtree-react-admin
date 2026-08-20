@@ -24,22 +24,11 @@ function Layout() {
   const keepaliveRef = useKeepAliveRef();
   const [isLoading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
-  const setAliveRef = usePublicStore(useShallow((state) => state.setAliveRef));
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
-  const { setPermissions, setUserInfo } = useUserStore(
-    useShallow((state) => ({
-      setPermissions: state.setPermissions,
-      setUserInfo: state.setUserInfo,
-    })),
-  );
-  const { menuList, setMenuList, toggleCollapsed, togglePhone } = useMenuStore(
-    useShallow((state) => ({
-      menuList: state.menuList,
-      setMenuList: state.setMenuList,
-      toggleCollapsed: state.toggleCollapsed,
-      togglePhone: state.togglePhone,
-    })),
-  );
+  const menuList = useMenuStore((state) => state.menuList);
+  const { setAliveRef } = usePublicStore.getState();
+  const { setPermissions, setUserInfo } = useUserStore.getState();
+  const { setMenuList, toggleCollapsed, togglePhone } = useMenuStore.getState();
 
   const { permissions, userId, isMaximize, isCollapsed, isPhone } = useCommonStore();
 
@@ -162,8 +151,8 @@ function Layout() {
             {permissions.length > 0 && (
               <motion.div
                 key={pathname}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}
               >
                 <ErrorBoundary>{outlet}</ErrorBoundary>

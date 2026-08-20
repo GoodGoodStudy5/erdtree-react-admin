@@ -8,7 +8,7 @@ import { getUrlAllParam } from '@/utils';
 export const useSearchUrlParams = (form: FormInstance) => {
   const [, setSearchParams] = useSearchParams();
   const { pathname, search } = useLocation();
-  const { setTabs } = useTabsStore((state) => state);
+  const { setTabs } = useTabsStore.getState();
 
   /** url参数带入搜索表单中 */
   const handleSetSearchForm = useCallback(() => {

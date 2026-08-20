@@ -12,7 +12,6 @@ import { useLocation } from 'react-router-dom';
 import { useDropdownMenu } from '../hooks/useDropdownMenu';
 import { useCommonStore, useNavigateProgress } from '@/hooks';
 import { useTabsStore, usePublicStore, getTabTitle } from '@/stores';
-import { useShallow } from 'zustand/react/shallow';
 import { setTitle } from '@/utils';
 import styles from '../index.module.less';
 import TabRefresh from './TabRefresh';
@@ -42,28 +41,13 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const [contextMenuKey, setContextMenuKey] = useState<string | null>(null);
 
-  const setRefresh = usePublicStore((state) => state.setRefresh);
-  const { setOpenKeys, setSelectedKeys } = useMenuStore(
-    useShallow((state) => ({
-      setOpenKeys: state.setOpenKeys,
-      setSelectedKeys: state.setSelectedKeys,
-    })),
-  );
+  const { setRefresh } = usePublicStore.getState();
+  const { setOpenKeys, setSelectedKeys } = useMenuStore.getState();
 
-  // 使用 useShallow 优化 Zustand 订阅
-  const { tabs, activeKey, setActiveKey, addTabs, sortTabs, closeTabs, setNav, switchTabsLang } =
-    useTabsStore(
-      useShallow((state) => ({
-        tabs: state.tabs,
-        activeKey: state.activeKey,
-        setActiveKey: state.setActiveKey,
-        addTabs: state.addTabs,
-        sortTabs: state.sortTabs,
-        closeTabs: state.closeTabs,
-        setNav: state.setNav,
-        switchTabsLang: state.switchTabsLang,
-      })),
-    );
+  const tabs = useTabsStore((state) => state.tabs);
+  const activeKey = useTabsStore((state) => state.activeKey);
+  const { setActiveKey, addTabs, sortTabs, closeTabs, setNav, switchTabsLang } =
+    useTabsStore.getState();
 
   const { permissions, isMaximize, menuList } = useCommonStore();
 

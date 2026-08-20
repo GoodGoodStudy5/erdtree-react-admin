@@ -23,7 +23,7 @@ function ForgetPage() {
   const [messageApi, contextHolder] = message.useMessage();
   const [verificationTime, setVerificationTime] = useState(0);
   const timer = useRef<NodeJS.Timeout | null>(null);
-  const setThemeValue = usePublicStore((state) => state.setThemeValue);
+  const { setThemeValue } = usePublicStore.getState();
   const themeCache = (localStorage.getItem(THEME_KEY) || 'light') as ThemeType;
 
   useEffect(() => {

@@ -23,7 +23,7 @@ function Header() {
   const [handleLogout] = useLogout();
   const { modal } = App.useApp();
   const { isCollapsed, isMaximize, username, nav } = useCommonStore();
-  const toggleCollapsed = useMenuStore((state) => state.toggleCollapsed);
+  const { toggleCollapsed } = useMenuStore.getState();
 
   // 下拉菜单内容
   const items: MenuProps['items'] = [

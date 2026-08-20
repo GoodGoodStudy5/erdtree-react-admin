@@ -31,8 +31,8 @@ export function SearchModal(props: Props) {
   const [active, setActive] = useState(''); // 选中值
   const [list, setList] = useState<SideMenu[]>([]);
   const [isOpen, setOpen] = useState(false);
-  const setOpenKeys = useMenuStore((state) => state.setOpenKeys);
-  const { addTabs, setActiveKey } = useTabsStore((state) => state);
+  const { setOpenKeys } = useMenuStore.getState();
+  const { addTabs, setActiveKey } = useTabsStore.getState();
 
   // 抛出外部方法
   useImperativeHandle(modalRef, () => ({
