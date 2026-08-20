@@ -277,6 +277,7 @@ export default tseslint.config(
       'src/hooks/**/*.ts',
       'src/utils/**/*.ts',
       'src/servers/**/*.ts',
+      'src/modals/**/*.ts',
       'src/stores/**/*.ts',
       'src/menus/**/*.ts',
     ],
@@ -330,7 +331,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/pages/**/*.tsx', 'src/layouts/**/*.tsx'],
+    files: ['src/pages/**/*.tsx', 'src/layouts/**/*.tsx', 'src/modals/**/*.tsx'],
     rules: {
       'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER, NO_IMPERATIVE_HANDLE],
     },

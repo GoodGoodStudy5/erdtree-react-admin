@@ -1,9 +1,9 @@
 import type { MenuProps } from 'antd';
 import { memo } from 'react';
-import { open } from '@south/components';
 import { App, Dropdown } from 'antd';
 import { useCommonStore } from '@/hooks';
 import { useMenuStore } from '@/stores';
+import { globalModals } from '@/modals';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -14,7 +14,6 @@ import {
 import Avatar from '@/assets/images/avatar.png';
 import styles from '../index.module.less';
 import { Fullscreen, GlobalSearch, I18n, Theme } from '@/components';
-import { UpdatePassword } from './UpdatePassword';
 import Nav from './Nav';
 import { $t } from '@/locales';
 
@@ -58,7 +57,7 @@ function Header() {
 
   /** 改密码. 改成功后登出由这里决定, 弹窗只管改密码本身 */
   const onUpdatePassword = async () => {
-    const isChanged = await open(UpdatePassword);
+    const isChanged = await globalModals.updatePassword.open();
     if (isChanged) handleLogout();
   };
 
