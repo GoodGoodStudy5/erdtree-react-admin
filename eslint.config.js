@@ -31,6 +31,93 @@ const NO_IMPERATIVE_HANDLE = {
   message: '弹窗改走命令式, 不要用 useImperativeHandle 暴露 open()',
 };
 
+/**
+ * 请求函数的动作词. 资源型是封闭集合; 命令型按需增补 —— 增补要改这张表, 那次修改就是评审.
+ * 若允许命令型用自由动词, 门禁就退化成只校 api 前缀, 封闭性当场失效.
+ */
+const API_ACTIONS = [
+  // 资源型
+  'Page',
+  'Detail',
+  'List',
+  'Options',
+  'Tree',
+  'Create',
+  'Update',
+  'Delete',
+  'BatchDelete',
+  'Export',
+  'Import',
+  // 命令型
+  'Login',
+  'PasswordUpdate',
+  'PasswordReset',
+  'PermissionRefresh',
+  'StateUpdate',
+  'Trends',
+];
+
+/**
+ * 门禁开启前就存在的请求函数, 原样放行.
+ *
+ * 这张清单**只允许变短**: 改掉某个老接口时删掉对应那一条. 为了让新代码过关而加长,
+ * 等于把门禁关掉. 豁免按符号名而非按文件 —— 新接口会加进这些既有文件, 按文件豁免就永久失效了.
+ */
+const LEGACY_API_NAMES = [
+  'getDataTrends',
+  'login',
+  'updatePassword',
+  'forgetPassword',
+  'getGames',
+  'getPartner',
+  'getPartnerDemo',
+  'getMenuPage',
+  'getMenuById',
+  'createMenu',
+  'updateMenu',
+  'deleteMenu',
+  'batchDeleteMenu',
+  'getMenuList',
+  'changeMenuState',
+  'getMenuPermissionList',
+  'getRolePage',
+  'getRoleById',
+  'createRole',
+  'updateRole',
+  'deleteRole',
+  'batchDeleteRole',
+  'getRoleList',
+  'getRolePermission',
+  'getLogPage',
+  'createLog',
+  'deleteLog',
+  'batchDeleteLog',
+  'getUserPage',
+  'getUserById',
+  'createUser',
+  'updateUser',
+  'deleteUser',
+  'batchDeleteUser',
+  'getUserRefreshPermissions',
+];
+
+/** 合规形态: api + 资源(允许复合名词) + 动作词 */
+const API_NAME_ALLOWED = `^(api[A-Z][A-Za-z0-9]*(${API_ACTIONS.join('|')})|${LEGACY_API_NAMES.join('|')})$`;
+
+/** 请求函数命名. 名字要自证两件事: 这次调用跨网络; 它是哪个资源的哪个动作 */
+const API_NAMING = [
+  {
+    selector: `ExportNamedDeclaration > FunctionDeclaration[id.name!=/${API_NAME_ALLOWED}/]`,
+    message:
+      '请求函数命名: api + 资源 + 动作词, 如 apiUserPage / apiUserOptions. 动作词见 eslint.config.js 的 API_ACTIONS; 需要新动作词请先改那张表',
+  },
+  {
+    selector: `ExportNamedDeclaration > VariableDeclaration > VariableDeclarator[init.type=/^(ArrowFunctionExpression|FunctionExpression)$/][id.name!=/${API_NAME_ALLOWED}/]`,
+    message:
+      '请求函数命名: api + 资源 + 动作词, 如 apiUserPage / apiUserOptions. 动作词见 eslint.config.js 的 API_ACTIONS; 需要新动作词请先改那张表',
+  },
+];
+
 /** 页面本体不再自己管弹窗开关 */
 const NO_SHELL_IN_PAGE = {
   selector: 'JSXOpeningElement[name.name=/^(BaseModal|ModalShell)$/]',
@@ -210,6 +297,14 @@ export default tseslint.config(
           ],
         },
       ],
+    },
+  },
+  {
+    // 请求函数命名. servers/index.ts 只做转发, 归下面的门面规则管, 这里不重复设防
+    files: ['src/servers/**/*.ts'],
+    ignores: ['src/servers/index.ts'],
+    rules: {
+      'no-restricted-syntax': ['error', ...API_NAMING],
     },
   },
   {
