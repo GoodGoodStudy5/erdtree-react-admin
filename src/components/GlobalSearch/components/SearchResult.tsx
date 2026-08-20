@@ -1,8 +1,7 @@
 import type { SideMenu } from '#/public';
 import { Fragment } from 'react';
 import { Icon } from '@iconify/react';
-import { useNavigate } from 'react-router-dom';
-import { useCommonStore } from '@/hooks';
+import { useCommonStore, useNavigateProgress } from '@/hooks';
 import { getMenuByKey, getOpenMenuByRouter } from '@/menus';
 import { useMenuStore, useTabsStore } from '@/stores';
 import { $t, i18n } from '@/locales';
@@ -20,7 +19,7 @@ export function SearchResult(props: Props) {
   const { permissions, menuList } = useCommonStore();
   const { addTabs, setActiveKey } = useTabsStore((state) => state);
   const setOpenKeys = useMenuStore((state) => state.setOpenKeys);
-  const navigate = useNavigate();
+  const navigate = useNavigateProgress();
   // 获取当前语言
   const currentLanguage = i18n.language;
 

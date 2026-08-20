@@ -5,8 +5,8 @@ import { useCallback, useMemo, memo } from 'react';
 import { Menu } from 'antd';
 import { isUrl, setTitle } from '@/utils';
 import { Icon } from '@iconify/react';
-import { useCommonStore } from '@/hooks';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useCommonStore, useNavigateProgress } from '@/hooks';
+import { useLocation } from 'react-router-dom';
 import { useMenuStore, getTabTitle } from '@/stores';
 import { useShallow } from 'zustand/react/shallow';
 import {
@@ -43,7 +43,7 @@ const filterMenuIcon = (menus: SideMenu[]): SideMenu[] => {
 };
 
 function LayoutMenu() {
-  const navigate = useNavigate();
+  const navigate = useNavigateProgress();
   const { pathname } = useLocation();
 
   const { tabs, setActiveKey, addTabs, setNav } = useTabsStore(

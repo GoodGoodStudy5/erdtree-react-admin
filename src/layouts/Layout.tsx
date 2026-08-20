@@ -9,7 +9,6 @@ import { versionCheck } from './utils/helper';
 import { getMenuList, getUserRefreshPermissions } from '@/servers';
 import { useMenuStore, useUserStore } from '@/stores';
 import { KeepAlive, useKeepAliveRef } from 'keepalive-for-react';
-import nprogress from 'nprogress';
 import Menu from './components/Menu';
 import Header from './components/Header';
 import Tabs from './components/Tabs';
@@ -86,26 +85,11 @@ function Layout() {
     }
   }, []);
 
-  // 组件卸载时确保关闭进度条（退出登录场景）
-  useEffect(() => {
-    return () => {
-      setTimeout(() => {
-        nprogress?.done?.();
-      }, 300);
-    };
-  }, []);
-
   // 监测是否需要刷新
   useEffect(() => {
-    nprogress?.done?.();
-
     requestAnimationFrame(() => {
       versionCheck(messageApi);
     });
-
-    return () => {
-      nprogress?.start?.();
-    };
   }, [pathname]);
 
   /** 判断是否是手机端 */

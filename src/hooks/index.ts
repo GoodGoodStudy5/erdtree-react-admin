@@ -4,6 +4,7 @@ export * from './useEcharts';
 export * from './useFullscreen';
 export * from './useKeyStroke';
 export * from './useLogout';
+export * from './useNavigateProgress';
 export * from './useSearchUrlParams';
 export * from './useSingleTab';
 export * from './useTime';

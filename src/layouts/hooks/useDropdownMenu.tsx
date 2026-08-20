@@ -10,7 +10,7 @@ import {
   PushpinOutlined,
   PushpinFilled,
 } from '@ant-design/icons';
-import { useCommonStore } from '@/hooks';
+import { useCommonStore, useNavigateProgress } from '@/hooks';
 import { useTabsStore } from '@/stores';
 import { useShallow } from 'zustand/shallow';
 import { $t } from '@/locales';
@@ -38,7 +38,7 @@ export function useDropdownMenu(props: Props) {
   const { closeLeft, closeOther, closeRight, closeTabs, toggleMaximize, toggleTabPin } =
     useTabsStore((state) => state);
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
-  const navigate = useNavigate();
+  const navigate = useNavigateProgress();
 
   // 菜单项
   const items: (key?: string) => MenuProps['items'] = (key = activeKey) => {

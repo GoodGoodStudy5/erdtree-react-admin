@@ -8,9 +8,9 @@ import { useCallback, useEffect, useMemo, useState, memo, useRef } from 'react';
 import type { RefObject } from 'react';
 import { getMenuByKey, getOpenMenuByRouter } from '@/menus';
 import { message, Tabs, Dropdown } from 'antd';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useDropdownMenu } from '../hooks/useDropdownMenu';
-import { useCommonStore } from '@/hooks';
+import { useCommonStore, useNavigateProgress } from '@/hooks';
 import { useTabsStore, usePublicStore, getTabTitle } from '@/stores';
 import { useShallow } from 'zustand/react/shallow';
 import { setTitle } from '@/utils';
@@ -26,7 +26,7 @@ interface LayoutTabsProps {
 
 function LayoutTabs({ aliveRef }: LayoutTabsProps) {
   const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const navigate = useNavigateProgress();
 
   // 使用 useMemo 缓存传感器配置，避免每次渲染重新创建
   const sensor = useSensor(PointerSensor, {

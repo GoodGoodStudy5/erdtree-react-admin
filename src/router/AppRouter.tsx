@@ -2,16 +2,12 @@ import { useEffect, useMemo } from 'react';
 import { App, theme, ConfigProvider } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { HashRouter as Router } from 'react-router-dom';
-import nprogress from 'nprogress';
 import RouterPage from './components/Router';
 import StaticMessage from '@south/message';
 
 // antd
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
-
-// 禁止进度条添加loading
-nprogress.configure({ showSpinner: false });
 
 // antd主题
 const { defaultAlgorithm, darkAlgorithm } = theme;

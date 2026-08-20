@@ -5,8 +5,7 @@ import { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import { debounce } from 'lodash';
 import { Modal, Input } from 'antd';
 import { Icon } from '@iconify/react';
-import { useNavigate } from 'react-router-dom';
-import { useKeyStroke, useCommonStore } from '@/hooks';
+import { useKeyStroke, useCommonStore, useNavigateProgress } from '@/hooks';
 import { getMenuByKey, getOpenMenuByRouter, searchMenuValue } from '@/menus';
 import { useMenuStore, useTabsStore } from '@/stores';
 import { SearchResult } from './SearchResult';
@@ -24,7 +23,7 @@ interface Props {
 
 /** 全局搜索弹窗, 输入关键字后按菜单名匹配 */
 export function SearchModal(props: Props) {
-  const navigate = useNavigate();
+  const navigate = useNavigateProgress();
   const inputRef = useRef<InputRef>(null);
   const { modalRef } = props;
   const { permissions, menuList } = useCommonStore();
