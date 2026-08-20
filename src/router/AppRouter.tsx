@@ -18,8 +18,6 @@ nprogress.configure({ showSpinner: false });
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
 import { useCommonStore } from '@/hooks';
-import { LocaleProvider } from '@south/components';
-import { $t } from '@/locales';
 
 /**
  * 侧边栏常驻深色, 不跟随明暗主题 —— 导航与内容分属两个平面, 边界始终清楚.
@@ -69,27 +67,13 @@ function AppRouter() {
     [theme],
   );
 
-  // @south/components 自带英文兜底, 这里把它换成本应用的语种
-  const modalLocale = useMemo(
-    () => ({
-      Modal: {
-        maximize: $t('public.maximize'),
-        exitMaximized: $t('public.exitMaximized'),
-        close: $t('public.close'),
-      },
-    }),
-    [currentLanguage],
-  );
-
   return (
     <Router>
       <ConfigProvider locale={locale} theme={themeConfig}>
         <App>
           <StaticMessage />
-          <LocaleProvider locale={modalLocale}>
-            {/* 语言切换后整树重挂载, 让各处直接调用的 $t 重新取值 */}
-            <RouterPage key={currentLanguage} />
-          </LocaleProvider>
+          {/* 语言切换后整树重挂载, 让各处直接调用的 $t 重新取值 */}
+          <RouterPage key={currentLanguage} />
         </App>
       </ConfigProvider>
     </Router>
