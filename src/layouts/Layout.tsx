@@ -1,5 +1,5 @@
 import { useToken, useCommonStore } from '@/hooks';
-import { useCallback, useEffect, useMemo, useState, memo, useDeferredValue } from 'react';
+import { useCallback, useEffect, useMemo, useState, memo } from 'react';
 import { useOutlet, useLocation } from 'react-router-dom';
 import { Skeleton, message } from 'antd';
 import { debounce } from 'lodash';
@@ -43,14 +43,6 @@ function Layout() {
   );
 
   const { permissions, userId, isMaximize, isCollapsed, isPhone } = useCommonStore();
-
-  // 使用 useDeferredValue 延迟非关键的路由更新，提升响应性
-  const deferredPathname = useDeferredValue(pathname);
-
-  /** Keepalive当前路由缓存 */
-  const currentCacheKey = useMemo(() => {
-    return deferredPathname;
-  }, [deferredPathname]);
 
   // keepalive 实例挂载后发布到 store, 供跨页面刷新调用
   useEffect(() => {
@@ -182,10 +174,10 @@ function Layout() {
             <Skeleton active className="p-30px" paragraph={{ rows: 10 }} />
           )}
           {!isLoading && permissions.length === 0 && <Forbidden />}
-          <KeepAlive aliveRef={keepaliveRef} activeCacheKey={currentCacheKey} max={10}>
+          <KeepAlive aliveRef={keepaliveRef} activeCacheKey={pathname} max={10}>
             {permissions.length > 0 && (
               <motion.div
-                key={deferredPathname}
+                key={pathname}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}
