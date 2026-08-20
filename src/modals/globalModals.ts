@@ -9,8 +9,8 @@ import { UpdatePassword } from './UpdatePassword';
  * 它们本来就在主 chunk 里, 进注册表不多下载一个字节.
  *
  * 页面弹窗不进这里. 页面弹窗进注册表会被拉进同一 chunk, 破坏按页分包, 而页面 import
- * 自己的弹窗依赖方向本来就是对的, 换不到任何解耦. 页面弹窗请直接 open(Comp, props),
- * 需要短写法就在弹窗同文件导出一个具名 open 函数.
+ * 自己的弹窗依赖方向本来就是对的, 换不到任何解耦. 页面弹窗请直接 openModal(Comp, props),
+ * 需要短写法就在弹窗同文件导出一个具名的调起函数.
  *
  * 「只收全局弹窗」这条口径由 depcruise 的 no-page-as-dependency 兜住: 本目录引 src/pages 直接报错.
  */

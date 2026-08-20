@@ -1,4 +1,4 @@
-export { ModalOutlet, createModalSet, open, useModalId } from './adapter';
+export { ModalOutlet, createModalSet, openModal, useModalId } from './adapter';
 export type { ModalInstance } from './adapter';
 export { BaseModal } from './BaseModal';
 export type { BaseModalProps } from './BaseModal';

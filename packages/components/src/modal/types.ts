@@ -28,7 +28,7 @@ export type OpenProps<C extends ModalComponent> = Omit<
   keyof ModalControl<never>
 >;
 
-/** 业务 props 全可选时允许省略 open 的第二个实参 */
+/** 业务 props 全可选时允许省略 openModal 的第二个实参 */
 export type OpenArgs<C extends ModalComponent> =
   object extends OpenProps<C> ? [props?: OpenProps<C>] : [props: OpenProps<C>];
 
@@ -116,7 +116,7 @@ export type CreateModalSetFn = <T extends Record<string, ModalComponent>>(
   };
 };
 
-/** 取当前弹窗实例 id 的签名. null 表示组件不是被 open 调起的 */
+/** 取当前弹窗实例 id 的签名. null 表示组件不是被 openModal 调起的 */
 export type UseModalIdFn = () => number | null;
 
 /** 关闭拦截的签名. 返回 false 则不关 */

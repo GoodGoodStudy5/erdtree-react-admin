@@ -3,7 +3,7 @@ import type { PagePermission } from '#/public';
 import { Button, message, Popconfirm } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
-import { open } from '@south/components';
+import { openModal } from '@south/components';
 import { searchList, tableColumns } from './model';
 import { MenuEditModal } from './MenuEditModal';
 import { getMenuPage, deleteMenu, batchDeleteMenu } from '@/servers';
@@ -89,7 +89,7 @@ function MenuPage() {
     // 在某个菜单下新增时, 默认落到它的下一层
     let type = record?.id ? record?.type : undefined;
     if (type && type < 3) type = type + 1;
-    if (await open(MenuEditModal, { parentId: record?.id, type })) getPage();
+    if (await openModal(MenuEditModal, { parentId: record?.id, type })) getPage();
   };
 
   /**
@@ -97,7 +97,7 @@ function MenuPage() {
    * @param id - 唯一值
    */
   const onUpdate = async (id: string) => {
-    if (await open(MenuEditModal, { id })) getPage();
+    if (await openModal(MenuEditModal, { id })) getPage();
   };
 
   /**

@@ -29,14 +29,14 @@ declare function expectType<T>(value: T): void;
 // 用真实现而非占位声明, 否则实现与契约仍可能各走各的
 import { BaseModal } from './BaseModal';
 import { ModalShell } from './ModalShell';
-import { createModalSet, open, useModalId } from './adapter';
+import { createModalSet, openModal, useModalId } from './adapter';
 import { useCloseGuard } from './useCloseGuard';
 import { useModalForm } from './useModalForm';
 import { useEvent } from './useEvent';
 import { useModalShell } from './useModalShell';
 
 // 实现必须符合契约里导出的签名. 任一处漂移这里先红
-const _open = open satisfies OpenFn;
+const _openModal = openModal satisfies OpenFn;
 const _createModalSet = createModalSet satisfies CreateModalSetFn;
 const _useModalId = useModalId satisfies UseModalIdFn;
 const _useCloseGuard = useCloseGuard satisfies UseCloseGuardFn;
@@ -44,7 +44,7 @@ const _useModalShell = useModalShell satisfies UseModalShellFn;
 const _ModalShell = ModalShell satisfies ModalShellFn;
 const _useModalForm = useModalForm satisfies UseModalFormFn;
 void [
-  _open,
+  _openModal,
   _createModalSet,
   _useModalId,
   _useCloseGuard,
@@ -114,32 +114,32 @@ function ModalConfirmDelete(_props: ModalControl<boolean>) {
 // ── 结果类型从 props 反推 ──────────────────────────────────────
 
 async function 结果类型从props反推() {
-  expectType<User | undefined>(await open(ModalUserEdit, { id: '1' }));
-  expectType<Role | undefined>(await open(ModalRoleEdit, { deptId: 3 }));
-  expectType<boolean | undefined>(await open(ModalConfirmDelete));
+  expectType<User | undefined>(await openModal(ModalUserEdit, { id: '1' }));
+  expectType<Role | undefined>(await openModal(ModalRoleEdit, { deptId: 3 }));
+  expectType<boolean | undefined>(await openModal(ModalConfirmDelete));
 
   // @ts-expect-error 交付的是 User 不是 Role
-  expectType<Role | undefined>(await open(ModalUserEdit, { id: '1' }));
+  expectType<Role | undefined>(await openModal(ModalUserEdit, { id: '1' }));
 }
 
 // ── 控制面字段不许调用方传 ────────────────────────────────────
 
 async function 控制面字段不许调用方传() {
   // @ts-expect-error resolve 属于底座
-  await open(ModalUserEdit, { id: '1', resolve: () => undefined });
+  await openModal(ModalUserEdit, { id: '1', resolve: () => undefined });
   // @ts-expect-error cancel 属于底座
-  await open(ModalUserEdit, { id: '1', cancel: () => undefined });
+  await openModal(ModalUserEdit, { id: '1', cancel: () => undefined });
 }
 
 // ── 多传或漏传必填 prop ───────────────────────────────────────
 
 async function 多传或漏传必填prop() {
   // @ts-expect-error nope 不存在
-  await open(ModalRoleEdit, { deptId: 3, nope: 1 });
+  await openModal(ModalRoleEdit, { deptId: 3, nope: 1 });
   // @ts-expect-error 漏传必填的 deptId
-  await open(ModalRoleEdit, {});
+  await openModal(ModalRoleEdit, {});
   // @ts-expect-error 有必填 prop 时不许省略第二个实参
-  await open(ModalRoleEdit);
+  await openModal(ModalRoleEdit);
 }
 
 // ── 集合门面下异形弹窗共存 ────────────────────────────────────
@@ -165,9 +165,9 @@ async function 集合门面下异形弹窗共存() {
 
 async function 叠层Promise不串台() {
   const [ra, rb, rc] = await Promise.all([
-    open(ModalUserEdit, { id: 'a' }),
-    open(ModalUserEdit, { id: 'b' }),
-    open(ModalRoleEdit, { deptId: 9 }),
+    openModal(ModalUserEdit, { id: 'a' }),
+    openModal(ModalUserEdit, { id: 'b' }),
+    openModal(ModalRoleEdit, { deptId: 9 }),
   ]);
   expectType<User | undefined>(ra);
   expectType<User | undefined>(rb);
@@ -304,7 +304,7 @@ function ModalWithGuard(_props: { id?: string } & ModalControl<User>) {
 }
 
 async function 关闭原因不外泄() {
-  const result = await open(ModalWithGuard, { id: '1' });
+  const result = await openModal(ModalWithGuard, { id: '1' });
   // @ts-expect-error 取消不带原因, 结果不是带 reason 的对象
   void result?.reason;
 }
@@ -312,12 +312,12 @@ async function 关闭原因不外泄() {
 // ── 全链路 ────────────────────────────────────────────────────
 
 async function 全链路() {
-  expectType<User | undefined>(await open(ModalViaShell, { id: '1' }));
-  expectType<User | undefined>(await open(ModalViaHook, { id: '1' }));
-  expectType<User | undefined>(await open(ModalUserForm, { id: '1' }));
+  expectType<User | undefined>(await openModal(ModalViaShell, { id: '1' }));
+  expectType<User | undefined>(await openModal(ModalViaHook, { id: '1' }));
+  expectType<User | undefined>(await openModal(ModalUserForm, { id: '1' }));
 
   // @ts-expect-error control 是外壳层的实现细节, 不该出现在调用侧
-  await open(ModalViaShell, { id: '1', control: undefined });
+  await openModal(ModalViaShell, { id: '1', control: undefined });
 }
 
 export {

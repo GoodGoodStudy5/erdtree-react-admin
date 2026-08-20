@@ -30,7 +30,7 @@ function InstanceHost({ instance }: { instance: ModalInstance }) {
 
 /**
  * 命令式弹窗的挂载点. 它只是显示器 —— 事实来源在 store,
- * 所以挂载之前调用的 open 不会丢, 挂上来会补渲染.
+ * 所以挂载之前调用的 openModal 不会丢, 挂上来会补渲染.
  */
 export function ModalOutlet() {
   const instances = useSyncExternalStore(

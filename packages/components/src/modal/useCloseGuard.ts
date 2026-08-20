@@ -5,7 +5,7 @@ import { useEvent } from './useEvent';
 
 /**
  * 拦截关闭请求, 返回 false 则不关. 典型用途是表单改过之后确认放弃编辑.
- * 关闭来源只到达这里, 不会外泄给 open 的调用方.
+ * 关闭来源只到达这里, 不会外泄给 openModal 的调用方.
  */
 export const useCloseGuard: UseCloseGuardFn = (guard) => {
   const id = useModalId();

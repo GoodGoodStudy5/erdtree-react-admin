@@ -9,7 +9,7 @@ const FALLBACK_REMOVE_DELAY = 300;
 type Settle = (value: unknown) => void;
 type Guard = (reason: CloseReason) => boolean | Promise<boolean>;
 
-/** 一次 open 对应一个实例. 叠层时各自独立, 结果互不串台 */
+/** 一次 openModal 对应一个实例. 叠层时各自独立, 结果互不串台 */
 export type ModalInstance = {
   readonly id: number;
   readonly Comp: ModalComponent;

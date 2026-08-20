@@ -2,7 +2,7 @@ import type { Key, TableRowSelection } from 'antd/es/table/interface';
 import { Form, message } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
-import { open } from '@south/components';
+import { openModal } from '@south/components';
 import { searchList, tableColumns } from './model';
 import { UserEditModal } from './UserEditModal';
 import { batchDeleteUser, deleteUser, getUserPage } from '@/servers';
@@ -84,7 +84,7 @@ function UserPage() {
 
   /** 点击新增 */
   const onCreate = async () => {
-    if (await open(UserEditModal)) getPage();
+    if (await openModal(UserEditModal)) getPage();
   };
 
   /**
@@ -92,7 +92,7 @@ function UserPage() {
    * @param id - 唯一值
    */
   const onUpdate = async (id: string) => {
-    if (await open(UserEditModal, { id })) getPage();
+    if (await openModal(UserEditModal, { id })) getPage();
   };
 
   /**

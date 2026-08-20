@@ -5,7 +5,7 @@ import type { CreateModalSetFn, ModalComponent, OpenFn } from '../../types';
  * 命令式调起弹窗. 自由函数而非 hook, 所以工具函数、store action、请求拦截器里都能直接调.
  * 结果在 store 内部按 unknown 搬运, 类型由 OpenFn 在此边界处一次性保证.
  */
-export const open = ((comp: ModalComponent, props?: Record<string, unknown>) =>
+export const openModal = ((comp: ModalComponent, props?: Record<string, unknown>) =>
   modalStore.push(comp, props ?? {})) as OpenFn;
 
 /**

@@ -49,7 +49,7 @@ const NO_MODAL_PROPS_ON_OTHER_CARRIER = [
   },
 ];
 
-/** 命令式底座取代了 ref 契约: open 的参数由 props 推导, 不再从 ref 类型反推 */
+/** 命令式底座取代了 ref 契约: openModal 的参数由 props 推导, 不再从 ref 类型反推 */
 const NO_IMPERATIVE_HANDLE = {
   selector: 'CallExpression[callee.name="useImperativeHandle"]',
   message: '弹窗改走命令式, 不要用 useImperativeHandle 暴露 open()',
@@ -145,7 +145,7 @@ const API_NAMING = [
 /** 页面本体不再自己管弹窗开关 */
 const NO_SHELL_IN_PAGE = {
   selector: 'JSXOpeningElement[name.name=/^(BaseModal|ModalShell)$/]',
-  message: '页面本体不要直接渲染弹窗外壳, 把弹窗抽成独立组件, 页面只用 open()',
+  message: '页面本体不要直接渲染弹窗外壳, 把弹窗抽成独立组件, 页面只用 openModal()',
 };
 
 export default tseslint.config(
