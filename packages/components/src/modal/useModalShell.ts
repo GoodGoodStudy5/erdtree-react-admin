@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { isModalAbort } from './abort';
-import { useModalInstance } from './adapter';
+import { modalStore, useModalId, useModalVisible } from './adapter';
 import type { UseModalShellFn } from './types';
+import { useEvent } from './useEvent';
 
 /**
  * 把控制面接成可直接用的一组东西.
@@ -11,17 +12,20 @@ import type { UseModalShellFn } from './types';
  *
  * 产出既有中性原语也有 modalProps: 后者只给 antd Modal 系载体整包展开,
  * 因为 JSX 展开不做多余属性检查, 展开到 Drawer 上 onCancel 会被静默忽略且不报错.
+ *
+ * submit 与 close 身份恒定, 调用方可以放进自己的依赖数组.
  */
 export const useModalShell: UseModalShellFn = (control, options) => {
-  const instance = useModalInstance();
+  const id = useModalId();
+  const visible = useModalVisible(id);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const { onOk, onError } = options;
   const { resolve, cancel } = control;
 
-  const submit = useCallback(() => {
+  const submit = useEvent(() => {
     void (async () => {
       setConfirmLoading(true);
-      instance?.setBusy(true);
+      if (id !== null) modalStore.setBusy(id, true);
       try {
         resolve(await onOk());
       } catch (error) {
@@ -33,30 +37,25 @@ export const useModalShell: UseModalShellFn = (control, options) => {
         else throw error;
       } finally {
         setConfirmLoading(false);
-        instance?.setBusy(false);
+        if (id !== null) modalStore.setBusy(id, false);
       }
     })();
-  }, [instance, onError, onOk, resolve]);
+  });
 
-  const close = useCallback(() => {
+  const close = useEvent(() => {
     // 有实例就走 requestClose, 它会过关闭拦截、并在提交中拒绝关闭
-    if (instance) instance.requestClose();
+    if (id !== null) void modalStore.requestClose(id);
     else cancel();
-  }, [cancel, instance]);
+  });
 
-  const modalProps = useMemo(() => {
-    const base = {
-      open: instance ? instance.visible : true,
-      confirmLoading,
-      onOk: submit,
-      onCancel: close,
-    };
-    // 非提交态不能给出这三个键. 展开时键存在即便值是 undefined 也会盖掉载体自己的默认值 ——
-    // BaseModal 默认禁止点遮罩关闭, 给一个 undefined 就把它打回 antd 的默认(可关)
-    if (!confirmLoading) return base;
-    // 提交中禁止关闭: antd 的 confirmLoading 只管确定按钮, 这三样得自己接管
-    return { ...base, cancelButtonProps: { disabled: true }, maskClosable: false, keyboard: false };
-  }, [close, confirmLoading, instance, submit]);
+  const base = { open: visible, confirmLoading, onOk: submit, onCancel: close };
+  // 不做 memo: 载体不是 memo 组件, 父组件重渲染时它必然重渲染, 省不下任何渲染
+  const modalProps = confirmLoading
+    ? // 提交中禁止关闭: antd 的 confirmLoading 只管确定按钮, 这三样得自己接管
+      { ...base, cancelButtonProps: { disabled: true }, maskClosable: false, keyboard: false }
+    : // 非提交态不能给出这三个键. 展开时键存在即便值是 undefined 也会盖掉载体自己的默认值 ——
+      // BaseModal 默认禁止点遮罩关闭, 给一个 undefined 就把它打回 antd 的默认(可关)
+      base;
 
   return { confirmLoading, submit, close, modalProps };
 };

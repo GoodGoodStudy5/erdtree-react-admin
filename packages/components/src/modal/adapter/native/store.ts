@@ -79,6 +79,11 @@ async function requestClose(id: number, reason: CloseReason = 'userRequest') {
   settle(id, undefined);
 }
 
+/** 某个实例是否还在显示. 交原始值, 让订阅方的依赖项停在 boolean 上 */
+function isVisible(id: number) {
+  return find(id)?.visible ?? false;
+}
+
 function setBusy(id: number, busy: boolean) {
   if (find(id)) patch(id, { busy });
 }
@@ -114,6 +119,7 @@ function push(Comp: ModalComponent, props: Record<string, unknown>) {
 export const modalStore = {
   subscribe,
   getSnapshot,
+  isVisible,
   push,
   settle,
   remove,

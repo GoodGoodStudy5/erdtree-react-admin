@@ -3,6 +3,7 @@ import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import checkFile from 'eslint-plugin-check-file';
+import importX from 'eslint-plugin-import-x';
 import jsdoc from 'eslint-plugin-jsdoc';
 import tseslint from 'typescript-eslint';
 
@@ -10,6 +11,29 @@ import tseslint from 'typescript-eslint';
  * flat config 的规则选项是整体替换而非合并, 所以每个用到 no-restricted-syntax 的块
  * 都要把该生效的选择器重新列全, 否则后写的块会把先写的整条盖掉.
  */
+
+/**
+ * 只报错, 不自动改.
+ *
+ * 用于合并类修复不可靠的规则: import-x 的重复导入修复遇到"内联 type 与值写在同一条"的导入时,
+ * 会把值一并塞进 import type, 产出编译不过的代码, 而 eslint 之后不再报错 —— 破坏被放过去了.
+ * 让人手动合并一次, 比让工具悄悄改坏一次便宜.
+ */
+function reportOnly(rule) {
+  return {
+    ...rule,
+    meta: { ...rule.meta, fixable: undefined, hasSuggestions: false },
+    create(context) {
+      const noFix = Object.create(context, {
+        report: {
+          value: (descriptor) =>
+            context.report({ ...descriptor, fix: undefined, suggest: undefined }),
+        },
+      });
+      return rule.create(noFix);
+    },
+  };
+}
 
 /** 外壳的 modalProps 只能展开到 antd Modal 系载体 */
 const NO_MODAL_PROPS_ON_OTHER_CARRIER = [
@@ -138,6 +162,10 @@ export default tseslint.config(
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'import-x': {
+        ...importX,
+        rules: { ...importX.rules, 'no-duplicates': reportOnly(importX.rules['no-duplicates']) },
+      },
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -263,6 +291,17 @@ export default tseslint.config(
           // caughtErrorsIgnorePattern: '^_',
         },
       ],
+      // 同一模块只留一条导入语句, 读一行就知道从这个模块取了什么.
+      // type 与值分属两条: 类型是编译期契约, 值是运行时依赖, 混在一行看不出哪些会进产物
+      'import-x/no-duplicates': ['error', { 'prefer-inline': false }],
+      // 承接上一条的分条口径: 类型说明符不许内联到值导入里, 一律提到顶层 import type
+      'import-x/consistent-type-specifier-style': ['error', 'prefer-top-level'],
+      // 纯类型不许走值导入 —— 值导入进产物, 类型不进, 形态得能自证.
+      // 内联形态会让"一个模块两条语句"和"一条混合语句"同时合法, 分条就失去判据
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports', fixStyle: 'separate-type-imports' },
+      ],
       // 见文件顶部常量的说明
       'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER],
       // 官方hooks校验
@@ -305,7 +344,9 @@ export default tseslint.config(
     files: ['src/servers/**/*.ts'],
     ignores: ['src/servers/index.ts'],
     rules: {
-      'no-restricted-syntax': ['error', ...API_NAMING],
+      // 通用块的选择器照文件顶部的说明重列: 眼下 servers 只有 .ts 文件, JSX 选择器命不中,
+      // 但列全之后这里的保证与辖区写法无关, 日后把辖区放宽到 .tsx 不会静默漏掉一条
+      'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER, ...API_NAMING],
     },
   },
   {

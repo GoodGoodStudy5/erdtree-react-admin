@@ -1,5 +1,6 @@
 import { Tooltip } from 'antd';
-import { useEffect, useRef, useState, useCallback, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import type { CSSProperties } from 'react';
 
 interface EllipsisTextProps {
   text: string;

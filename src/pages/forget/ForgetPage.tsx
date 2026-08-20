@@ -1,6 +1,5 @@
 import type { FormProps } from 'antd';
-import { InputNumber, message } from 'antd';
-import { Form, Button, Input } from 'antd';
+import { InputNumber, message, Form, Button, Input } from 'antd';
 import { I18n, Theme } from '@/components';
 import { setTitle } from '@/utils';
 import { message as globalMessage } from '@south/message';

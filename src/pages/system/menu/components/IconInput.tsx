@@ -1,6 +1,7 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { Icon } from '@iconify/react';
-import { Input, Tooltip, type InputProps } from 'antd';
+import { Input, Tooltip } from 'antd';
+import type { InputProps } from 'antd';
 import { $t } from '@/locales';
 
 function IconInput(props: InputProps) {

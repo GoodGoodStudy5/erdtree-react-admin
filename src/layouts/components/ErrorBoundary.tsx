@@ -1,4 +1,5 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
+import { Component } from 'react';
 import { Button, Result, Tooltip } from 'antd';
 import { LogoutOutlined, MessageOutlined, RedoOutlined } from '@ant-design/icons';
 import { useUserStore } from '@/stores';

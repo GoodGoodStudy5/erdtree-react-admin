@@ -1,33 +1,26 @@
-import { createContext, useContext } from 'react';
-import type { CloseReason } from '../../types';
-
-/** 当前弹窗实例的把手. 由挂载点注入, 供外壳层与 useCloseGuard 取用 */
-export type ModalInstanceApi = {
-  readonly id: number;
-  /** false 表示正在退场 */
-  readonly visible: boolean;
-  /** 提交进行中 */
-  readonly busy: boolean;
-  /** 交付结果并关闭 */
-  resolve: (value: unknown) => void;
-  /** 不交结果关闭 */
-  cancel: () => void;
-  /** 用户请求关闭. 会先过 useCloseGuard, 提交中则被拒绝 */
-  requestClose: (reason?: CloseReason) => void;
-  /** 标记提交进行中, 期间禁止关闭 */
-  setBusy: (busy: boolean) => void;
-  /** 注册关闭拦截 */
-  registerGuard: (guard: ((reason: CloseReason) => boolean | Promise<boolean>) | undefined) => void;
-  /** 退场动画放完了, 可以移除 */
-  notifyClosed: () => void;
-};
-
-export const ModalInstanceContext = createContext<ModalInstanceApi | null>(null);
+import { createContext, useContext, useSyncExternalStore } from 'react';
+import { modalStore } from './store';
 
 /**
- * 取当前弹窗实例. 返回 null 表示组件不是被 open 调起的 ——
- * 直接在 JSX 里当受控组件用时就是这种情况, 外壳层需要能容忍.
+ * 当前弹窗实例的 id. 只往下传这一个原始值.
+ *
+ * 命令都是 modalStore 上的模块级函数, 身份天然恒定; 把它们包成一个随实例状态重建的对象再发下来,
+ * 等于给稳定的东西套了个不稳定的壳, 下游还要为这个壳付依赖比较的钱.
+ *
+ * null 表示组件不是被 open 调起的 —— 直接在 JSX 里当受控组件用时就是这种情况, 外壳层需要能容忍.
  */
-export function useModalInstance(): ModalInstanceApi | null {
-  return useContext(ModalInstanceContext);
+export const ModalIdContext = createContext<number | null>(null);
+
+/** 取当前弹窗实例的 id. null 表示不是被 open 调起的 */
+export function useModalId(): number | null {
+  return useContext(ModalIdContext);
+}
+
+/**
+ * 订阅某个实例的显示态. 交出的是布尔原始值而非实例对象, 调用方的依赖项因此停在原始值上.
+ * 不是被 open 调起时恒为显示 —— 那时开关归 JSX 的使用者管.
+ */
+export function useModalVisible(id: number | null): boolean {
+  const getSnapshot = () => (id === null ? true : modalStore.isVisible(id));
+  return useSyncExternalStore(modalStore.subscribe, getSnapshot, getSnapshot);
 }

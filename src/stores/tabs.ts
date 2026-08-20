@@ -1,9 +1,8 @@
 import type { TabPaneProps } from 'antd';
 import type { NavData } from '@/menus';
 import type { KeepAliveRef } from 'keepalive-for-react';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist, createJSONStorage, devtools } from 'zustand/middleware';
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
 import { LANG } from '@/utils';
 
 /** 标签页数据, key 即路由路径 */

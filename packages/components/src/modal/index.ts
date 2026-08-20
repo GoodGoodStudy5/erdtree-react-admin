@@ -1,5 +1,5 @@
-export { ModalOutlet, createModalSet, open, useModalInstance } from './adapter';
-export type { ModalInstance, ModalInstanceApi } from './adapter';
+export { ModalOutlet, createModalSet, open, useModalId } from './adapter';
+export type { ModalInstance } from './adapter';
 export { BaseModal } from './BaseModal';
 export type { BaseModalProps } from './BaseModal';
 export { ModalAbort, isModalAbort } from './abort';
@@ -23,6 +23,7 @@ export type {
   UseModalFormResult,
   OpenFn,
   CreateModalSetFn,
+  UseModalIdFn,
   UseCloseGuardFn,
   UseModalShellFn,
   ModalShellFn,

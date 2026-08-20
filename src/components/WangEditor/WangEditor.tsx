@@ -1,6 +1,7 @@
 import '@wangeditor/editor/dist/css/style.css';
 import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
-import { useState, useEffect, type HTMLAttributes } from 'react';
+import { useState, useEffect } from 'react';
+import type { HTMLAttributes } from 'react';
 import { Editor, Toolbar } from '@wangeditor/editor-for-react';
 import { FILE_API } from '@/utils';
 import { $t } from '@/locales';

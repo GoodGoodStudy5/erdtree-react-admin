@@ -4,7 +4,7 @@ import { UpdatePassword } from './UpdatePassword';
 /**
  * 全局公共弹窗组: 只收不属于任何页面的共性弹窗.
  *
- * 用注册表换来的是"调用方不必 import 弹窗组件" —— 请求拦截器、通用 store action 这些
+ * 用注册表换来的是"调用方不必 import 弹窗组件" —— 请求拦截器, 通用 store action 这些
  * 底层调用点因此也能调起弹窗, 不必反向依赖上层. 而这份收益只有全局弹窗拿得到:
  * 它们本来就在主 chunk 里, 进注册表不多下载一个字节.
  *

@@ -1,7 +1,6 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, FC } from 'react';
 import { CSS } from '@dnd-kit/utilities';
 import { useSortable } from '@dnd-kit/sortable';
-import type { FC } from 'react';
 import type { Transform } from '@dnd-kit/utilities';
 
 export interface DraggableTabPaneProps {

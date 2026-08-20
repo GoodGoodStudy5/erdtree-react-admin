@@ -1,4 +1,5 @@
-import { Select, type SelectProps } from 'antd';
+import { Select } from 'antd';
+import type { SelectProps } from 'antd';
 import { MAX_TAG_COUNT } from './constants';
 import { $t } from '@/locales';
 

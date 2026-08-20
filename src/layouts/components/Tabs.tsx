@@ -1,15 +1,11 @@
 import type { TabsProps } from 'antd';
 import type { KeepAliveRef } from 'keepalive-for-react';
-import {
-  type DragEndEvent,
-  closestCenter,
-  DndContext,
-  PointerSensor,
-  useSensor,
-} from '@dnd-kit/core';
+import { closestCenter, DndContext, PointerSensor, useSensor } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import DraggableTabNode from './DraggableTabNode';
-import { useCallback, useEffect, useMemo, useState, memo, useRef, type RefObject } from 'react';
+import { useCallback, useEffect, useMemo, useState, memo, useRef } from 'react';
+import type { RefObject } from 'react';
 import { getMenuByKey, getOpenMenuByRouter } from '@/menus';
 import { message, Tabs, Dropdown } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';

@@ -1,6 +1,5 @@
 import { MENU_STATUS } from '@/utils';
-import { getUserPage } from '@/servers';
-import { getRoleList } from '@/servers';
+import { getUserPage, getRoleList } from '@/servers';
 import { $t } from '@/locales';
 
 const otherSearch: BaseSearchList[] = [];

@@ -1,6 +1,8 @@
 import type { Key } from 'react';
-import { Spin, type SelectProps } from 'antd';
-import { getRolePermission, type PermissionData } from '@/servers';
+import { Spin } from 'antd';
+import type { SelectProps } from 'antd';
+import { getRolePermission } from '@/servers';
+import type { PermissionData } from '@/servers';
 import MenuAuthorize from './MenuAuthorize';
 
 interface Props extends SelectProps {

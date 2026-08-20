@@ -1,6 +1,6 @@
 import type { FormInstance } from 'antd';
 import { Form } from 'antd';
-import { useCallback, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { ModalAbort } from './abort';
 
 /**
@@ -10,6 +10,7 @@ import { ModalAbort } from './abort';
  */
 const SUBMIT_SETTLE_TIMEOUT = 10_000;
 import type { ModalControl, UseModalFormOptions, UseModalFormResult } from './types';
+import { useEvent } from './useEvent';
 import { useModalShell } from './useModalShell';
 
 /**
@@ -30,30 +31,8 @@ export function useModalForm<V, R>(
     null,
   );
   const { onSubmit, onError } = options;
-  const submitRef = useRef<() => void>(() => undefined);
 
-  const handleFinish = useCallback(
-    (values: V) => {
-      const task = pending.current;
-      pending.current = null;
-      if (!task) {
-        // 表单内回车会直接触发 onFinish, 此时还没有等待中的提交.
-        // 转交外壳走完整流程, 否则这一次提交会被无声丢弃
-        submitRef.current();
-        return;
-      }
-      void (async () => {
-        try {
-          task.resolve(await onSubmit(values));
-        } catch (error) {
-          task.reject(error);
-        }
-      })();
-    },
-    [onSubmit],
-  );
-
-  const onOk = useCallback(async () => {
+  const onOk = useEvent(async () => {
     try {
       // 先自行校验: 不过就地中止, 否则表单组件多半只 console.warn, 提交态会一直挂着
       await form.validateFields();
@@ -80,13 +59,27 @@ export function useModalForm<V, R>(
       };
       form.submit();
     });
-  }, [form]);
+  });
 
   const shell = useModalShell(control, { onOk, onError });
 
-  // 渲染期不能写 ref, 放到提交后同步
-  useEffect(() => {
-    submitRef.current = shell.submit;
+  const handleFinish = useEvent((values: V) => {
+    const task = pending.current;
+    pending.current = null;
+    if (!task) {
+      // 没有等待中的提交, 说明这次不是点确定发起的 —— 多半是业务自己调了 form.submit().
+      // 转交外壳走完整流程, 否则这一次提交会被无声丢弃.
+      // 回车不在此处判别: 它分不出来源, 已由 BaseModal 在内容容器上按手势拦掉
+      shell.submit();
+      return;
+    }
+    void (async () => {
+      try {
+        task.resolve(await onSubmit(values));
+      } catch (error) {
+        task.reject(error);
+      }
+    })();
   });
 
   return { form: form as FormInstance<V>, handleFinish, ...shell };

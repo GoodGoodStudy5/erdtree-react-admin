@@ -1,6 +1,7 @@
 import type { BaseFormData } from '#/form';
 import type { PagePermission } from '#/public';
-import { Button, Drawer, Form, type FormInstance, message, Spin } from 'antd';
+import { Button, Drawer, Form, message, Spin } from 'antd';
+import type { FormInstance } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { searchList, createList, tableColumns } from './model';

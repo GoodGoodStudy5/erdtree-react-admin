@@ -1,16 +1,12 @@
 import type { LoginData } from '@/servers';
 import type { FormProps } from 'antd';
-import { Checkbox, message } from 'antd';
-import { Form, Button, Input } from 'antd';
+import { Checkbox, message, Form, Button, Input } from 'antd';
 import { I18n, Theme } from '@/components';
-import { login } from '@/servers';
+import { login, getMenuList, getUserRefreshPermissions } from '@/servers';
 import { LOGIN_EXPIRED_MSG } from '@south/request';
-import { setTitle } from '@/utils';
-import { getMenuList } from '@/servers';
-import { getUserRefreshPermissions } from '@/servers';
+import { setTitle, cancelAllRequest } from '@/utils';
 import { encryption, decryption } from '@south/utils';
 import { getFirstMenu } from '@/menus';
-import { cancelAllRequest } from '@/utils';
 import Logo from '@/assets/images/logo.svg';
 import { $t, i18n } from '@/locales';
 

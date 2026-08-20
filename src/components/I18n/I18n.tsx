@@ -4,10 +4,8 @@ import { Icon } from '@iconify/react';
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
-import { LANG } from '@/utils';
-import { setTitle } from '@/utils';
-import { getTabTitle } from '@/stores';
-import { useTabsStore } from '@/stores';
+import { LANG, setTitle } from '@/utils';
+import { getTabTitle, useTabsStore } from '@/stores';
 import { i18n } from '@/locales';
 
 /** 界面语言取值 */

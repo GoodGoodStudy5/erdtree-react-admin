@@ -1,6 +1,5 @@
 import { getFirstMenu, getMenuByKey } from '@/menus';
-import { getMenuList } from '@/servers';
-import { getUserRefreshPermissions } from '@/servers';
+import { getMenuList, getUserRefreshPermissions } from '@/servers';
 import { useMenuStore, useUserStore } from '@/stores';
 import { Button } from 'antd';
 import { $t } from '@/locales';

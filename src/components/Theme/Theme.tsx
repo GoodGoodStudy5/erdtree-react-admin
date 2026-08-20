@@ -1,7 +1,9 @@
-import { ThemeType, usePublicStore } from '@/stores';
+import type { ThemeType } from '@/stores';
+import { usePublicStore } from '@/stores';
 import { Tooltip } from 'antd';
 import { Icon } from '@iconify/react';
-import { MouseEvent, useEffect, useState } from 'react';
+import type { MouseEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { THEME_KEY } from '@/utils';
 import './index.module.less';
 import { $t } from '@/locales';

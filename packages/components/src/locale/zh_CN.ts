@@ -4,7 +4,7 @@ import type { ComponentsLocale } from './types';
 export const zhCN: ComponentsLocale = {
   Modal: {
     maximize: '最大化',
-    exitMaximized: '还原',
+    exitMaximized: '退出最大化',
     close: '关闭',
   },
 };

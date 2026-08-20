@@ -1,4 +1,5 @@
-import { Button, Upload, type UploadProps } from 'antd';
+import { Button, Upload } from 'antd';
+import type { UploadProps } from 'antd';
 import { $t } from '@/locales';
 
 /** 文件上传, 请求自动带上登录令牌 */

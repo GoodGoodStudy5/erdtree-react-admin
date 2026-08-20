@@ -2,7 +2,8 @@ import type { ComponentType, BaseFormList } from '#/form';
 import { initCompProps } from './helper';
 import type { FormInstance, InputProps } from 'antd';
 import { Input, Spin } from 'antd';
-import { type KeyboardEvent, lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
+import type { KeyboardEvent } from 'react';
 import { cloneDeep } from 'lodash';
 
 /**

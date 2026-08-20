@@ -8,7 +8,7 @@ type Props = {
   children?: ReactNode;
 };
 
-/** 注入本包组件的文案. 不挂也能用, 那时组件走包内自带的英文 */
+/** 覆盖本包组件的文案. 不挂也能用, 那时组件跟着宿主给 antd 的语种走 */
 export function LocaleProvider({ locale, children }: Props) {
   return <LocaleContext.Provider value={locale}>{children}</LocaleContext.Provider>;
 }

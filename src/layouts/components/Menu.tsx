@@ -3,7 +3,7 @@ import type { SideMenu } from '#/public';
 import type { ItemType, MenuItemType } from 'antd/es/menu/interface';
 import { useCallback, useMemo, memo } from 'react';
 import { Menu } from 'antd';
-import { isUrl } from '@/utils';
+import { isUrl, setTitle } from '@/utils';
 import { Icon } from '@iconify/react';
 import { useCommonStore } from '@/hooks';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -19,7 +19,6 @@ import {
 } from '@/menus';
 import styles from '../index.module.less';
 import Logo from '@/assets/images/logo.svg';
-import { setTitle } from '@/utils';
 import { $t, i18n } from '@/locales';
 
 /**

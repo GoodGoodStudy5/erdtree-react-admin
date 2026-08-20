@@ -7,3 +7,5 @@ allowBuilds:
   esbuild: true
   # code-inspector-plugin 的可选依赖, 仅用于个别 IDE 唤起方式, 不构建也能正常跳转
   node-pty: false
+  # eslint 解析导入路径用的原生模块, 各平台预编译包已发布, 本机不必再编译一遍
+  unrs-resolver: false

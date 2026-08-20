@@ -1,4 +1,5 @@
-import { TreeSelect, type TreeSelectProps } from 'antd';
+import { TreeSelect } from 'antd';
+import type { TreeSelectProps } from 'antd';
 import { MAX_TAG_COUNT } from './constants';
 import { $t } from '@/locales';
 

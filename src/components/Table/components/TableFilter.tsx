@@ -1,7 +1,8 @@
-import { type TableProps, type CheckboxProps, Button, Popover, Divider, Checkbox } from 'antd';
+import { Button, Popover, Divider, Checkbox } from 'antd';
+import type { TableProps, CheckboxProps } from 'antd';
 import { useState, memo } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
-import { TableColumn } from '#/public';
+import type { TableColumn } from '#/public';
 import { DragContent } from './DragContent';
 import { $t } from '@/locales';
 

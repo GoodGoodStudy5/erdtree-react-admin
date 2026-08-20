@@ -1,5 +1,5 @@
 import { BaseModal } from './BaseModal';
-import { useModalInstance } from './adapter';
+import { modalStore, useModalId } from './adapter';
 import type { ModalShellProps } from './types';
 import { useModalShell } from './useModalShell';
 
@@ -12,7 +12,7 @@ import { useModalShell } from './useModalShell';
 export function ModalShell<R>(props: ModalShellProps<R>) {
   const { control, onOk, onError, children, afterClose, ...rest } = props;
   const shell = useModalShell(control, { onOk, onError });
-  const instance = useModalInstance();
+  const id = useModalId();
 
   return (
     <BaseModal
@@ -21,7 +21,7 @@ export function ModalShell<R>(props: ModalShellProps<R>) {
       afterClose={() => {
         afterClose?.();
         // 退场动画放完了, 提前于兜底计时移除实例
-        instance?.notifyClosed();
+        if (id !== null) modalStore.remove(id);
       }}
     >
       {children}

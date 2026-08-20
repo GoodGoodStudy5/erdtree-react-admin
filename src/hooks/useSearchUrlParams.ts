@@ -1,7 +1,7 @@
 /**
  * 将搜索参数带入url中
  */
-import { type FormInstance } from 'antd';
+import type { FormInstance } from 'antd';
 import { getUrlAllParam } from '@/utils';
 
 /** 用 URL 参数回填搜索表单, 使分享链接与刷新后仍保留查询条件 */

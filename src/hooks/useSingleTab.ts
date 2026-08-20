@@ -1,7 +1,6 @@
 import type { TabsData } from '@/stores';
 import { getMenuByKey, getMenuName, getOpenMenuByRouter } from '@/menus';
-import { ADD_TITLE, EDIT_TITLE } from '@/utils';
-import { setTitle } from '@/utils';
+import { ADD_TITLE, EDIT_TITLE, setTitle } from '@/utils';
 import { useCommonStore } from './useCommonStore';
 import { useLocation } from 'react-router-dom';
 import { useCallback, useEffect } from 'react';

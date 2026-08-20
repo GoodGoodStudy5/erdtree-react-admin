@@ -1,8 +1,7 @@
 import type { CSSProperties, ReactNode, Ref } from 'react';
 import type { BaseFormData, BaseFormList } from '#/form';
-import type { ColProps, FormInstance } from 'antd';
+import type { ColProps, FormInstance, FormProps } from 'antd';
 import { useEffect } from 'react';
-import { FormProps } from 'antd';
 import { Form } from 'antd';
 import { getComponent } from './utils/componentMap';
 import { filterEmptyStr, filterFormItem, handleValuePropName } from './utils/helper';

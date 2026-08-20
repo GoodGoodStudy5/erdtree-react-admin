@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useSyncExternalStore } from 'react';
-import { ModalInstanceContext } from './instance';
-import type { ModalInstanceApi } from './instance';
+import { ModalIdContext } from './instance';
 import { modalStore } from './store';
 import type { ModalInstance } from './store';
 
@@ -11,27 +10,21 @@ import type { ModalInstance } from './store';
 let mounted = false;
 
 function InstanceHost({ instance }: { instance: ModalInstance }) {
-  const { id, Comp, props, visible, busy } = instance;
+  const { id, Comp, props } = instance;
 
-  const api = useMemo<ModalInstanceApi>(
+  // id 在本实例存续期间不变, 所以控制面算一次就够; 它是弹窗组件的 props, 身份要稳
+  const control = useMemo(
     () => ({
-      id,
-      visible,
-      busy,
       resolve: (value: unknown) => modalStore.settle(id, value),
       cancel: () => modalStore.settle(id, undefined),
-      requestClose: (reason) => void modalStore.requestClose(id, reason),
-      setBusy: (next: boolean) => modalStore.setBusy(id, next),
-      registerGuard: (guard) => modalStore.registerGuard(id, guard),
-      notifyClosed: () => modalStore.remove(id),
     }),
-    [id, visible, busy],
+    [id],
   );
 
   return (
-    <ModalInstanceContext.Provider value={api}>
-      <Comp {...props} resolve={api.resolve} cancel={api.cancel} />
-    </ModalInstanceContext.Provider>
+    <ModalIdContext.Provider value={id}>
+      <Comp {...props} resolve={control.resolve} cancel={control.cancel} />
+    </ModalIdContext.Provider>
   );
 }
 

@@ -1,4 +1,4 @@
-import type { MouseEventHandler, ReactNode, RefObject } from 'react';
+import type { KeyboardEventHandler, MouseEventHandler, ReactNode, RefObject } from 'react';
 import type { ModalProps } from 'antd';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 import { useRef, useState } from 'react';
@@ -15,13 +15,23 @@ export interface BaseModalProps extends Omit<ModalProps, 'onCancel'> {
   /** 内容区加载态, 打开时先拉详情的场景用 */
   isLoading?: boolean;
   onCancel: () => void;
-  /** 覆盖标题栏三个按钮的悬停提示. 不传则走 LocaleProvider, 再不济落回包内英文 */
+  /** 覆盖标题栏三个按钮的悬停提示. 不传则走 LocaleProvider, 再不济跟着 antd 的语种走 */
   locale?: Partial<ModalLocale>;
+  /** 允许回车提交. 默认不允许, 判据见下面的 onContentKeyDown */
+  submitOnEnter?: boolean;
 }
 
 /** 弹窗, 支持标题栏拖拽与全屏, 移动端自动铺满 */
 export function BaseModal(props: BaseModalProps) {
-  const { width, children, wrapClassName, onCancel, isLoading = false, locale } = props;
+  const {
+    width,
+    children,
+    wrapClassName,
+    onCancel,
+    isLoading = false,
+    locale,
+    submitOnEnter = false,
+  } = props;
   const isPhone = useIsPhone();
   const defaultLocale = useLocale('Modal');
   const text = { ...defaultLocale, ...locale };
@@ -57,6 +67,22 @@ export function BaseModal(props: BaseModalProps) {
   /** 最大化 */
   const onFullscreen = () => {
     setFullscreen(!isFullscreen);
+  };
+
+  /**
+   * 弹窗里回车不是提交手势: 确定按钮始终摆在眼前, 回车省不下操作成本,
+   * 代价却是在任一输入框敲回车就可能提交并关窗.
+   *
+   * 拦在内容容器上, 所以每个弹窗不需要为此做任何配合 —— 要配合就会有人忘, 而忘了是静默的.
+   * 只拦单行输入框: 多行输入要靠回车换行; 下拉与日期选择器自己已经处理完回车,
+   * 这里取消的只是浏览器的默认动作(表单隐式提交), 不影响它们已经做完的选中.
+   */
+  const onContentKeyDown: KeyboardEventHandler<HTMLDivElement> = (event) => {
+    if (submitOnEnter || event.key !== 'Enter') return;
+    // 输入法用回车确认候选词, 那一下不能碰
+    if (event.nativeEvent.isComposing) return;
+    if (!(event.target instanceof HTMLInputElement)) return;
+    event.preventDefault();
   };
 
   /** 点击关闭 */
@@ -133,7 +159,9 @@ export function BaseModal(props: BaseModalProps) {
       width={isFullscreen ? '100%' : width || 520}
     >
       <Spin spinning={isLoading}>
-        <div className="base-modal-content">{children}</div>
+        <div className="base-modal-content" onKeyDown={onContentKeyDown}>
+          {children}
+        </div>
       </Spin>
     </Modal>
   );

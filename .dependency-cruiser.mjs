@@ -42,7 +42,8 @@ export default {
     {
       name: 'no-page-as-dependency',
       comment:
-        '页面 index 是路由机制入口而非公共门面, 只有 src/router 可以引用. 页面里要复用的东西请抽到 components',
+        '页面 index 是路由机制入口而非公共门面, 只有 src/router 可以引用. 页面里要复用的东西请抽到 components. ' +
+        '全局公共弹窗组「只收不属于任何页面的弹窗」这条口径也压在本规则上, 放宽 from 之前先看 docs/adr 与 src/modals 的归属说明',
       severity: 'error',
       from: { pathNot: '^src/(pages/|router/|main\\.tsx$)' },
       to: { path: '^src/pages/' },

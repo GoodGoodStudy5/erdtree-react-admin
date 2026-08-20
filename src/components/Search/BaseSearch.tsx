@@ -1,8 +1,8 @@
-import type { ColProps, FormInstance } from 'antd';
+import type { ColProps, FormInstance, FormProps } from 'antd';
 import type { BaseFormData, BaseSearchList } from '#/form';
-import { type CSSProperties, type ReactNode, type Ref, useEffect, useState, useMemo } from 'react';
-import { type FormProps, Button, Col, Flex } from 'antd';
-import { Form } from 'antd';
+import type { CSSProperties, ReactNode, Ref } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { Form, Button, Col, Flex } from 'antd';
 import { filterDayjs } from '../Dates';
 import { useCommonStore } from '@/hooks';
 import { getComponent } from '../Form/utils/componentMap';

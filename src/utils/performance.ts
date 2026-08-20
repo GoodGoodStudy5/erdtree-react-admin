@@ -1,4 +1,5 @@
-import { onCLS, onFCP, onINP, onLCP, onTTFB, type Metric } from 'web-vitals';
+import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
+import type { Metric } from 'web-vitals';
 
 /**
  * 性能指标接口
@@ -179,7 +180,11 @@ export function getPerformanceReport(): string {
 /**
  * 测量性能
  */
-export function measurePerformance(markName: string, startMark: string, endMark: string): number | null {
+export function measurePerformance(
+  markName: string,
+  startMark: string,
+  endMark: string,
+): number | null {
   return performanceMonitor.measure(markName, startMark, endMark);
 }
 

@@ -1,5 +1,6 @@
 import type { CheckboxList } from './TableFilter';
-import { type DragEndEvent, DndContext } from '@dnd-kit/core';
+import { DndContext } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { Icon } from '@iconify/react';
 import { Checkbox } from 'antd';

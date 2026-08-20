@@ -6,7 +6,7 @@
 
 | 管什么 | 配置 |
 | --- | --- |
-| index 只能是门面、页面文件命名、跨目录导出必须带 TSDoc | `eslint.config.js` |
+| index 只能是门面、页面文件命名、跨目录导出必须带 TSDoc、导入按模块合并且 type 与值分条 | `eslint.config.js` |
 | 目录边界、页面引用方向、循环依赖 | `.dependency-cruiser.mjs` |
 | 样式规范 | `packages/stylelintConfig/index.mjs` |
 | 提交格式、校验分档 | `.husky/`、`package.json` 的 scripts |
