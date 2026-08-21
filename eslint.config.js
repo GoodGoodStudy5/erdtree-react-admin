@@ -165,6 +165,19 @@ const NO_SHELL_IN_PAGE = {
   message: '页面本体不要直接渲染弹窗外壳, 把弹窗抽成独立组件, 页面只用 openModal()',
 };
 
+/**
+ * 用例只从包门面取件. 从深层文件取件的用例会把包的内部结构写进断言,
+ * 于是内部一动就要改用例 —— 缝退化成实现的镜子, 照不出对外行为有没有变.
+ */
+const TEST_ONLY_VIA_FACADE = {
+  patterns: [
+    {
+      group: ['.', '..', './**', '../**'],
+      message: '用例只从 @south/<包名> 门面导入, 不引用包内深层文件',
+    },
+  ],
+};
+
 export default tseslint.config(
   // 构建产物不参与校验, 包的 dist 在任意层级都要排除
   // .design / .scratch 是设计草稿与工作区, 不进版本库, 也不受工程规范约束
@@ -447,6 +460,12 @@ export default tseslint.config(
           message: '页面 index 只能写 export { default } from "./<页面名>Page"',
         },
       ],
+    },
+  },
+  {
+    files: ['packages/*/src/**/*.test.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': ['error', TEST_ONLY_VIA_FACADE],
     },
   },
 );

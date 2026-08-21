@@ -23,7 +23,7 @@
       "#/*": ["types/*"]
     }
   },
-  "include": ["src", "packages/*/src", "types/**/*.d.ts"],
+  "include": ["src", "packages/*/src", "types/**/*.d.ts", "vitest.config.ts", "vitest.setup.ts"],
   "exclude": ["dist", "node_modules", "cypress"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
