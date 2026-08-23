@@ -362,7 +362,9 @@ export default tseslint.config(
     },
   },
   {
-    // 跨目录可见的能力自带说明书, 调用方读一行签名即可, 不必点进实现
+    // 跨目录可见的能力自带说明书, 调用方读一行签名即可, 不必点进实现.
+    // packages 的对外面比 src 更远 (独立发布, 调用方看不到实现), 所以整包都在辖区内;
+    // 用例与类型测试不算对外能力, 排除
     files: [
       'src/components/**/*.{ts,tsx}',
       'src/hooks/**/*.ts',
@@ -371,7 +373,9 @@ export default tseslint.config(
       'src/modals/**/*.ts',
       'src/stores/**/*.ts',
       'src/menus/**/*.ts',
+      'packages/*/src/**/*.{ts,tsx}',
     ],
+    ignores: ['packages/*/src/**/__test__/**'],
     plugins: { jsdoc },
     rules: {
       'jsdoc/require-jsdoc': [

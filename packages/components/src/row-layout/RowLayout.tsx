@@ -2,6 +2,7 @@ import type { ColProps } from 'antd';
 import type { ReactNode } from 'react';
 import { Children, cloneElement, isValidElement, useContext, useMemo } from 'react';
 import { Col, Row } from 'antd';
+import { propsMerge } from '../utils';
 import { DEFAULT_COLUMN_NUM, RowLayoutContext } from './context';
 import type {
   RowInnerProps,
@@ -16,9 +17,29 @@ const GRID_SPAN = 24;
 const MEDIUM_MIN_SPAN = 8;
 const DEFAULT_GUTTER: RowLayoutProps['gutter'] = [16, 16];
 
+/**
+ * 调用方自带宽度的键. 给了它们, 库的这套断点就整套让位.
+ *
+ * 因为 antd 的 `-xs` 类是不带媒体查询发出的, 且排在 span 之后 —— 两套一起下发,
+ * 调用方的 span 在任何视口下都不生效, 正是要销掉的死属性问题.
+ * 单独给某个断点 (如 xl) 不算自带宽度: 那一个键盖掉库的同名键即可, 其余档照旧兜着.
+ */
+const OWN_WIDTH_KEYS = ['span', 'flex'] as const;
+
 /** Col 的跨度上限是 24 格 */
 function limitSpan(span: number) {
   return Math.min(GRID_SPAN, span);
+}
+
+/** 按列数与所占列格算出全套断点 */
+function breakpointsOf(colSize: number, baseSpan: number) {
+  return {
+    xs: limitSpan(colSize * GRID_SPAN),
+    sm: limitSpan(colSize * (GRID_SPAN / 2)),
+    md: limitSpan(colSize * Math.max(baseSpan, MEDIUM_MIN_SPAN)),
+    lg: limitSpan(colSize * Math.max(baseSpan, MEDIUM_MIN_SPAN)),
+    xl: limitSpan(colSize * baseSpan),
+  };
 }
 
 /**
@@ -62,19 +83,10 @@ function buildCols(children: ReactNode, columnNum: RowLayoutColumnNum) {
 
     // 浅拷贝剥离 colSize, 不 delete 调用方传进来的对象: 那是别人的数据, 还可能是冻结的
     const { colSize = 1, ...restColProps } = childColProps ?? {};
+    const ownsWidth = OWN_WIDTH_KEYS.some((key) => key in restColProps);
+    const colProps = propsMerge(ownsWidth ? {} : breakpointsOf(colSize, baseSpan), restColProps);
 
-    return (
-      <Col
-        xs={limitSpan(colSize * GRID_SPAN)}
-        sm={limitSpan(colSize * (GRID_SPAN / 2))}
-        md={limitSpan(colSize * Math.max(baseSpan, MEDIUM_MIN_SPAN))}
-        lg={limitSpan(colSize * Math.max(baseSpan, MEDIUM_MIN_SPAN))}
-        xl={limitSpan(colSize * baseSpan)}
-        {...restColProps}
-      >
-        {content}
-      </Col>
-    );
+    return <Col {...colProps}>{content}</Col>;
   });
 }
 
@@ -86,7 +98,8 @@ function buildCols(children: ReactNode, columnNum: RowLayoutColumnNum) {
  * 需要另一套版式请在外面包一层, 不要 fork 本组件.
  *
  * 逃生舱分层: 默认等宽 → 子元素带 `colProps={{ colSize: n }}` 占多列 →
- * 直接写 `<Col>` 拆壳透传全量 ColProps.
+ * 直接写 `<Col>` 拆壳透传全量 ColProps. 最后一层里调用方一旦自带宽度 (span / flex),
+ * 库的断点整套让位, 见 OWN_WIDTH_KEYS.
  */
 export function RowLayout(props: RowLayoutProps) {
   const {
@@ -96,6 +109,8 @@ export function RowLayout(props: RowLayoutProps) {
     children,
     ...restRowProps
   } = props;
+  // gutter 先经解构给默认值再进合并: 显式传 undefined 时该落回默认, 而合并层会让 undefined 覆盖
+  const rowProps = propsMerge({ gutter }, restRowProps);
   // context 的值要稳定, 否则每次渲染都让整棵 RowInner 白重渲染一遍
   const contextValue = useMemo(() => ({ columnNum }), [columnNum]);
 
@@ -105,9 +120,7 @@ export function RowLayout(props: RowLayoutProps) {
 
   return (
     <RowLayoutContext.Provider value={contextValue}>
-      <Row gutter={gutter} {...restRowProps}>
-        {buildCols(children, columnNum)}
-      </Row>
+      <Row {...rowProps}>{buildCols(children, columnNum)}</Row>
     </RowLayoutContext.Provider>
   );
 }

@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
  */
 export type RowLayoutColumnNum = 1 | 2 | 3 | 4;
 
+/** RowLayout 的 props. antd RowProps 全量透传, children 由本组件裹进 Col */
 export interface RowLayoutProps extends Omit<RowProps, 'children'> {
   children: ReactNode;
   /** 每行几列, 默认 3 */
@@ -20,6 +21,7 @@ export interface RowLayoutProps extends Omit<RowProps, 'children'> {
   ifShow?: boolean;
 }
 
+/** RowInner 的 props. 列数与 gutter 都经 context 继承父级, 这里只留成组开关 */
 export interface RowInnerProps {
   /** 是否渲染, 默认 true */
   ifShow?: boolean;

@@ -10,8 +10,6 @@ export type RequestService<TData, TParams extends unknown[]> = (
 export interface UseRequestOptions<TData, TParams extends unknown[]> {
   /** true 则挂载时不自动请求, 全部由 run / runAsync 触发 */
   manual?: boolean;
-  /** 首次自动请求的入参. manual 为 true 时无意义 */
-  defaultParams?: TParams;
   /**
    * 防抖毫秒数. 只作用于 run —— runAsync 是"我要这次结果"的入口, 防抖会让它无从等待,
    * 所以它始终立即发起.
@@ -49,7 +47,7 @@ export function useRequest<TData, TParams extends unknown[]>(
   service: RequestService<TData, TParams>,
   options: UseRequestOptions<TData, TParams> = {},
 ): UseRequestResult<TData, TParams> {
-  const { manual = false, defaultParams, debounceWait, onSuccess, onError } = options;
+  const { manual = false, debounceWait, onSuccess, onError } = options;
   const [data, setData] = useState<TData>();
   const [loading, setLoading] = useState(false);
   /** 发起序号. 每次发起自增, 响应回来时对不上号就是被顶掉的旧请求 */
@@ -81,14 +79,14 @@ export function useRequest<TData, TParams extends unknown[]>(
     }
   });
 
-  /** run 的落地动作. 它不返回 Promise, 所以异常在这里就要有归宿 */
+  /**
+   * run 的落地动作. 它不返回 Promise, 调用方看不到这次失败, 所以异常在这里就地记一行.
+   *
+   * 不按"有没有 onError"来决定记不记: onError 是通知通道而不是日志, 且被后发请求顶掉的那次
+   * 压根不走 onError —— 只看 onError 会让它失败得无声无息.
+   */
   const fireAndForget = useEvent((...params: TParams) => {
-    runAsync(...params).catch((error: unknown) => {
-      // 没有 onError 的话, 至少留一行日志: 静默的失败会让"请求没发"和"请求失败"长得一样
-      if (!onError) {
-        console.error(error);
-      }
-    });
+    runAsync(...params).catch((error: unknown) => console.error(error));
   });
 
   const run = useEvent((...params: TParams) => {
@@ -106,9 +104,9 @@ export function useRequest<TData, TParams extends unknown[]>(
   }, []);
 
   useEffect(() => {
-    // 自动请求只在挂载时打一次; 之后要不要再请求由调用方用 run / runAsync 决定
+    // 自动请求只在挂载时打一次, 且不带参; 要带参就用 manual + run / runAsync 自己发
     if (!manual) {
-      fireAndForget(...((defaultParams ?? []) as TParams));
+      fireAndForget(...([] as unknown as TParams));
     }
   }, []);
 

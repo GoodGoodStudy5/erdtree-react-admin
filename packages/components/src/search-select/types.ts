@@ -73,6 +73,7 @@ export interface SearchSelectRef<OT extends SearchSelectOption = SearchSelectOpt
   fetchOptionsForCascade: (keyword?: string) => Promise<OT[] | undefined>;
 }
 
+/** SearchSelect 的 props. antd SelectProps 全量透传, 另加数据源与搜索行为的口子 */
 export interface SearchSelectProps<
   OT extends SearchSelectOption = SearchSelectOption,
   VT extends SearchSelectValue<OT> = OT['value'],

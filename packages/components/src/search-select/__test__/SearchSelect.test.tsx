@@ -143,6 +143,20 @@ describe('SearchSelect', () => {
     expect(screen.queryByTitle('北京')).toBeNull();
   });
 
+  it('options 受控时搜索也不发请求, 只本地过滤 (回归钉)', async () => {
+    const request = vi.fn(async () => CITY_OPTIONS);
+
+    // 两个都给: 数据归调用方管, request 不该被搜索唤起, 否则请求白发、结果还被丢掉
+    render(<SearchSelect debounceWait={10} options={CITY_OPTIONS} request={request} />);
+    openPanel();
+    typeSearch('北');
+
+    await waitFor(() => expect(screen.getByTitle('北京')).toBeTruthy());
+    expect(screen.queryByTitle('上海')).toBeNull();
+    await sleep(30);
+    expect(request).not.toHaveBeenCalled();
+  });
+
   it('include 与 exclude 同时给时只认 include', async () => {
     render(<SearchSelect exclude={['bj']} include={['bj', 'sh']} options={CITY_OPTIONS} />);
     openPanel();

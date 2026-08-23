@@ -78,7 +78,6 @@ function useRequest可选项收窄() {
   useRequest(apiUserDetail, {
     manual: true,
     debounceWait: 500,
-    defaultParams: ['1'],
     onSuccess(data, params) {
       expectType<User>(data);
       expectType<[string]>(params);
@@ -89,8 +88,8 @@ function useRequest可选项收窄() {
     },
   });
 
-  // @ts-expect-error defaultParams 的形状必须与 service 入参一致
-  useRequest(apiUserDetail, { defaultParams: [1] });
+  // @ts-expect-error 自动请求不带参: 要带参就 manual + run, 所以没有 defaultParams 这个口
+  useRequest(apiUserDetail, { defaultParams: ['1'] });
   // @ts-expect-error 缓存/轮询不在本原语的范围内, 拼错的可选项要当场报
   useRequest(apiUserDetail, { pollingInterval: 1000 });
 }

@@ -58,21 +58,17 @@ export function SearchSelect<
   /** 联动请求期间屏蔽旧选项, 直到新数据到位 */
   const [isCascadeBlocked, setCascadeBlocked] = useState(false);
   const searchKeywordRef = useRef('');
-  const isOptionsControlled = options !== undefined;
+  /** options 受控时数据归调用方管, 没有 request 时也无处可拉 —— 两种情况都不发请求 */
+  const canFetch = options === undefined && request !== undefined;
   const { data, loading, run, runAsync } = useRequest<OT[], [string?]>(request ?? NO_REQUEST, {
     manual: true,
     debounceWait,
     onSuccess: () => setCascadeBlocked(false),
-    onError: (error) => {
-      setCascadeBlocked(false);
-      // 选项拉不回来时下拉只是空的, 不该把页面搞崩; 留一行日志给排查
-      console.error(error);
-    },
+    onError: () => setCascadeBlocked(false),
   });
 
   const fetchOptions = useEvent(async (keyword?: string) => {
-    // options 受控时数据归调用方管, 没有 request 时也无处可拉
-    if (isOptionsControlled || !request) {
+    if (!canFetch) {
       return undefined;
     }
     return runAsync(keyword);
@@ -80,16 +76,21 @@ export function SearchSelect<
 
   const fetchOptionsForCascade = useEvent(async (keyword?: string) => {
     // 拉不了数据就别屏蔽: 没有新数据来解除屏蔽, 等于把下拉锁死
-    if (isOptionsControlled || !request) {
+    if (!canFetch) {
       return undefined;
     }
     setCascadeBlocked(true);
     return fetchOptions(keyword);
   });
 
-  /** 不等结果的内部触发. 失败已由 onError 记过日志, 这里只是不让它变成未处理的 rejection */
+  /**
+   * 不等结果的内部触发 (首次加载与聚焦加载).
+   *
+   * 没人接这个 Promise, 所以失败在这里就地记一行并降级为空选项 —— 交给 onError 记不行:
+   * 被后发请求顶掉的那次压根不走 onError.
+   */
   const triggerFetch = useEvent((keyword?: string) => {
-    void fetchOptions(keyword).catch(() => undefined);
+    fetchOptions(keyword).catch((error: unknown) => console.error(error));
   });
 
   const handleSearch = useEvent((keyword: string) => {
@@ -106,7 +107,7 @@ export function SearchSelect<
   });
 
   useEffect(() => {
-    // 首次加载只在挂载时打一次, 之后由搜索、聚焦与联动驱动
+    // 挂载时拉一次; autoLoad 由关变开时也拉 —— 那正是调用方说"现在可以取数了"
     if (autoLoad) {
       triggerFetch();
     }
@@ -115,7 +116,7 @@ export function SearchSelect<
   const flatProps = flattenShowSearch(restProps);
   const visibleOptions = filterVisibleOptions(options ?? data, { include, exclude });
   /** 远程搜索: 服务端按关键字给结果, 本地就不再过滤一遍 */
-  const isRemoteSearch = request !== undefined && !searchByLocal && flatProps.showSearch !== false;
+  const isRemoteSearch = canFetch && !searchByLocal && flatProps.showSearch !== false;
   /** 本地过滤参与匹配的字段: searchKeys 优先, 多列下拉默认取各列, 否则跟 optionFilterProp */
   const localSearchKeys =
     searchKeys ??

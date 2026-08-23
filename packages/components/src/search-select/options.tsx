@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { SearchSelectColumnsTable, SearchSelectOption } from './types';
 
 /**
@@ -23,10 +23,10 @@ export function filterVisibleOptions<OT extends SearchSelectOption>(
   return options;
 }
 
-/** 取值转成可比较的小写字符串. 非字符串/数字的字段 (如 JSX label) 不参与匹配 */
-function toSearchText(value: unknown): string {
+/** 取值的纯文本形态. 非字符串/数字的字段 (如 JSX label) 没有可比较也可展示的文本, 给空串 */
+function toPlainText(value: unknown): string {
   if (typeof value === 'string') {
-    return value.toLowerCase();
+    return value;
   }
   if (typeof value === 'number') {
     return String(value);
@@ -50,25 +50,58 @@ export function matchOptionByKeys<OT extends SearchSelectOption>(
   if (target === '') {
     return true;
   }
-  return keys.some((key) => toSearchText(option?.[key]).includes(target));
+  return keys.some((key) => toPlainText(option?.[key]).toLowerCase().includes(target));
 }
 
-/** 多列下拉的表头. 与选项行用同一套列宽规则, 所以两者对得齐 */
+/**
+ * 多列下拉的一个单元格. 表头与选项行共用它, 列宽规则因此只有一份 —— 两者才对得齐.
+ *
+ * 写成渲染函数而不是组件: 它没有自己的状态, 也不需要独立的 reconciliation,
+ * 而本文件的其余导出都是普通函数, 混进一个组件会让整个模块不适合 fast refresh.
+ */
+function renderCell({
+  key,
+  children,
+  maxWidth,
+  title,
+  allowWrap,
+}: {
+  key: string;
+  children: ReactNode;
+  maxWidth?: CSSProperties['maxWidth'];
+  title?: string;
+  allowWrap?: boolean;
+}) {
+  return (
+    <div
+      key={key}
+      className={
+        allowWrap
+          ? 'search-select-table-cell search-select-table-cell-wrap'
+          : 'search-select-table-cell'
+      }
+      style={{ maxWidth, flexBasis: maxWidth }}
+      title={title === '' ? undefined : title}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** 多列下拉的表头 */
 export function renderColumnsHeader<OT extends SearchSelectOption>(
   columnsTable: SearchSelectColumnsTable<OT>,
 ): ReactNode {
   return (
     <div className="search-select-table-header">
-      {columnsTable.columns.map((column) => (
-        <div
-          className="search-select-table-cell"
-          key={column.dataIndex}
-          style={{ maxWidth: column.maxWidth, flexBasis: column.maxWidth }}
-          title={typeof column.title === 'string' ? column.title : undefined}
-        >
-          {column.title}
-        </div>
-      ))}
+      {columnsTable.columns.map((column) =>
+        renderCell({
+          key: column.dataIndex,
+          maxWidth: column.maxWidth,
+          title: toPlainText(column.title),
+          children: column.title,
+        }),
+      )}
     </div>
   );
 }
@@ -85,20 +118,13 @@ export function renderColumnsRow<OT extends SearchSelectOption>(
       {columns.map((column) => {
         const value = option[column.dataIndex];
 
-        return (
-          <div
-            className={
-              allowWrap
-                ? 'search-select-table-cell search-select-table-cell-wrap'
-                : 'search-select-table-cell'
-            }
-            key={column.dataIndex}
-            style={{ maxWidth: column.maxWidth, flexBasis: column.maxWidth }}
-            title={toSearchText(value) === '' ? undefined : String(value)}
-          >
-            {column.render ? column.render(value, option) : (value as ReactNode)}
-          </div>
-        );
+        return renderCell({
+          key: column.dataIndex,
+          allowWrap,
+          maxWidth: column.maxWidth,
+          title: toPlainText(value),
+          children: column.render ? column.render(value, option) : (value as ReactNode),
+        });
       })}
     </div>
   );

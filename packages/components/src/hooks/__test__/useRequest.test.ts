@@ -72,11 +72,11 @@ describe('useRequest', () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it('非 manual 时挂载即请求一次', async () => {
-    const service = vi.fn(async (id: string) => `detail-${id}`);
-    const { result } = renderHook(() => useRequest(service, { defaultParams: ['7'] }));
+  it('非 manual 时挂载即请求一次, 不带参', async () => {
+    const service = vi.fn(async () => '全量列表');
+    const { result } = renderHook(() => useRequest(service));
 
-    await waitFor(() => expect(result.current.data).toBe('detail-7'));
-    expect(service).toHaveBeenCalledExactlyOnceWith('7');
+    await waitFor(() => expect(result.current.data).toBe('全量列表'));
+    expect(service).toHaveBeenCalledExactlyOnceWith();
   });
 });

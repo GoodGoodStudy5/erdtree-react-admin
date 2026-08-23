@@ -1,5 +1,5 @@
 import type { Ref } from 'react';
-import { createRef } from 'react';
+import { createRef, StrictMode } from 'react';
 import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 import { Col } from 'antd';
@@ -67,7 +67,7 @@ describe('RowLayout', () => {
     expect(className).toContain('ant-col-xs-24');
   });
 
-  it('直接写 Col 时拆壳: 它的 props 照原样透传, 内容还在', () => {
+  it('直接写 Col 时拆壳: 自带宽度就由它说了算, 库的断点整套让位', () => {
     const { container, getByText } = render(
       <RowLayout>
         <Col span={12} className="my-col">
@@ -79,7 +79,23 @@ describe('RowLayout', () => {
 
     expect(className).toContain('ant-col-12');
     expect(className).toContain('my-col');
+    // antd 的 -xs 类不带媒体查询且排在 span 之后, 一起下发会让调用方的 span 永不生效
+    expect(className).not.toContain('ant-col-xs-24');
+    expect(className).not.toContain('ant-col-xl-8');
     expect(getByText('自己排')).toBeTruthy();
+  });
+
+  it('只覆盖某一个断点时, 其余档仍由库兜着', () => {
+    const { container } = render(
+      <RowLayout>
+        <Field colProps={{ xl: 24 }} label="a" />
+      </RowLayout>,
+    );
+    const className = colClassNames(container);
+
+    expect(className).toContain('ant-col-xl-24');
+    expect(className).toContain('ant-col-md-8');
+    expect(className).toContain('ant-col-xs-24');
   });
 
   it('子元素挂的 ref 一定能拿到 (回归钉: 重建元素会静默丢掉它)', () => {
@@ -94,14 +110,17 @@ describe('RowLayout', () => {
     expect(ref.current).toBeInstanceOf(HTMLInputElement);
   });
 
-  it('不改写调用方传进来的 colProps: 冻结对象也照样渲染', () => {
+  it('StrictMode 下不改写调用方传进来的 colProps: 冻结对象也照样渲染', () => {
     const colProps = Object.freeze({ colSize: 2 });
 
+    // zouwu 版 delete 掉输入对象上的 colSize, 冻结对象在严格模式下会当场抛
     expect(() =>
       render(
-        <RowLayout>
-          <Field colProps={colProps} label="a" />
-        </RowLayout>,
+        <StrictMode>
+          <RowLayout>
+            <Field colProps={colProps} label="a" />
+          </RowLayout>
+        </StrictMode>,
       ),
     ).not.toThrow();
     expect(colProps).toEqual({ colSize: 2 });

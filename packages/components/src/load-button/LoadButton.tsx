@@ -9,6 +9,7 @@ import './LoadButton.less';
 /** 确认气泡的配置. content 是 antd 没有的第二行说明文字, 给"这一下要删什么"留位置 */
 export type LoadButtonConfirmProps = PopconfirmProps & { content?: ReactNode };
 
+/** LoadButton 的 props. antd ButtonProps 全量透传, onClick 换成可返回 Promise 的版本 */
 export interface LoadButtonProps extends Omit<ButtonProps, 'onClick'> {
   /**
    * 点击回调. 返回 Promise 时组件自动接管 loading 与防重复点击, 于是调用方一行
@@ -115,7 +116,7 @@ export function LoadButton(props: LoadButtonProps) {
     {
       type: 'link',
       // 没显式给 type 时这是一枚文字按钮, 去掉 antd link 按钮的内边距与行高, 好嵌在表格行里
-      className: props.type === undefined ? 'load-button load-button-link-text' : 'load-button',
+      className: restProps.type === undefined ? 'load-button load-button-link-text' : 'load-button',
     } as ButtonProps,
     restProps,
   );

@@ -2,8 +2,8 @@
 type PropsRecord = Record<string, unknown>;
 
 /**
- * 要与外部同名回调合成的内部行为. 值给 false / undefined 表示这次不需要该行为,
- * 于是外部回调原样生效 —— 调用方按条件开关内部行为时不必自己写分支.
+ * 要与外部同名回调合成的内部行为. 值不是函数 (false / undefined / null) 就表示这次不需要
+ * 该行为, 于是外部回调原样生效 —— 调用方按条件开关内部行为时不必自己写分支.
  */
 export type EventComposition = Record<
   string,

@@ -11,6 +11,7 @@ type CopyConfig = Exclude<
   boolean | undefined
 >;
 
+/** ElementCopy 的 props. 三个键: 内容、外层类名、复制配置 */
 export interface ElementCopyProps {
   /** 要展示也要被复制的内容. 任意 JSX, 复制载荷由它渲染出来的文本决定 */
   children: ReactNode;
@@ -39,12 +40,10 @@ export function ElementCopy({ children, className, copyProps }: ElementCopyProps
   // 只在点复制时被调用, 渲染期不读 ref
   const readVisibleText = useEvent(() => contentRef.current?.innerText ?? '');
   const copyable = propsMerge({ text: readVisibleText }, copyProps);
+  const rootProps = propsMerge({ className: 'element-copy' }, { className });
 
   return (
-    <Typography.Paragraph
-      className={className ? `element-copy ${className}` : 'element-copy'}
-      copyable={copyable}
-    >
+    <Typography.Paragraph {...rootProps} copyable={copyable}>
       <div className="element-copy-content" ref={contentRef}>
         {children}
       </div>
