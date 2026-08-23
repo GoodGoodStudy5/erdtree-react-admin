@@ -1,13 +1,5 @@
-import type { RouteObject } from 'react-router-dom';
 import type { RouteModules } from '../utils/helper';
-import { useEffect, useMemo } from 'react';
-import { handleRoutes } from '../utils/helper';
-import { useRoutes } from 'react-router-dom';
-import Login from '@/pages/login';
-import Forget from '@/pages/forget';
-import NotFound from '@/pages/404';
-import Guards from './Guards';
-import { ModalOutlet } from '@south/components';
+import { useEffect } from 'react';
 
 const pages = import.meta.glob('../../pages/**/*.tsx', { eager: false }) as RouteModules;
 
@@ -37,7 +29,8 @@ function preloadModules(modules: RouteModules, preloaded: Set<string>, label: st
   }
 }
 
-function App() {
+/** 空闲时预热页面与组件, 让首次进入页面不必等模块下载 */
+export const usePreloadModules = () => {
   // 预加载路由和组件，在空闲时间加载
   useEffect(() => {
     // 使用 requestIdleCallback 在浏览器空闲时预加载
@@ -50,39 +43,4 @@ function App() {
 
     return () => cancelIdleCallback(idleCallbackId);
   }, []);
-
-  // 使用 useMemo 缓存路由配置，避免每次渲染都重新创建
-  const routes = useMemo(() => {
-    const layouts = handleRoutes(pages);
-    const newRoutes: RouteObject[] = [
-      {
-        path: 'login',
-        element: <Login />,
-      },
-      {
-        path: 'forget',
-        element: <Forget />,
-      },
-      {
-        path: '',
-        element: <Guards />,
-        children: layouts,
-      },
-      {
-        path: '*',
-        element: <NotFound />,
-      },
-    ];
-    return newRoutes;
-  }, []);
-
-  return (
-    <>
-      {useRoutes(routes)}
-      {/* 挂在路由树内, 切语言时随整树重挂载, 弹窗里的文案才跟得上 */}
-      <ModalOutlet />
-    </>
-  );
-}
-
-export default App;
+};

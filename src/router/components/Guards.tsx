@@ -1,10 +1,11 @@
 import { useEffect, useState, useMemo, useRef, lazy, Suspense } from 'react';
-import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
+import { useLocation, useOutlet } from 'react-router-dom';
 import { message } from '@south/message';
 import { getLocalInfo } from '@south/utils';
 import { TOKEN } from '@/utils';
 import { Spin } from 'antd';
 import { $t } from '@/locales';
+import { router } from '../router';
 
 // 懒加载 Layout 组件，减少首屏加载体积
 const Layout = lazy(() => import('@/layouts'));
@@ -20,7 +21,6 @@ function getTokenSync() {
 
 function Guards() {
   const outlet = useOutlet();
-  const navigate = useNavigate();
   const location = useLocation();
 
   // 同步检查权限，避免异步导致的页面闪动
@@ -64,7 +64,7 @@ function Guards() {
       isRedirectingRef.current = true;
 
       // 执行重定向
-      navigate(redirectPath, { replace: true });
+      router.navigate(redirectPath, { replace: true });
       setRedirected(true);
 
       // 如果是跳转到登录页，显示提示信息
@@ -84,7 +84,7 @@ function Guards() {
         clearTimeout(timer);
       };
     }
-  }, [shouldRedirect, redirectPath, navigate, location.pathname]);
+  }, [shouldRedirect, redirectPath, location.pathname]);
 
   // 使用 useMemo 缓存 Layout 组件，只在 token 和 isValid 变化时重新渲染
   const layoutElement = useMemo(() => {

@@ -1,5 +1,6 @@
 import { TOKEN } from './config';
 import { creteRequest } from '@south/request';
+import { router } from '@/router';
 
 // 生成环境所用的接口
 const prefixUrl = import.meta.env.VITE_BASE_URL as string;
@@ -7,22 +8,12 @@ const baseURL = process.env.NODE_ENV !== 'development' ? prefixUrl : '/api';
 
 /** 业务侧统一请求实例, 已内置令牌注入与权限过期跳转 */
 export const request = creteRequest(baseURL, TOKEN, {
-  // 权限过期处理：自动兼容 HashRouter 与 BrowserRouter。
-  // HashRouter 路由在 hash（形如 "#/ai-refund/workbench"），改 hash 后需 reload；
-  // BrowserRouter 路由在 pathname，改 location.href 会自动整页加载。
+  // 令牌过期后回到登录页, 并记下此刻所在的页面, 重新登录后接着看
   onAuthExpired: () => {
-    const isHashRouter = window.location.hash.startsWith('#');
-    const currentRoute = isHashRouter
-      ? window.location.hash.slice(1)
-      : `${window.location.pathname}${window.location.search}`;
+    const { pathname, search } = router.location;
+    const currentRoute = `${pathname}${search}`;
     const redirect = currentRoute && currentRoute !== '/login' ? `?redirect=${currentRoute}` : '';
-    const loginPath = `/login${redirect}`;
-    if (isHashRouter) {
-      window.location.hash = loginPath;
-      window.location.reload();
-    } else {
-      window.location.href = loginPath;
-    }
+    router.navigate(`/login${redirect}`);
   },
 });
 

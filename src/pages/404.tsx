@@ -3,9 +3,9 @@ import { getMenuList, getUserRefreshPermissions } from '@/servers';
 import { useMenuStore, useUserStore } from '@/stores';
 import { Button } from 'antd';
 import { $t } from '@/locales';
+import { router } from '@/router';
 
 function NotFound() {
-  const navigate = useNavigate();
   const { permissions, menuList } = useCommonStore();
   const { setMenuList } = useMenuStore.getState();
   const { setPermissions, setUserInfo } = useUserStore.getState();
@@ -60,7 +60,7 @@ function NotFound() {
     if (currentMenuList.length === 0) return;
 
     const firstMenu = getFirstMenu(currentMenuList, currentPermissions);
-    navigate(firstMenu || '/');
+    router.navigate(firstMenu || '/');
     const menuByKeyProps = {
       menus: currentMenuList,
       permissions: currentPermissions,

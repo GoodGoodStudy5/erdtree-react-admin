@@ -1,6 +1,5 @@
 import type { RouteObject } from 'react-router-dom';
 import type { ComponentType } from 'react';
-import { lazy } from 'react';
 import { ROUTER_EXCLUDE } from './config';
 
 /**
@@ -39,19 +38,15 @@ export function handleRoutes(routes: RouteModules): RouteObject[] {
     const path = getRouterPage(key);
     if (path === '/login') continue;
 
-    // 使用 React.lazy 包装动态导入的组件
-    const LazyComponent = lazy(async () => {
-      const module = await routes[key]();
-      // 处理不同的模块导出格式
-      const Component = (module?.default || module) as ComponentType;
-      return {
-        default: Component,
-      };
-    });
-
     layouts.push({
       path,
-      element: <LazyComponent />,
+      // 交给路由做按需加载, 页面代码的下载才算进「跳转尚未落地」, 进度条得以覆盖这段等待
+      lazy: async () => {
+        const module = await routes[key]();
+        // 处理不同的模块导出格式
+        const Component = (module?.default || module) as ComponentType;
+        return { Component };
+      },
     });
   }
 

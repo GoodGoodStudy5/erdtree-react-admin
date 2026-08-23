@@ -9,6 +9,7 @@ import { encryption, decryption } from '@south/utils';
 import { getFirstMenu } from '@/menus';
 import Logo from '@/assets/images/logo.svg';
 import { $t, i18n } from '@/locales';
+import { router } from '@/router';
 
 const CHECK_REMEMBER = 'remember_me';
 const USER_USERNAME = 'login_username';
@@ -28,7 +29,6 @@ function readRememberedPassword(cache: string): string | undefined {
 }
 
 function LoginPage() {
-  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [getToken, setToken] = useToken();
   const [isLoading, setLoading] = useState(false);
@@ -121,7 +121,7 @@ function LoginPage() {
     if (search?.includes('?redirect=')) {
       const url = getRedirectUrl();
       if (url) {
-        navigate(url);
+        router.navigate(url);
         return;
       }
     }
@@ -131,7 +131,7 @@ function LoginPage() {
     if (!firstMenu) {
       return messageApi.error({ content: $t('login.notPermissions'), key: 'permissions' });
     }
-    navigate(firstMenu);
+    router.navigate(firstMenu);
   };
 
   useEffect(() => {
@@ -222,7 +222,7 @@ function LoginPage() {
 
   /** 点击忘记密码 */
   const onForgetPassword = () => {
-    navigate(`/forget${search}`);
+    router.navigate(`/forget${search}`);
   };
 
   return (

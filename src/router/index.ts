@@ -1,1 +1,7 @@
-export { default } from './AppRouter';
+/**
+ * 本目录对外交付的是跳转能力, 谁都可以取用.
+ *
+ * 装配入口 AppRouter 不在此转发 —— 它要认识每一个页面, 而页面反过来要跳转,
+ * 同一个门面同时交出这两样就成环. 装配只有 main.tsx 一个消费者, 由它直引.
+ */
+export * from './router';

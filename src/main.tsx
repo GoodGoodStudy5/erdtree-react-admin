@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom/client';
-import Router from './router';
+import AppRouter from './router/AppRouter';
 import '@/assets/css/public.less';
 import '@/assets/fonts/font.less';
 
@@ -42,7 +42,7 @@ if (typeof window !== 'undefined') {
 // 优先渲染应用，减少首屏加载时间
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
-    <Router />
+    <AppRouter />
   </StyleProvider>,
 );
 

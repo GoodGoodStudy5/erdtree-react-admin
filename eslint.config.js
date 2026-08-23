@@ -159,6 +159,15 @@ const NO_USE_TRANSLATION = {
   message: '国际化直接 import { $t } from "@/locales", 语言订阅只在 AppRouter 一处',
 };
 
+/**
+ * 跳转只从导航门面取件. useNavigate 拿到的是组件内专属入口, 有了它就必须把「想跳转的东西」
+ * 做成组件, 于是请求层、store、工具函数一律跳不了 —— 门面同时服务组件内外, 不留这道分岔.
+ */
+const NO_USE_NAVIGATE = {
+  selector: 'CallExpression[callee.name="useNavigate"]',
+  message: '页面跳转 import { router } from "@/router" 调 router.navigate, 组件内外同一个入口',
+};
+
 /** 页面本体不再自己管弹窗开关 */
 const NO_SHELL_IN_PAGE = {
   selector: 'JSXOpeningElement[name.name=/^(BaseModal|ModalShell)$/]',
@@ -333,7 +342,7 @@ export default tseslint.config(
         { prefer: 'type-imports', fixStyle: 'separate-type-imports' },
       ],
       // 见文件顶部常量的说明
-      'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER],
+      'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER, NO_USE_NAVIGATE],
       // 官方hooks校验
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'off',
@@ -344,6 +353,7 @@ export default tseslint.config(
     files: [
       'src/components/**/*.{ts,tsx}',
       'src/hooks/**/*.ts',
+      'src/router/*.ts',
       'src/utils/**/*.ts',
       'src/servers/**/*.ts',
       'src/modals/**/*.ts',
@@ -376,7 +386,12 @@ export default tseslint.config(
     rules: {
       // 通用块的选择器照文件顶部的说明重列: 眼下 servers 只有 .ts 文件, JSX 选择器命不中,
       // 但列全之后这里的保证与辖区写法无关, 日后把辖区放宽到 .tsx 不会静默漏掉一条
-      'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER, ...API_NAMING],
+      'no-restricted-syntax': [
+        'error',
+        ...NO_MODAL_PROPS_ON_OTHER_CARRIER,
+        ...API_NAMING,
+        NO_USE_NAVIGATE,
+      ],
     },
   },
   {
@@ -404,7 +419,12 @@ export default tseslint.config(
   {
     files: ['src/pages/**/*.tsx', 'src/layouts/**/*.tsx', 'src/modals/**/*.tsx'],
     rules: {
-      'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER, NO_IMPERATIVE_HANDLE],
+      'no-restricted-syntax': [
+        'error',
+        ...NO_MODAL_PROPS_ON_OTHER_CARRIER,
+        NO_IMPERATIVE_HANDLE,
+        NO_USE_NAVIGATE,
+      ],
     },
   },
   {
@@ -416,6 +436,7 @@ export default tseslint.config(
         ...NO_MODAL_PROPS_ON_OTHER_CARRIER,
         NO_IMPERATIVE_HANDLE,
         NO_SHELL_IN_PAGE,
+        NO_USE_NAVIGATE,
       ],
     },
   },

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useTransition } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { useNavigation } from 'react-router-dom';
 import nprogress from 'nprogress';
+import { router } from '@/router';
 
 /** 等待短于这个时长不提示, 秒开的页面不打扰用户 */
 const PROGRESS_DELAY = 300;
@@ -15,19 +16,18 @@ nprogress.configure({ showSpinner: false });
  * 判据是跳转本身有没有落地 —— 它涵盖代码下载与首屏渲染, 新页面就绪的那一刻进度条结束。
  */
 export const useNavigateProgress = () => {
-  const navigate = useNavigate();
-  const [isPending, startTransition] = useTransition();
+  const { state } = useNavigation();
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    if (isPending) {
+    if (state !== 'idle') {
       timer.current = window.setTimeout(() => nprogress?.start?.(), PROGRESS_DELAY);
       return;
     }
 
     window.clearTimeout(timer.current);
     nprogress?.done?.();
-  }, [isPending]);
+  }, [state]);
 
   // 跳转途中离开界面时不留下一条走不完的进度条
   useEffect(
@@ -38,10 +38,5 @@ export const useNavigateProgress = () => {
     [],
   );
 
-  return useCallback(
-    (to: string) => {
-      startTransition(() => navigate(to));
-    },
-    [navigate, startTransition],
-  );
+  return router.navigate;
 };

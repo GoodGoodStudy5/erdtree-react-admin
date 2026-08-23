@@ -1,17 +1,17 @@
 import { getFirstMenu, getMenuByKey } from '@/menus';
 import { Button } from 'antd';
 import { $t } from '@/locales';
+import { router } from '@/router';
 
 /** 无权限占位, 提供回首页入口. 既作为 /403 页面, 也作为内容区的无权限替代 */
 export function Forbidden() {
-  const navigate = useNavigate();
   const { permissions, menuList } = useCommonStore();
   const { addTabs, setActiveKey } = useTabsStore.getState();
 
   /** 跳转首页 */
   const goIndex = () => {
     const firstMenu = getFirstMenu(menuList, permissions);
-    navigate(firstMenu);
+    router.navigate(firstMenu);
     const menuByKeyProps = { menus: menuList, permissions, key: firstMenu };
     const newItems = getMenuByKey(menuByKeyProps);
     if (newItems?.key) {

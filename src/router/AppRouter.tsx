@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from 'react';
 import { App, theme, ConfigProvider } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { HashRouter as Router } from 'react-router-dom';
-import RouterPage from './components/Router';
+import { RouterProvider } from 'react-router-dom';
+import { dataRouter } from './bootstrap';
+import { usePreloadModules } from './components/preload';
 import StaticMessage from '@south/message';
 
 // antd
@@ -37,6 +38,8 @@ function AppRouter() {
   const { i18n } = useTranslation();
   const { theme } = useCommonStore();
 
+  usePreloadModules();
+
   // 获取当前语言
   const currentLanguage = i18n.language;
 
@@ -63,15 +66,13 @@ function AppRouter() {
   );
 
   return (
-    <Router>
-      <ConfigProvider locale={locale} theme={themeConfig}>
-        <App>
-          <StaticMessage />
-          {/* 语言切换后整树重挂载, 让各处直接调用的 $t 重新取值 */}
-          <RouterPage key={currentLanguage} />
-        </App>
-      </ConfigProvider>
-    </Router>
+    <ConfigProvider locale={locale} theme={themeConfig}>
+      <App>
+        <StaticMessage />
+        {/* 语言切换后整树重挂载, 让各处直接调用的 $t 重新取值 */}
+        <RouterProvider router={dataRouter} key={currentLanguage} />
+      </App>
+    </ConfigProvider>
   );
 }
 

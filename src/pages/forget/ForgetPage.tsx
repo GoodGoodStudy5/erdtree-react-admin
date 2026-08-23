@@ -6,6 +6,7 @@ import { message as globalMessage } from '@south/message';
 import { forgetPassword } from '@/servers';
 import Logo from '@/assets/images/logo.svg';
 import { $t, i18n } from '@/locales';
+import { router } from '@/router';
 
 interface ForgetData {
   username: string;
@@ -17,7 +18,6 @@ interface ForgetData {
 
 function ForgetPage() {
   const { search } = useLocation();
-  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [isLoading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -72,7 +72,7 @@ function ForgetPage() {
         content: $t('login.verificationPassed'),
         key: 'success',
       });
-      navigate(`/login${search}`);
+      router.navigate(`/login${search}`);
     } finally {
       setLoading(false);
     }
@@ -273,7 +273,7 @@ function ForgetPage() {
           <Button
             htmlType="submit"
             className="w-full mt-12px mb-10px rounded-5px tracking-2px"
-            onClick={() => navigate(`/login${search}`)}
+            onClick={() => router.navigate(`/login${search}`)}
           >
             {$t('public.back')}
           </Button>
