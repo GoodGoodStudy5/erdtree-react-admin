@@ -178,6 +178,28 @@ const TEST_ONLY_VIA_FACADE = {
   ],
 };
 
+/**
+ * 用例与类型测试都住在被测目录的 __test__/ 里: 一个组的用例集中一处, 实现目录只剩实现.
+ * vitest 的 include 也只收这个位置, 两处同一口径 —— 放错地方的用例不会被"顺便跑掉".
+ */
+const TEST_HOME = {
+  '*.test.{ts,tsx}': '**/__test__/',
+  '*.typetest.{ts,tsx}': '**/__test__/',
+};
+
+/**
+ * 请求原语只有一个切换点: hooks/requestAdapter.ts. 组件绕过它直接引实现, 换 ahooks 时
+ * 就不再是"改一行导出", 而要满仓库找调用点 —— 适配器层当场失去意义.
+ */
+const NO_REQUEST_IMPL_DIRECT = {
+  patterns: [
+    {
+      group: ['**/hooks/useRequest', './useRequest'],
+      message: '请求原语从 hooks 门面 (背后是 requestAdapter) 取, 不直接引实现',
+    },
+  ],
+};
+
 export default tseslint.config(
   // 构建产物不参与校验, 包的 dist 在任意层级都要排除
   // .design / .scratch 是设计草稿与工作区, 不进版本库, 也不受工程规范约束
@@ -460,6 +482,22 @@ export default tseslint.config(
           message: '页面 index 只能写 export { default } from "./<页面名>Page"',
         },
       ],
+    },
+  },
+  {
+    // 测试文件的住所. 类型测试也归这条管, 所以 files 要把两种后缀都列上
+    files: ['**/*.test.{ts,tsx}', '**/*.typetest.{ts,tsx}'],
+    plugins: { 'check-file': checkFile },
+    rules: {
+      'check-file/folder-match-with-fex': ['error', TEST_HOME],
+    },
+  },
+  {
+    // 适配器是唯一切换点. 用例走门面导入, 本就碰不到实现, 不必进这条辖区
+    files: ['packages/components/src/**/*.{ts,tsx}'],
+    ignores: ['packages/components/src/hooks/requestAdapter.ts', '**/*.test.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': ['error', NO_REQUEST_IMPL_DIRECT],
     },
   },
   {

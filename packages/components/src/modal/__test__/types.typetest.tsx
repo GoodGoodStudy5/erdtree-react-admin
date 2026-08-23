@@ -21,19 +21,19 @@ import type {
   UseCloseGuardFn,
   UseModalIdFn,
   UseModalShellFn,
-} from './types';
+} from '../types';
 
 /** 断言实参可赋给 T. 类型不符则编译期报错 */
 declare function expectType<T>(value: T): void;
 
 // 用真实现而非占位声明, 否则实现与契约仍可能各走各的
-import { BaseModal } from './BaseModal';
-import { ModalShell } from './ModalShell';
-import { createModalSet, openModal, useModalId } from './adapter';
-import { useCloseGuard } from './useCloseGuard';
-import { useModalForm } from './useModalForm';
-import { useEvent } from './useEvent';
-import { useModalShell } from './useModalShell';
+import { BaseModal } from '../BaseModal';
+import { ModalShell } from '../ModalShell';
+import { createModalSet, openModal, useModalId } from '../adapter';
+import { useCloseGuard } from '../useCloseGuard';
+import { useModalForm } from '../useModalForm';
+import { useEvent } from '../useEvent';
+import { useModalShell } from '../useModalShell';
 
 // 实现必须符合契约里导出的签名. 任一处漂移这里先红
 const _openModal = openModal satisfies OpenFn;
