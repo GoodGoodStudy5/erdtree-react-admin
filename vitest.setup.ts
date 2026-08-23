@@ -82,21 +82,30 @@ if (!('innerText' in window.HTMLElement.prototype)) {
   });
 }
 
-const MAX_WIDTH_QUERY = /^\(max-width:\s*(\d+)px\)$/;
+/** 宽度约束. antd 的响应式栅格问 min-width, 弹窗问 max-width, 断点区间是两者用 and 相连 */
+const WIDTH_CONDITION = /^\((min|max)-width:\s*(\d+)px\)$/;
 
 function matchesViewport(query: string) {
-  const matched = MAX_WIDTH_QUERY.exec(query);
-  if (!matched) {
-    throw new Error(`用例环境的 matchMedia 只答"窄于某宽度", 答不了: ${query}`);
-  }
-  return window.innerWidth <= Number(matched[1]);
+  return query.split(/\s+and\s+/).every((condition) => {
+    const matched = WIDTH_CONDITION.exec(condition.trim());
+
+    if (!matched) {
+      throw new Error(`用例环境的 matchMedia 只答视口宽度, 答不了: ${query}`);
+    }
+    const [, bound, value] = matched;
+
+    return bound === 'max'
+      ? window.innerWidth <= Number(value)
+      : window.innerWidth >= Number(value);
+  });
 }
 
 /**
- * jsdom 不实现 matchMedia, 而组件要按视口宽度分手机与桌面, 用例得能指定站在哪一档.
- * 结果按 window.innerWidth 现算, 默认那档是桌面; 要手机档就在渲染前把宽度改小.
+ * jsdom 不实现 matchMedia, 而组件要按视口宽度分档 (弹窗分手机与桌面, 栅格分五个断点),
+ * 用例得能指定站在哪一档. 结果按 window.innerWidth 现算, 默认那档是桌面;
+ * 要窄屏就在渲染前把宽度改小.
  *
- * 答不了的查询当场抛错而不是给 false —— 静默的 false 会让"没这么窄"和"问错了"长得一样.
+ * 答不了的查询当场抛错而不是给 false —— 静默的 false 会让"没这么宽"和"问错了"长得一样.
  * 也不派发 change: 挂载之后改宽度不会重新求值. 视口变化不是任何组件的行为契约,
  * 真要测它, 值得的是浏览器环境而不是更像浏览器的替身.
  */
