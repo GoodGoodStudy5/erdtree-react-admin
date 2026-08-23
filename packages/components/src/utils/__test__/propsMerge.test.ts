@@ -10,6 +10,15 @@ describe('propsMerge', () => {
     expect(merged.allowClear).toBe(false);
   });
 
+  it('外部显式传 undefined 视为没给, 默认值仍然生效', () => {
+    // 照真实调用点的形状写: 外部 props 的键是可选的, 算出 undefined 是常事
+    const outer: { placeholder?: string; xs?: number } = { placeholder: undefined };
+    const merged = propsMerge({ placeholder: '请选择', xs: 24 }, outer);
+
+    expect(merged.placeholder).toBe('请选择');
+    expect(merged.xs).toBe(24);
+  });
+
   it('className 是例外: 两边拼接而不是覆盖', () => {
     const merged = propsMerge({ className: 'load-button' }, { className: 'my-btn' });
 

@@ -20,8 +20,10 @@ const DEFAULT_GUTTER: RowLayoutProps['gutter'] = [16, 16];
 /**
  * 调用方自带宽度的键. 给了它们, 库的这套断点就整套让位.
  *
- * 因为 antd 的 `-xs` 类是不带媒体查询发出的, 且排在 span 之后 —— 两套一起下发,
- * 调用方的 span 在任何视口下都不生效, 正是要销掉的死属性问题.
+ * span 必须让位: antd 的 `-xs` 类不带媒体查询, 且排在 span 之后 —— 两套一起下发, 调用方的
+ * span 在任何视口下都不生效, 正是要销掉的死属性问题. flex 走内联样式, 压得住类名, 但同时
+ * 下发两套宽度口径只会让人猜哪套算, 所以一并让位.
+ *
  * 单独给某个断点 (如 xl) 不算自带宽度: 那一个键盖掉库的同名键即可, 其余档照旧兜着.
  */
 const OWN_WIDTH_KEYS = ['span', 'flex'] as const;
@@ -83,7 +85,8 @@ function buildCols(children: ReactNode, columnNum: RowLayoutColumnNum) {
 
     // 浅拷贝剥离 colSize, 不 delete 调用方传进来的对象: 那是别人的数据, 还可能是冻结的
     const { colSize = 1, ...restColProps } = childColProps ?? {};
-    const ownsWidth = OWN_WIDTH_KEYS.some((key) => key in restColProps);
+    // 按值判断而不是按键存在: `span={undefined}` 意思是"没给宽度", 不该让库的断点让位
+    const ownsWidth = OWN_WIDTH_KEYS.some((key) => restColProps[key] !== undefined);
     const colProps = propsMerge(ownsWidth ? {} : breakpointsOf(colSize, baseSpan), restColProps);
 
     return <Col {...colProps}>{content}</Col>;
@@ -102,15 +105,8 @@ function buildCols(children: ReactNode, columnNum: RowLayoutColumnNum) {
  * 库的断点整套让位, 见 OWN_WIDTH_KEYS.
  */
 export function RowLayout(props: RowLayoutProps) {
-  const {
-    columnNum = DEFAULT_COLUMN_NUM,
-    ifShow = true,
-    gutter = DEFAULT_GUTTER,
-    children,
-    ...restRowProps
-  } = props;
-  // gutter 先经解构给默认值再进合并: 显式传 undefined 时该落回默认, 而合并层会让 undefined 覆盖
-  const rowProps = propsMerge({ gutter }, restRowProps);
+  const { columnNum = DEFAULT_COLUMN_NUM, ifShow = true, children, ...restRowProps } = props;
+  const rowProps = propsMerge({ gutter: DEFAULT_GUTTER }, restRowProps);
   // context 的值要稳定, 否则每次渲染都让整棵 RowInner 白重渲染一遍
   const contextValue = useMemo(() => ({ columnNum }), [columnNum]);
 

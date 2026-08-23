@@ -21,6 +21,13 @@ export type ComposedHandlers<F extends EventComposition> = {
   [K in keyof F]?: (...args: never[]) => unknown;
 };
 
+/** 摘掉值为 undefined 的键, 让它们落回默认值 */
+function omitUndefined(props: object | undefined): PropsRecord {
+  const entries = Object.entries((props ?? {}) as PropsRecord);
+
+  return Object.fromEntries(entries.filter(([, value]) => value !== undefined));
+}
+
 /** className 拼接. 空串不进结果, 免得渲染出 class=" " 这种噪音 */
 function joinClassName(...names: unknown[]): string | undefined {
   const valid = names.filter((name): name is string => typeof name === 'string' && name !== '');
@@ -31,7 +38,10 @@ function joinClassName(...names: unknown[]): string | undefined {
 /**
  * 组件内部默认值与外部 props 的三层合并:
  *
- * 1. 默认值可覆盖 —— 外部同名键盖掉内部默认, 组件不替调用方做决定;
+ * 1. 默认值可覆盖 —— 外部同名键盖掉内部默认, 组件不替调用方做决定. 但外部显式传 undefined
+ *    视为"没给": React 生态里 undefined 就是缺省, 而默认值层的意义正是补上没给的键 ——
+ *    让 `placeholder={undefined}` 抹掉组件的默认占位、`xs={undefined}` 抹掉一档断点,
+ *    是把"我不管"读成了"我要空的";
  * 2. className 是例外, 两边拼接而不是覆盖 —— 内部靠类名挂样式, 被盖掉组件就散了;
  * 3. fnObjs 里列出的回调事件合成 —— 内部行为先跑, 再调外部同名回调并把它的返回值交出去.
  *
@@ -47,7 +57,7 @@ export function propsMerge<
   P extends object | undefined,
   F extends EventComposition = EventComposition,
 >(defaultProps: D, props: P, fnObjs?: F): MergedProps<D, P> & ComposedHandlers<F> {
-  const merged = { ...defaultProps, ...props } as PropsRecord;
+  const merged = { ...defaultProps, ...omitUndefined(props) } as PropsRecord;
   const className = joinClassName(
     (defaultProps as PropsRecord).className,
     (props as PropsRecord | undefined)?.className,

@@ -110,6 +110,40 @@ describe('RowLayout', () => {
     expect(ref.current).toBeInstanceOf(HTMLInputElement);
   });
 
+  it('colProps 里显式传 undefined 的断点落回库的默认, 不留空档', () => {
+    const { container } = render(
+      <RowLayout>
+        {/* 调用方按条件算 colProps 时很容易算出 undefined; 那是"我不管", 不是"要空的" */}
+        <Field colProps={{ xs: undefined, xl: 24 }} label="a" />
+      </RowLayout>,
+    );
+    const className = colClassNames(container);
+
+    expect(className).toContain('ant-col-xs-24');
+    expect(className).toContain('ant-col-xl-24');
+  });
+
+  it('gutter 显式传 undefined 时仍用库的默认间距', () => {
+    const explicit = render(
+      <RowLayout gutter={[16, 16]}>
+        <Field label="a" />
+      </RowLayout>,
+    );
+    const expected = explicit.container.querySelector<HTMLElement>('.ant-row')?.style.cssText;
+
+    explicit.unmount();
+
+    const implicit = render(
+      <RowLayout gutter={undefined}>
+        <Field label="a" />
+      </RowLayout>,
+    );
+
+    // 不硬编码 antd 落 gutter 的方式, 只要"没给"与"给了默认值"渲染成同一个样子
+    expect(implicit.container.querySelector<HTMLElement>('.ant-row')?.style.cssText).toBe(expected);
+    expect(expected).not.toBe('');
+  });
+
   it('StrictMode 下不改写调用方传进来的 colProps: 冻结对象也照样渲染', () => {
     const colProps = Object.freeze({ colSize: 2 });
 

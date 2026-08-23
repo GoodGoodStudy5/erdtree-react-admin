@@ -390,6 +390,7 @@ export default tseslint.config(
             'ExportNamedDeclaration[declaration.type="TSInterfaceDeclaration"]',
             'ExportNamedDeclaration[declaration.type="TSTypeAliasDeclaration"]',
             'ExportNamedDeclaration[declaration.type="TSEnumDeclaration"]',
+            'ExportDefaultDeclaration',
           ],
         },
       ],

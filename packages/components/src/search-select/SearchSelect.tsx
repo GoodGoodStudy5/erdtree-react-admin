@@ -93,19 +93,6 @@ export function SearchSelect<
     fetchOptions(keyword).catch((error: unknown) => console.error(error));
   });
 
-  const handleSearch = useEvent((keyword: string) => {
-    searchKeywordRef.current = keyword;
-    run(keyword.trim());
-  });
-
-  const handleOpenChange = useEvent((open: boolean) => {
-    // 关闭时若还留着搜索词, 内部补一次空搜索, 下次打开看到的才是完整选项.
-    // 不转发给外部 onSearch —— 这一下不是用户输入
-    if (!open && searchKeywordRef.current !== '') {
-      handleSearch('');
-    }
-  });
-
   useEffect(() => {
     // 挂载时拉一次; autoLoad 由关变开时也拉 —— 那正是调用方说"现在可以取数了"
     if (autoLoad) {
@@ -124,6 +111,23 @@ export function SearchSelect<
     (Array.isArray(flatProps.optionFilterProp)
       ? flatProps.optionFilterProp
       : [flatProps.optionFilterProp ?? 'label']);
+
+  const handleSearch = useEvent((keyword: string) => {
+    searchKeywordRef.current = keyword;
+    // 自己再判一次而不是只靠挂不挂 onSearch: 关面板的重置也走这里, 而 props 可能中途变了
+    // (开始给 options、或翻开 searchByLocal), 那时候打字就不该再触网
+    if (isRemoteSearch) {
+      run(keyword.trim());
+    }
+  });
+
+  const handleOpenChange = useEvent((open: boolean) => {
+    // 关闭时若还留着搜索词, 内部补一次空搜索, 下次打开看到的才是完整选项.
+    // 不转发给外部 onSearch —— 这一下不是用户输入
+    if (!open && searchKeywordRef.current !== '') {
+      handleSearch('');
+    }
+  });
 
   const mergedProps = propsMerge(
     {

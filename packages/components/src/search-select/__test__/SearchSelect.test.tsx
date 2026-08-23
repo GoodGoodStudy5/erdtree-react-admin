@@ -90,6 +90,48 @@ describe('SearchSelect', () => {
     expect(request).toHaveBeenCalledTimes(2);
   });
 
+  it('关面板时残留的搜索词会被重置, 下次打开看到的是完整选项', async () => {
+    const request = vi.fn(async () => CITY_OPTIONS);
+
+    render(<SearchSelect allowFocusLoad={false} debounceWait={10} request={request} />);
+    await waitFor(() => expect(request).toHaveBeenCalledOnce());
+
+    openPanel();
+    typeSearch('北');
+    await waitFor(() => expect(request).toHaveBeenLastCalledWith('北'));
+
+    // 点空白处收起面板
+    fireEvent.mouseDown(document.body);
+
+    await waitFor(() => expect(request).toHaveBeenLastCalledWith(''));
+  });
+
+  it('受控 options 下关面板的重置也不触网 (回归钉)', async () => {
+    const request = vi.fn(async () => CITY_OPTIONS);
+    const { rerender } = render(
+      <SearchSelect allowFocusLoad={false} debounceWait={10} request={request} />,
+    );
+
+    await waitFor(() => expect(request).toHaveBeenCalledOnce());
+    openPanel();
+    typeSearch('北');
+    await waitFor(() => expect(request).toHaveBeenCalledTimes(2));
+
+    // 调用方中途开始自己供数据: 此后连"关面板补一次空搜索"都不该再发请求
+    rerender(
+      <SearchSelect
+        allowFocusLoad={false}
+        debounceWait={10}
+        options={CITY_OPTIONS}
+        request={request}
+      />,
+    );
+    fireEvent.mouseDown(document.body);
+    await sleep(30);
+
+    expect(request).toHaveBeenCalledTimes(2);
+  });
+
   it('聚焦时补拉一次, allowFocusLoad 关掉就不拉', async () => {
     const request = vi.fn(async () => CITY_OPTIONS);
     const { unmount } = render(<SearchSelect autoLoad={false} request={request} />);

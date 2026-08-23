@@ -67,9 +67,14 @@ export interface SearchSelectRef<OT extends SearchSelectOption = SearchSelectOpt
   options: OT[] | undefined;
   /** 是否有请求在飞 */
   isLoading: boolean;
-  /** 重新拉一次选项. 返回的 Promise 可以等 */
+  /**
+   * 重新拉一次选项. 返回的 Promise 可以等.
+   *
+   * options 受控或没给 request 时不发请求, 直接 resolve `undefined` —— 那两种情况下
+   * 数据不归组件管. 拿到 undefined 表示"这次没去取", 与"取到空数组"是两回事.
+   */
   fetchOptions: (keyword?: string) => Promise<OT[] | undefined>;
-  /** 联动时拉选项: 立刻屏蔽旧选项, 新数据到位前不给选 */
+  /** 联动时拉选项: 立刻屏蔽旧选项, 新数据到位前不给选. 不发请求时同样 resolve undefined */
   fetchOptionsForCascade: (keyword?: string) => Promise<OT[] | undefined>;
 }
 
