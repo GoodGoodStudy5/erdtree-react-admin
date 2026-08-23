@@ -1,0 +1,66 @@
+/** 参与合并的 props 形状. 值一律 unknown, 具体类型由调用点的泛型还原 */
+export type MergeableProps = Record<string, unknown> & { className?: string };
+
+/**
+ * 要与外部同名回调合成的内部行为. 值给 false / undefined 表示这次不需要该行为,
+ * 于是外部回调原样生效 —— 调用方按条件开关内部行为时不必自己写分支.
+ */
+export type EventComposition = Record<
+  string,
+  ((...args: never[]) => unknown) | false | undefined | null
+>;
+
+/** 合并结果. props 缺省时只剩默认值, 不该塌成 never */
+export type MergedProps<D, P> = P extends MergeableProps ? D & P : D;
+
+/**
+ * 事件合成出来的回调. 一律可选: fnObjs 的值给了 false / undefined 时这个键可能根本不存在.
+ * 参数与返回值都收不窄 —— 内部行为与外部回调的签名在这一层是未知的, 由调用点的 props 类型还原.
+ */
+export type ComposedHandlers<F extends EventComposition> = {
+  [K in keyof F]?: (...args: never[]) => unknown;
+};
+
+/** className 拼接. 空串不进结果, 免得渲染出 class=" " 这种噪音 */
+function joinClassName(...names: unknown[]): string | undefined {
+  const valid = names.filter((name): name is string => typeof name === 'string' && name !== '');
+
+  return valid.length > 0 ? valid.join(' ') : undefined;
+}
+
+/**
+ * 组件内部默认值与外部 props 的三层合并:
+ *
+ * 1. 默认值可覆盖 —— 外部同名键盖掉内部默认, 组件不替调用方做决定;
+ * 2. className 是例外, 两边拼接而不是覆盖 —— 内部靠类名挂样式, 被盖掉组件就散了;
+ * 3. fnObjs 里列出的回调事件合成 —— 内部行为先跑, 再调外部同名回调并把它的返回值交出去.
+ *
+ * 第三条是通用组件的生死线: 裸展开 `{...props}` 会让"外部传了个同名回调"静默杀掉组件的
+ * 核心能力 (搜索下拉传了 onSearch 就不再发请求, 复制组件传了 onCopy 就不再复制),
+ * 而调用方看到的只是"这组件坏了".
+ */
+export function propsMerge<
+  D extends MergeableProps,
+  P extends MergeableProps | undefined,
+  F extends EventComposition = EventComposition,
+>(defaultProps: D, props: P, fnObjs?: F): MergedProps<D, P> & ComposedHandlers<F> {
+  const merged: MergeableProps = {
+    ...defaultProps,
+    ...props,
+    className: joinClassName(defaultProps.className, props?.className),
+  };
+
+  Object.entries(fnObjs ?? {}).forEach(([key, innerFn]) => {
+    if (typeof innerFn !== 'function') {
+      return;
+    }
+    const outerFn = merged[key];
+
+    merged[key] = (...args: never[]) => {
+      innerFn(...args);
+      return typeof outerFn === 'function' ? outerFn(...args) : undefined;
+    };
+  });
+
+  return merged as MergedProps<D, P> & ComposedHandlers<F>;
+}

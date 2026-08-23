@@ -10,7 +10,7 @@ import { ModalAbort } from './abort';
  */
 const SUBMIT_SETTLE_TIMEOUT = 10_000;
 import type { ModalControl, UseModalFormOptions, UseModalFormResult } from './types';
-import { useEvent } from './useEvent';
+import { useEvent } from '../hooks';
 import { useModalShell } from './useModalShell';
 
 /**
