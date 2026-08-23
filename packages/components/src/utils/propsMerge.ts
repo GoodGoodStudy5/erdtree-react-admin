@@ -1,5 +1,5 @@
-/** 参与合并的 props 形状. 值一律 unknown, 具体类型由调用点的泛型还原 */
-export type MergeableProps = Record<string, unknown> & { className?: string };
+/** 合并期间的读写视角. 对外的类型由调用点的泛型还原, 这里只负责按键取值 */
+type PropsRecord = Record<string, unknown>;
 
 /**
  * 要与外部同名回调合成的内部行为. 值给 false / undefined 表示这次不需要该行为,
@@ -11,7 +11,7 @@ export type EventComposition = Record<
 >;
 
 /** 合并结果. props 缺省时只剩默认值, 不该塌成 never */
-export type MergedProps<D, P> = P extends MergeableProps ? D & P : D;
+export type MergedProps<D, P> = P extends object ? D & P : D;
 
 /**
  * 事件合成出来的回调. 一律可选: fnObjs 的值给了 false / undefined 时这个键可能根本不存在.
@@ -38,17 +38,25 @@ function joinClassName(...names: unknown[]): string | undefined {
  * 第三条是通用组件的生死线: 裸展开 `{...props}` 会让"外部传了个同名回调"静默杀掉组件的
  * 核心能力 (搜索下拉传了 onSearch 就不再发请求, 复制组件传了 onCopy 就不再复制),
  * 而调用方看到的只是"这组件坏了".
+ *
+ * 泛型约束取 object 而不是带 className 的形状: 后者是弱类型, antd 那些没有 className 的
+ * 配置对象 (如 Typography 的 copyable) 会被判为"没有共同属性"而进不来.
  */
 export function propsMerge<
-  D extends MergeableProps,
-  P extends MergeableProps | undefined,
+  D extends object,
+  P extends object | undefined,
   F extends EventComposition = EventComposition,
 >(defaultProps: D, props: P, fnObjs?: F): MergedProps<D, P> & ComposedHandlers<F> {
-  const merged: MergeableProps = {
-    ...defaultProps,
-    ...props,
-    className: joinClassName(defaultProps.className, props?.className),
-  };
+  const merged = { ...defaultProps, ...props } as PropsRecord;
+  const className = joinClassName(
+    (defaultProps as PropsRecord).className,
+    (props as PropsRecord | undefined)?.className,
+  );
+
+  // 两边都没给就不要凭空造出这个键: 合并不该给本来没有 className 的配置对象加字段
+  if (className !== undefined) {
+    merged.className = className;
+  }
 
   Object.entries(fnObjs ?? {}).forEach(([key, innerFn]) => {
     if (typeof innerFn !== 'function') {

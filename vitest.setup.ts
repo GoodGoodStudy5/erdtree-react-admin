@@ -12,6 +12,18 @@ afterEach(() => {
   window.innerWidth = DEFAULT_WIDTH;
 });
 
+/**
+ * jsdom 不实现 ResizeObserver, 而 antd 的弹层 (下拉、气泡) 挂载时就会订阅尺寸变化.
+ *
+ * 替身只做到"能被订阅", 不派发任何回调: jsdom 没有排版, 元素尺寸恒为 0, 报出来的变化是假的.
+ * 依赖真实尺寸的行为 (弹层翻转、虚拟列表可视区) 因此测不了, 那是浏览器环境的活.
+ */
+window.ResizeObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
+
 const MAX_WIDTH_QUERY = /^\(max-width:\s*(\d+)px\)$/;
 
 function matchesViewport(query: string) {
