@@ -19,10 +19,68 @@ afterEach(() => {
  * 依赖真实尺寸的行为 (弹层翻转、虚拟列表可视区) 因此测不了, 那是浏览器环境的活.
  */
 window.ResizeObserver = class {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe = () => undefined;
+  unobserve = () => undefined;
+  disconnect = () => undefined;
 };
+
+/** 会自带换行的标签. 只是近似, 真实的块级判定要看计算样式 */
+const BLOCK_TAGS = new Set([
+  'ADDRESS',
+  'ARTICLE',
+  'BLOCKQUOTE',
+  'DIV',
+  'FOOTER',
+  'FORM',
+  'H1',
+  'H2',
+  'H3',
+  'H4',
+  'H5',
+  'H6',
+  'HEADER',
+  'LI',
+  'OL',
+  'P',
+  'PRE',
+  'SECTION',
+  'TABLE',
+  'TR',
+  'UL',
+]);
+
+/** 按 DOM 结构近似 innerText: 块级标签的边界给一个换行, 其余照文本内容 */
+function approximateInnerText(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return node.textContent ?? '';
+  }
+  if (!(node instanceof window.HTMLElement)) {
+    return '';
+  }
+  if (node.tagName === 'BR') {
+    return '\n';
+  }
+  const inner = Array.from(node.childNodes).map(approximateInnerText).join('');
+
+  return BLOCK_TAGS.has(node.tagName) ? `${inner}\n` : inner;
+}
+
+/**
+ * jsdom 不实现 innerText —— 它要排版才算得出来, 而 jsdom 没有排版.
+ * "复制用户眼睛看到的文本"这类能力正是靠它取值, 所以用例环境得给个替身.
+ *
+ * 替身只够验证"组件读的是渲染后的文本、块级结构带来的换行没丢";
+ * 真实的排版折行 (自动换行、隐藏元素、CSS 生成内容) 只有浏览器算得准, 那不进这条缝.
+ */
+if (!('innerText' in window.HTMLElement.prototype)) {
+  Object.defineProperty(window.HTMLElement.prototype, 'innerText', {
+    configurable: true,
+    get(this: HTMLElement) {
+      // 结尾的换行不算: 它来自容器自身的块级边界, 不是用户看到的空行
+      return approximateInnerText(this).replace(/\n+$/, '');
+    },
+  });
+}
 
 const MAX_WIDTH_QUERY = /^\(max-width:\s*(\d+)px\)$/;
 
