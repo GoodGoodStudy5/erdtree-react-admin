@@ -1,0 +1,17 @@
+.element-copy {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  /* Paragraph 自带段落间距, 嵌在表格行或表单里时不需要 */
+  &.ant-typography {
+    margin-bottom: 0;
+  }
+
+  /* 内容占满剩余宽度, 复制按钮贴右; 长文本按字符断行, 不撑破容器 */
+  .element-copy-content {
+    display: inline-block;
+    flex: 1;
+    word-break: break-all;
+  }
+}

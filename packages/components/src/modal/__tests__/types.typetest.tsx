@@ -21,19 +21,18 @@ import type {
   UseCloseGuardFn,
   UseModalIdFn,
   UseModalShellFn,
-} from './types';
+} from '../types';
 
 /** 断言实参可赋给 T. 类型不符则编译期报错 */
 declare function expectType<T>(value: T): void;
 
 // 用真实现而非占位声明, 否则实现与契约仍可能各走各的
-import { BaseModal } from './BaseModal';
-import { ModalShell } from './ModalShell';
-import { createModalSet, openModal, useModalId } from './adapter';
-import { useCloseGuard } from './useCloseGuard';
-import { useModalForm } from './useModalForm';
-import { useEvent } from './useEvent';
-import { useModalShell } from './useModalShell';
+import { BaseModal } from '../BaseModal';
+import { ModalShell } from '../ModalShell';
+import { createModalSet, openModal, useModalId } from '../adapter';
+import { useCloseGuard } from '../useCloseGuard';
+import { useModalForm } from '../useModalForm';
+import { useModalShell } from '../useModalShell';
 
 // 实现必须符合契约里导出的签名. 任一处漂移这里先红
 const _openModal = openModal satisfies OpenFn;
@@ -52,41 +51,6 @@ void [
   _ModalShell,
   _useModalForm,
 ];
-
-// ── useEvent 保持原回调的形状 ──────────────────────────────────
-//
-// 约束取 Function, 不取看起来更贴切的 `(...args: any[]) => any`: 后者带调用签名, 会给内联箭头
-// 的参数列表定下上下文类型, 参数类型于是静默失效 —— `useEvent((x = 1) => x + 1)` 里的 x 成了
-// any, 之后传字符串也不报, 而 tsc 全绿. 改成 `A extends unknown[]` 同样是上下文类型, 只是把
-// 静默换成刺耳(报 x is of type unknown). Function 不带调用签名, 参数才从注解与默认值自己推,
-// 没注解也没默认值时正常报隐式 any.
-//
-// 实现里最后一次向外的类型转换也去不掉: 造出来的是收 unknown[] 的函数, 而 T 可能是更窄的子类型.
-// 用函数重载能去掉它且 tsc 干净, 但基础 eslint 的 no-redeclare 不认 TS 重载会报警告, 为一个函数
-// 把全局规则换成 TS 版不值.
-//
-// 约束改回去, 下面几条 @ts-expect-error 会哑掉, tsc 以 TS2578 失败.
-
-function useEvent锁身份不改形状() {
-  const 默认参数 = useEvent((count = 1) => count + 1);
-  expectType<number>(默认参数());
-  expectType<number>(默认参数(2));
-  // @ts-expect-error 默认值决定了参数是 number
-  默认参数('2');
-
-  const 显式参数 = useEvent((name: string, age: number) => `${name}${age}`);
-  expectType<string>(显式参数('a', 1));
-  // @ts-expect-error 实参顺序反了
-  显式参数(1, 'a');
-
-  const 异步回调 = useEvent(async (id: string) => id.length);
-  expectType<Promise<number>>(异步回调('a'));
-  // @ts-expect-error 返回的是 Promise, 不是裸值
-  expectType<number>(异步回调('a'));
-
-  const 可选参数 = useEvent((flag?: boolean) => flag);
-  expectType<boolean | undefined>(可选参数());
-}
 
 declare function Drawer(props: DrawerProps): ReactNode;
 declare function Modal(props: ModalProps): ReactNode;
@@ -321,7 +285,6 @@ async function 全链路() {
 }
 
 export {
-  useEvent锁身份不改形状,
   结果类型从props反推,
   控制面字段不许调用方传,
   多传或漏传必填prop,

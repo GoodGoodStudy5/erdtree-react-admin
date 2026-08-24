@@ -247,4 +247,5 @@ export function measureFunctionTime(
   };
 }
 
+/** 性能埋点门面: 打点、测量与清理都从这里取 */
 export default performanceMonitor;

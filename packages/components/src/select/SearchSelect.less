@@ -1,0 +1,45 @@
+/* 多列下拉: 表头与选项行用同一套列宽规则, 两者才对得齐 */
+.search-select-table-popup {
+  padding-top: 0;
+
+  .search-select-table-header,
+  .search-select-table-row {
+    display: flex;
+    white-space: nowrap;
+  }
+
+  .search-select-table-header {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    background-color: #fafafa;
+  }
+
+  .search-select-table-cell {
+    flex: 1;
+    padding: 4px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-bottom: 1px solid #f0f0f0;
+
+    &.search-select-table-cell-wrap {
+      word-break: break-all;
+      word-wrap: break-word;
+      white-space: initial;
+    }
+  }
+
+  .search-select-table-cell + .search-select-table-cell {
+    border-left: 1px solid #f0f0f0;
+  }
+
+  /* 选项本身不再留内边距, 内边距归单元格 */
+  .ant-select-item-option {
+    padding: 0;
+  }
+
+  .ant-select-item-option-content {
+    display: flex;
+  }
+}

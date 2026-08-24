@@ -8,9 +8,16 @@ export type ModalLocale = {
   close: string;
 };
 
+/** 搜索下拉自带的文案 */
+export type SearchSelectLocale = {
+  /** 未选中时的占位提示 */
+  placeholder: string;
+};
+
 /** 本包全部组件的文案集合 */
 export type ComponentsLocale = {
   Modal: ModalLocale;
+  SearchSelect: SearchSelectLocale;
 };
 
 /** 宿主注入时可以只覆盖关心的部分, 其余落回包内默认 */

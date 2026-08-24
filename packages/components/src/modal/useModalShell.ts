@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { isModalAbort } from './abort';
 import { modalStore, useModalId, useModalVisible } from './adapter';
 import type { UseModalShellFn } from './types';
-import { useEvent } from './useEvent';
+import { useEvent } from '../hooks';
 
 /**
  * 把控制面接成可直接用的一组东西.
