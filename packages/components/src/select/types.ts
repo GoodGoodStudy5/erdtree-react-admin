@@ -21,8 +21,7 @@ export interface SearchSelectOption {
 /**
  * labelInValue 时的值形状: 调用方必须给完整的 `{label, value}`.
  *
- * 窄契约 —— 组件不为"选项还没拉回来时删不掉已选值"做回填缝补, 那段缝补在 zouwu 里正是
- * 最难读的一段, 而它解的问题只出现在契约被破坏时.
+ * 窄契约 —— 组件不为"选项还没拉回来时删不掉已选值"做回填缝补
  */
 export interface SearchSelectLabeledValue<OT extends SearchSelectOption = SearchSelectOption> {
   key?: string;

@@ -254,8 +254,9 @@ export default tseslint.config(
       'no-lone-blocks': 'warn',
       // 禁止使用多个空格
       'no-multi-spaces': 'warn',
-      // 禁止多次声明同一变量
-      'no-redeclare': 'warn',
+      // 禁止多次声明同一变量. 用 TS 版本: 基础版把函数重载判成重复声明
+      'no-redeclare': 'off',
+      '@typescript-eslint/no-redeclare': 'warn',
       // 禁止在 return 语句中使用赋值语句
       'no-return-assign': 'warn',
       // 禁用不必要的 return await

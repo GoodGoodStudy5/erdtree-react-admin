@@ -37,7 +37,7 @@ function toPlainText(value: unknown): string {
 /**
  * 本地过滤的匹配规则: 关键字命中任一指定字段即算命中, 统一小写后做包含比较.
  *
- * 大小写模糊与首尾空格是固定默认 (zouwu 的 allowLowercaseSearch / filterInputTrans 两个开关
+ * 大小写模糊与首尾空格是固定默认
  * 并入这里): 没见过想要"区分大小写的下拉搜索"的需求, 留着开关只是多两条分支.
  */
 export function matchOptionByKeys<OT extends SearchSelectOption>(

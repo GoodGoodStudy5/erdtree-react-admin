@@ -82,8 +82,6 @@ describe('ElementCopy', () => {
         </ElementCopy>
       </StrictMode>,
     );
-
-    // zouwu 版在渲染期就往 body 塞隐藏 textarea 做 execCommand, 重挂载一次就漏一个
     expect(document.querySelectorAll('textarea')).toHaveLength(0);
   });
 });

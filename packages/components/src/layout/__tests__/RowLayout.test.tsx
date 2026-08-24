@@ -147,7 +147,6 @@ describe('RowLayout', () => {
   it('StrictMode 下不改写调用方传进来的 colProps: 冻结对象也照样渲染', () => {
     const colProps = Object.freeze({ colSize: 2 });
 
-    // zouwu 版 delete 掉输入对象上的 colSize, 冻结对象在严格模式下会当场抛
     expect(() =>
       render(
         <StrictMode>
