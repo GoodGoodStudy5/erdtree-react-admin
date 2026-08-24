@@ -7,4 +7,7 @@ export const zhCN: ComponentsLocale = {
     exitMaximized: '退出最大化',
     close: '关闭',
   },
+  SearchSelect: {
+    placeholder: '请选择',
+  },
 };

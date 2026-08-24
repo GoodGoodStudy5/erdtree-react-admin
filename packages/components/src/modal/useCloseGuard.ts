@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { modalStore, useModalId } from './adapter';
 import type { UseCloseGuardFn } from './types';
-import { useEvent } from './useEvent';
+import { useEvent } from '../hooks';
 
 /**
  * 拦截关闭请求, 返回 false 则不关. 典型用途是表单改过之后确认放弃编辑.

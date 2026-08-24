@@ -9,4 +9,7 @@ export const enUS: ComponentsLocale = {
     exitMaximized: 'Exit maximized',
     close: 'Close',
   },
+  SearchSelect: {
+    placeholder: 'Please select',
+  },
 };

@@ -186,4 +186,5 @@ export function addBreadcrumb(
 }
 
 export { Sentry };
+/** Sentry 门面: 初始化与上报都经它, 调用方不直接碰 SDK */
 export default { initSentry, captureException, captureMessage, setUser, clearUser, addBreadcrumb };

@@ -34,4 +34,5 @@ function StaticMessage() {
 
 export { message, notification, modal };
 
+/** 静态调用的挂载点: 渲染它一次, message / notification / modal 三个静态方法才有 antd 上下文 */
 export default StaticMessage;

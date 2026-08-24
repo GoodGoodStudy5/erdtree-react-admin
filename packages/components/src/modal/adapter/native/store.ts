@@ -116,6 +116,7 @@ function push(Comp: ModalComponent, props: Record<string, unknown>) {
   });
 }
 
+/** 弹窗实例表的对外读写口. useSyncExternalStore 要的订阅与快照都在这里 */
 export const modalStore = {
   subscribe,
   getSnapshot,

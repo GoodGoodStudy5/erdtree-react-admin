@@ -324,4 +324,5 @@ class AxiosRequest {
   }
 }
 
+/** axios 实例的封装类. 拦截器、取消与统一错误处理都在它身上 */
 export default AxiosRequest;

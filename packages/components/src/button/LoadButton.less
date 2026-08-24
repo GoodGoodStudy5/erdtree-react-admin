@@ -1,0 +1,27 @@
+.load-button {
+  /* 没显式给 type 时的文字按钮: 让它在表格行里与文本对齐, 不带按钮的框与内边距 */
+  &.ant-btn-link.load-button-link-text {
+    height: auto;
+    padding: 0;
+    font-size: inherit;
+    font-weight: inherit;
+    border: 0;
+  }
+}
+
+/* 确认气泡的双行标题 */
+.load-button-pop-title {
+  display: flex;
+  flex-direction: column;
+
+  .load-button-pop-title-label {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+  }
+
+  .load-button-pop-title-content {
+    font-size: 12px;
+    word-break: break-all;
+  }
+}
