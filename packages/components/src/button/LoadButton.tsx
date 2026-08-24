@@ -24,6 +24,8 @@ export interface LoadButtonProps extends Omit<ButtonProps, 'onClick'> {
    * 异步 onClick 收场时的通知. isCatch 为 true 表示以异常收场, error 是原样的异常对象.
    *
    * 组件不替调用方消化异常: 它只收回 loading, 处理与否由这个回调的实现决定.
+   *
+   * 已知边界: 回调比收回 loading 早一个 React 周期, 回调执行时按钮仍是 loading 态.
    */
   onClickFinally?: (result: { isCatch: boolean; error?: unknown }) => void;
   /** loading 期间替换的按钮文案. 不传则沿用 children; 外部显式传 loading 时同样生效 */

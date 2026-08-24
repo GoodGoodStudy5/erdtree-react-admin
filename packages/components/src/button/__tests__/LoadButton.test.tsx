@@ -40,7 +40,8 @@ describe('LoadButton', () => {
 
     expect(onClick).toHaveBeenCalledOnce();
     await waitFor(() => expect(onClickFinally).toHaveBeenCalledWith({ isCatch: false }));
-    expect(button.className).not.toContain('ant-btn-loading');
+    // 收回 loading 比 onClickFinally 晚一个 React 周期, 回调到了不代表 class 已经摘掉
+    await waitFor(() => expect(button.className).not.toContain('ant-btn-loading'));
   });
 
   it('失败时 onClickFinally 拿到原样的异常, 并留下一行日志', async () => {
@@ -57,7 +58,10 @@ describe('LoadButton', () => {
 
     await waitFor(() => expect(onClickFinally).toHaveBeenCalledWith({ isCatch: true, error }));
     expect(consoleError).toHaveBeenCalledWith(error);
-    expect(screen.getByRole('button').className).not.toContain('ant-btn-loading');
+    // 收回 loading 比 onClickFinally 晚一个 React 周期, 回调到了不代表 class 已经摘掉
+    await waitFor(() =>
+      expect(screen.getByRole('button').className).not.toContain('ant-btn-loading'),
+    );
     consoleError.mockRestore();
   });
 
