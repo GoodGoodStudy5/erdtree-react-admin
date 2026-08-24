@@ -179,12 +179,12 @@ const TEST_ONLY_VIA_FACADE = {
 };
 
 /**
- * 用例与类型测试都住在被测目录的 __test__/ 里: 一个组的用例集中一处, 实现目录只剩实现.
+ * 用例与类型测试都住在被测目录的 __tests__/ 里: 一个组的用例集中一处, 实现目录只剩实现.
  * vitest 的 include 也只收这个位置, 两处同一口径 —— 放错地方的用例不会被"顺便跑掉".
  */
 const TEST_HOME = {
-  '*.test.{ts,tsx}': '**/__test__/',
-  '*.typetest.{ts,tsx}': '**/__test__/',
+  '*.test.{ts,tsx}': '**/__tests__/',
+  '*.typetest.{ts,tsx}': '**/__tests__/',
 };
 
 /**
@@ -375,7 +375,7 @@ export default tseslint.config(
       'src/menus/**/*.ts',
       'packages/*/src/**/*.{ts,tsx}',
     ],
-    ignores: ['packages/*/src/**/__test__/**'],
+    ignores: ['packages/*/src/**/__tests__/**'],
     plugins: { jsdoc },
     rules: {
       'jsdoc/require-jsdoc': [
@@ -495,6 +495,20 @@ export default tseslint.config(
     plugins: { 'check-file': checkFile },
     rules: {
       'check-file/folder-match-with-fex': ['error', TEST_HOME],
+    },
+  },
+  {
+    // 双词目录名写的是组件名, 装不下同品类的第二个实现: load-button 里放不进 DeleteButton.
+    // 品类按能力域划分而不按渲染成什么 —— 复制按钮渲染成 Button 但归 copyable.
+    // 已知边界: FLAT_CASE 只拦分隔符, loadbutton 与品类划错都过得去, 这两条靠评审.
+    // 辖区不含二级, __tests__ 与 adapter/native 这些内部结构不受影响
+    files: ['packages/components/src/**/*.{ts,tsx}'],
+    plugins: { 'check-file': checkFile },
+    rules: {
+      'check-file/folder-naming-convention': [
+        'error',
+        { 'packages/components/src/*/': 'FLAT_CASE' },
+      ],
     },
   },
   {
