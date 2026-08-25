@@ -14,16 +14,22 @@ import {
 interface SortableItemProps {
   item: CheckboxList;
   index: number;
+  /** 该字段的勾选还没确认生效 */
+  isPending?: boolean;
+  pendingColor?: string;
 }
 
 interface DragContentProps {
   list: CheckboxList[];
+  /** 勾选与已生效状态不一致的字段 */
+  pendingValues?: string[];
+  pendingColor?: string;
   handleDragEnd: (list: CheckboxList[]) => void;
 }
 
 // 排序组件
 function SortableItem(props: SortableItemProps) {
-  const { item } = props;
+  const { item, isPending, pendingColor } = props;
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: item.value, // 每个可拖拽对象的唯一标识
   });
@@ -54,7 +60,7 @@ function SortableItem(props: SortableItemProps) {
         <Icon icon="icon-park-outline:drag" />
       </div>
       <Checkbox value={item.value} className="flex-1">
-        {item.label}
+        <span style={isPending ? { color: pendingColor } : undefined}>{item.label}</span>
       </Checkbox>
     </div>
   );
@@ -63,7 +69,7 @@ function SortableItem(props: SortableItemProps) {
 // 拖拽组件
 /** 列筛选面板里的可拖拽行, 拖动即调整列顺序 */
 export function DragContent(props: DragContentProps) {
-  const { list, handleDragEnd } = props;
+  const { list, pendingValues, pendingColor, handleDragEnd } = props;
 
   /** 拖拽结束操作 */
   const onDragEnd = (event: DragEndEvent) => {
@@ -84,7 +90,13 @@ export function DragContent(props: DragContentProps) {
         strategy={verticalListSortingStrategy}
       >
         {list?.map((item, index) => (
-          <SortableItem key={item.value} index={index} item={item} />
+          <SortableItem
+            key={item.value}
+            index={index}
+            item={item}
+            isPending={pendingValues?.includes(item.value)}
+            pendingColor={pendingColor}
+          />
         ))}
       </SortableContext>
     </DndContext>

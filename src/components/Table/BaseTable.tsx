@@ -60,7 +60,8 @@ export function BaseTable(props: Props) {
   const tableRef = useRef<HTMLDivElement>(null);
   const [tableFilters, setTableFilters] = useState<string[]>([]);
   const [sortList, setSortList] = useState<string[]>([]);
-  const [prevColumns, setPrevColumns] = useState(props.columns);
+  // 初值留空: 首次渲染也要走下面那段播种, 否则勾选列表是空的而表格一列都不显示
+  const [prevColumns, setPrevColumns] = useState<Props['columns']>(undefined);
   // 行高取自真实渲染结果, 虚拟滚动需要它换算可视条数
   /* eslint-disable-next-line react-hooks/refs */
   const rows = tableRef.current?.querySelectorAll('.ant-table-row');
@@ -77,14 +78,16 @@ export function BaseTable(props: Props) {
   // 外部换掉列定义时丢弃用户的筛选、排序与列宽调整
   if (prevColumns !== props.columns) {
     const newColumns = filterTableColumns(props.columns as TableColumn[]);
-    const columnKeys = newColumns
+    const checkedKeys = newColumns
       ?.filter((col) => !(col as TableColumn).hidden)
       .map((col) => col.dataIndex)
       .filter(Boolean) as string[];
+    // 顺序必须含隐藏列: useFiler 按 sortList 下标排序, 缺列的 indexOf 得 -1 会把隐藏列甩到最前
+    const sortKeys = newColumns?.map((col) => col.dataIndex).filter(Boolean) as string[];
     setPrevColumns(props.columns);
     setColumns(newColumns);
-    setTableFilters(columnKeys);
-    setSortList(columnKeys);
+    setTableFilters(checkedKeys);
+    setSortList(sortKeys);
   }
 
   // 添加新增缺少方法警告
@@ -142,7 +145,6 @@ export function BaseTable(props: Props) {
       .filter((col) => !(col as TableColumn).hidden)
       .map((col, index) => ({
         ...col,
-        ellipsis: col.ellipsis ?? true,
         // 手机端去除列固定，除非设置了isKeepFixed
         fixed: col?.fixed && !(isPhone && !(col as TableColumn)?.isKeepFixed) ? col.fixed : false,
         onHeaderCell: (column: object, i: number) => ({
@@ -203,10 +205,12 @@ export function BaseTable(props: Props) {
               return <Tag color={color}>{textContent}</Tag>;
             }
 
-            // 超出不省略则换行
-            if (col.ellipsis !== undefined && !col.ellipsis) {
+            // 列宽撞上上限后折行, 不打省略号; 要省略号的列自己声明 ellipsis
+            if (!col.ellipsis) {
               return (
-                <span className="break-all break-words whitespace-pre-wrap">{textContent}</span>
+                <span className="break-all break-words whitespace-pre-wrap" style={{ color }}>
+                  {textContent}
+                </span>
               );
             }
 
@@ -325,6 +329,8 @@ export function BaseTable(props: Props) {
         <Table
           size="small"
           rowKey="id"
+          // 显式声明: 靠 rc-table 推导时, 列宽自适应会取决于页面有没有写 fixed 列
+          tableLayout="auto"
           pagination={false}
           loading={isLoading}
           {...props}

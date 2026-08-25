@@ -22,3 +22,16 @@
 .ant-table-body {
   overflow: auto visible !important;
 }
+
+/* 列宽自适应的边界. 上限归这里, 因为 antd 的列契约只有 minWidth 没有 maxWidth */
+.ant-table {
+  .ant-table-thead > tr > th {
+    /* 表头不换行, 于是表头文字宽成为该列事实上的下限, 不必另给 minWidth */
+    white-space: nowrap;
+  }
+
+  .ant-table-tbody > tr > td {
+    /* 300px 封顶; 页面显式写了 width 的列由 onCell 的行内样式压过这一条 */
+    max-width: 300px;
+  }
+}

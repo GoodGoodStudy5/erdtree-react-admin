@@ -1,4 +1,4 @@
-import { Button, Popover, Divider, Checkbox } from 'antd';
+import { Button, Popover, Divider, Checkbox, theme } from 'antd';
 import type { TableProps, CheckboxProps } from 'antd';
 import { useState, memo } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
@@ -56,6 +56,20 @@ function TableFilter(props: Props) {
   const [checkedList, setCheckedList] = useState<string[]>(
     () => filterColumns(columns).checkedList,
   );
+  // 已生效的勾选与顺序. 暂存与它的差就是待确认的改动 —— 面板据此标色, 也据此决定给不给取消按钮
+  const [applied, setApplied] = useState(() => {
+    const seeded = filterColumns(columns);
+
+    return { checked: seeded.checkedList, list: seeded.list };
+  });
+  const { token } = theme.useToken();
+  const pendingValues = list
+    .map((item) => item.value)
+    .filter((value) => checkedList.includes(value) !== applied.checked.includes(value));
+  // 顺序变了也算待确认, 但标不出色: 顺序是整体的, 落不到单条上
+  const isOrderChanged =
+    list.map((item) => item.value).join() !== applied.list.map((item) => item.value).join();
+  const hasPending = pendingValues.length > 0 || isOrderChanged;
   const checkAll = list.length === checkedList.length;
   const indeterminate = checkedList.length > 0 && checkedList.length < list.length;
   const params: Partial<Props> = { ...props };
@@ -73,22 +87,27 @@ function TableFilter(props: Props) {
    */
   const onChangeCheckbox = (checkedValue: string[]) => {
     setCheckedList(checkedValue);
-    handleFilter(checkedValue);
   };
 
-  /** 处理筛选 */
-  const handleFilter = (checkedList: string[], currentList = list) => {
+  /** 确认. 面板里的勾选与拖拽只改暂存, 这里是唯一的生效出口 */
+  const handleConfirm = () => {
     getTableChecks(
       checkedList,
-      currentList.map((item) => item.value),
+      list.map((item) => item.value),
     );
+    setApplied({ checked: checkedList, list });
+    setOpen(false);
+  };
+
+  /** 取消. 暂存回到已生效状态, 待确认的勾选与顺序一并丢弃 */
+  const handleCancel = () => {
+    setCheckedList(applied.checked);
+    setList(applied.list);
   };
 
   /** 全选 */
   const onCheckAllChange: CheckboxProps['onChange'] = (e) => {
-    const checkedList = e.target.checked ? list.map((item) => item.value) : [];
-    setCheckedList(checkedList);
-    handleFilter(checkedList);
+    setCheckedList(e.target.checked ? list.map((item) => item.value) : []);
   };
 
   /** 重置列表 */
@@ -108,16 +127,11 @@ function TableFilter(props: Props) {
 
     setCheckedList(allCheckedList);
     setList(newList);
-    handleFilter(allCheckedList, newList);
   };
 
   /** 处理拖拽结束 */
   const handleDragEnd = (list: CheckboxList[]) => {
     setList(list);
-    getTableChecks(
-      checkedList,
-      list.map((item) => item.value),
-    );
   };
 
   // 渲染内容
@@ -137,19 +151,35 @@ function TableFilter(props: Props) {
 
         <Divider className="!my-5px" />
 
+        {/* 列多时条目会顶穿视口, 因此只让条目区滚动, 全选与重置留在滚动区外 */}
         <Checkbox.Group
-          className="flex flex-col !px-5px !pb-5px relative"
+          className="flex flex-col !px-5px !pb-5px relative max-h-50vh overflow-y-auto"
           value={checkedList}
           onChange={onChangeCheckbox}
         >
-          <DragContent list={list} handleDragEnd={handleDragEnd} />
+          <DragContent
+            list={list}
+            pendingValues={pendingValues}
+            pendingColor={token.colorWarning}
+            handleDragEnd={handleDragEnd}
+          />
         </Checkbox.Group>
 
         <Divider className="!mt-10px !mb-5px" />
 
-        <Button className="flex-1 text-center" type="link" size="small" onClick={handleReset}>
-          {$t('public.reset')}
-        </Button>
+        <div className="flex items-center gap-4px px-5px">
+          <Button className="flex-1" type="link" size="small" onClick={handleReset}>
+            {$t('public.reset')}
+          </Button>
+          {hasPending && (
+            <Button className="flex-1" size="small" onClick={handleCancel}>
+              {$t('public.cancel')}
+            </Button>
+          )}
+          <Button className="flex-1" type="primary" size="small" onClick={handleConfirm}>
+            {$t('public.confirm')}
+          </Button>
+        </div>
       </div>
     );
   };
