@@ -17,7 +17,7 @@
     "build:dev": "pnpm typecheck && vite build --mode dev",
     "build:test": "pnpm typecheck && vite build --mode test",
     "check": "lint-staged",
-    "check:full": "pnpm lint && pnpm lint:stylelint && pnpm typecheck && depcruise src packages --config .dependency-cruiser.mjs --output-type err-long && pnpm test",
+    "check:full": "pnpm lint && pnpm lint:stylelint && pnpm typecheck && depcruise src packages --config .dependency-cruiser.mjs --output-type err-long && pnpm test && sh scripts/check-stamp.sh save",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

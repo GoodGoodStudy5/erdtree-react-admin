@@ -15,4 +15,6 @@
 | `pnpm check` | 只扫已暂存的文件 | eslint、stylelint、prettier，自动修复 | pre-commit |
 | `pnpm check:full` | 全量 | 上面全部 + 类型检查 + 目录边界与循环依赖 + 组件库用例 | pre-push |
 
+`check:full` 跑通后把当前提交记进 `.git/check-full.stamps`, pre-push 命中就跳过全量校验. 记账与命中都要求工作区干净 —— 带未提交改动跑出的结论不属于任何一个提交, 记了也没法复用. 代价认下: 手上留着未提交改动时, 每次 push 都全量重跑.
+
 改规则去改配置，不用回来改这份文档。

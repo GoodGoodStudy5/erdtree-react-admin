@@ -1,1 +1,6 @@
+if sh scripts/check-stamp.sh verify; then
+  echo "check:full 已在当前提交跑过且工作区未变, 跳过."
+  exit 0
+fi
+
 pnpm check:full
