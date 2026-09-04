@@ -1,4 +1,5 @@
 import { TOKEN } from './config';
+import { attachTimeZone } from './timezone';
 import { creteRequest } from '@south/request';
 import { router } from '@/router';
 
@@ -16,6 +17,8 @@ export const request = creteRequest(baseURL, TOKEN, {
     router.navigate(`/login${redirect}`);
   },
 });
+
+request.instance.interceptors.request.use(attachTimeZone);
 
 // 创建多个请求
 // export const newRequest = creteRequest('/test', TOKEN);
