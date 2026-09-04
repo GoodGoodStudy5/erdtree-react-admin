@@ -147,7 +147,8 @@ export function BaseModal(props: BaseModalProps) {
     <Modal
       destroyOnHidden
       closable={false}
-      maskClosable={false}
+      keyboard={false}
+      mask={{ closable: false }}
       modalRender={!isPhone ? modalRender : undefined}
       {...props}
       className={`base-modal ${props.className}`}

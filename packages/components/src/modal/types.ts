@@ -119,6 +119,9 @@ export type CreateModalSetFn = <T extends Record<string, ModalComponent>>(
 /** 取当前弹窗实例 id 的签名. null 表示组件不是被 openModal 调起的 */
 export type UseModalIdFn = () => number | null;
 
+/** 订阅某个实例显示态的签名. 不是被 openModal 调起时恒为显示 */
+export type UseModalVisibleFn = (id: number | null) => boolean;
+
 /** 关闭拦截的签名. 返回 false 则不关 */
 export type UseCloseGuardFn = (guard: (reason: CloseReason) => boolean | Promise<boolean>) => void;
 

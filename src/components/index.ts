@@ -6,6 +6,8 @@ export * from './Content';
 export * from './Copy';
 export * from './Count';
 export * from './Dates';
+export * from './Descriptions';
+export * from './Drawer';
 export * from './Ellipsis';
 export * from './Forbidden';
 export * from './Form';

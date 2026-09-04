@@ -1,4 +1,5 @@
 import { createContext, useContext, useSyncExternalStore } from 'react';
+import type { ModalInstance } from './store';
 import { modalStore } from './store';
 
 /**
@@ -23,4 +24,29 @@ export function useModalId(): number | null {
 export function useModalVisible(id: number | null): boolean {
   const getSnapshot = () => (id === null ? true : modalStore.isVisible(id));
   return useSyncExternalStore(modalStore.subscribe, getSnapshot, getSnapshot);
+}
+
+/**
+ * 订阅当前全部弹窗实例, 按调起顺序. 只读 —— push / settle / discardAll 不外开,
+ * 开合只有 openModal 与 requestCloseModal 两个口.
+ */
+export function useModalInstances(): readonly ModalInstance[] {
+  return useSyncExternalStore(modalStore.subscribe, modalStore.getSnapshot, modalStore.getSnapshot);
+}
+
+/**
+ * 同步读此刻的实例表. 给 effect 里要「此刻」而非「渲染时那一份」的调用方 ——
+ * 同一拍里刚 openModal 出来的实例, 渲染时的快照还看不见.
+ */
+export function getModalInstances(): readonly ModalInstance[] {
+  return modalStore.getSnapshot();
+}
+
+/**
+ * 代调用方请求关闭某个实例, 等同用户点关闭 —— 过 useCloseGuard, 提交中拒绝.
+ * 调用方收到 undefined, 与用户主动关窗不可区分.
+ * @param id - 实例 id, 从 useModalId 取
+ */
+export function requestCloseModal(id: number): void {
+  void modalStore.requestClose(id);
 }

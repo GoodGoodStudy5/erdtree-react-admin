@@ -1,11 +1,12 @@
 import type { BaseFormData } from '#/form';
 import type { PagePermission } from '#/public';
-import { Button, Drawer, Form, message, Spin } from 'antd';
+import { Button, Form, message, Spin } from 'antd';
 import type { FormInstance } from 'antd';
 import { useMemo, useCallback } from 'react';
 import { useEffectOnActive } from 'keepalive-for-react';
 import { searchList, createList, tableColumns } from './model';
 import { getRolePage, getRoleById, createRole, updateRole, deleteRole } from '@/servers';
+import { BaseDrawer } from '@/components';
 import { $t } from '@/locales';
 
 // 当前行数据
@@ -204,11 +205,7 @@ function RolePage() {
             <UpdateBtn onClick={() => onUpdate((record as RowData).id)} />
           )}
           {pagePermission.create === true && (
-            <Button
-              type="primary"
-              className="small-btn"
-              onClick={() => onCopy((record as RowData).id)}
-            >
+            <Button type="primary" onClick={() => onCopy((record as RowData).id)}>
               {$t('public.copy')}
             </Button>
           )}
@@ -265,7 +262,7 @@ function RolePage() {
         />
       </BaseCard>
 
-      <Drawer
+      <BaseDrawer
         width={600}
         title={createTitle}
         maskClosable={false}
@@ -291,7 +288,7 @@ function RolePage() {
             handleFinish={handleCreate}
           />
         </Spin>
-      </Drawer>
+      </BaseDrawer>
     </BaseContent>
   );
 }

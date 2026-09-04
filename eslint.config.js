@@ -74,6 +74,7 @@ const API_ACTIONS = [
   'Import',
   // 命令型
   'Login',
+  'Logout',
   'PasswordUpdate',
   'PasswordReset',
   'PermissionRefresh',
@@ -188,6 +189,20 @@ const NO_USE_TRANSLATION = {
   message: '国际化直接 import { $t } from "@/locales", 语言订阅只在 AppRouter 一处',
 };
 
+/** 拖拽调宽与关窗重置只实现在公共封装一处 */
+const NO_ANTD_DRAWER = {
+  name: 'antd',
+  importNames: ['Drawer'],
+  message: '侧抽屉用 @/components 的 BaseDrawer: 直接用 antd Drawer 会绕开拖拽调宽与关窗重置',
+};
+
+/** 详情字段块的疏密与列数只在一处定 */
+const NO_ANTD_DESCRIPTIONS = {
+  name: 'antd',
+  importNames: ['Descriptions'],
+  message: '详情字段块用 @/components 的 BaseDescriptions: 描边、三列、紧凑三项默认只在那里定',
+};
+
 /**
  * src 全域的导入红线. 公共封装自己要包 antd 原件, 传入自己那一条免掉.
  * @param except - 免掉的那一条
@@ -195,9 +210,13 @@ const NO_USE_TRANSLATION = {
 const srcRestrictedImports = (except) => [
   'error',
   {
-    paths: [NO_MODAL_OUTLET, NO_USE_TRANSLATION, NO_PROTOTYPE_SLOT].filter(
-      (one) => one !== except,
-    ),
+    paths: [
+      NO_MODAL_OUTLET,
+      NO_USE_TRANSLATION,
+      NO_PROTOTYPE_SLOT,
+      NO_ANTD_DRAWER,
+      NO_ANTD_DESCRIPTIONS,
+    ].filter((one) => one !== except),
     patterns: [NO_PROTOTYPE_IMPORT],
   },
 ];
@@ -209,6 +228,13 @@ const srcRestrictedImports = (except) => [
 const NO_USE_NAVIGATE = {
   selector: 'CallExpression[callee.name="useNavigate"]',
   message: '页面跳转 import { router } from "@/router" 调 router.navigate, 组件内外同一个入口',
+};
+
+/** 抽屉名整段进 URL, 要编码的字符会让分享出去的链接读不出开的是哪个抽屉 */
+const NO_UNSAFE_DRAWER_NAME = {
+  selector:
+    "CallExpression[callee.name='useDrawerRoutes'] > ObjectExpression > Property > Literal[value=/[^a-zA-Z0-9_-]/]",
+  message: '抽屉名只用字母、数字、- 与 _',
 };
 
 /** 页面本体不再自己管弹窗开关 */
@@ -507,6 +533,7 @@ export default tseslint.config(
         ...NO_MODAL_PROPS_ON_OTHER_CARRIER,
         NO_IMPERATIVE_HANDLE,
         NO_SHELL_IN_PAGE,
+        NO_UNSAFE_DRAWER_NAME,
         NO_USE_NAVIGATE,
       ],
     },
@@ -514,17 +541,38 @@ export default tseslint.config(
   {
     // 挂载点只此一处, 其余地方拿不到也不该拿
     files: ['src/**/*.{ts,tsx}'],
-    ignores: ['src/router/**'],
+    ignores: ['src/router/**', 'src/components/Drawer/**', 'src/components/Descriptions/**'],
     rules: {
       'no-restricted-imports': srcRestrictedImports(),
     },
   },
   {
-    // 语言订阅只此一处; 挂载点在本目录内合法, 故只重列语言这一条
+    // 语言订阅只此一处; 挂载点在本目录内合法, 故只重列其余几条
     files: ['src/router/**/*.{ts,tsx}'],
     ignores: ['src/router/AppRouter.tsx'],
     rules: {
-      'no-restricted-imports': ['error', { paths: [NO_USE_TRANSLATION] }],
+      'no-restricted-imports': [
+        'error',
+        { paths: [NO_USE_TRANSLATION, NO_ANTD_DRAWER, NO_ANTD_DESCRIPTIONS] },
+      ],
+    },
+  },
+  {
+    // 公共封装自己要包 antd 原件, 各自只免掉自己那一条
+    files: ['src/components/Drawer/**/*.{ts,tsx}'],
+    rules: { 'no-restricted-imports': srcRestrictedImports(NO_ANTD_DRAWER) },
+  },
+  {
+    files: ['src/components/Descriptions/**/*.{ts,tsx}'],
+    rules: { 'no-restricted-imports': srcRestrictedImports(NO_ANTD_DESCRIPTIONS) },
+  },
+  {
+    // 「挂载点只此一处」防的是产物, 而用例不进产物 —— 要覆盖 openModal 那条路径就得挂一个.
+    // 导航门面同理: 用例自己建 MemoryRouter, 门面持有的是另一个 router 实例, 调它跳不动这一个
+    files: ['src/**/__tests__/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': srcRestrictedImports(NO_MODAL_OUTLET),
+      'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER],
     },
   },
   {

@@ -21,6 +21,7 @@ import type {
   UseCloseGuardFn,
   UseModalIdFn,
   UseModalShellFn,
+  UseModalVisibleFn,
 } from '../types';
 
 /** 断言实参可赋给 T. 类型不符则编译期报错 */
@@ -29,7 +30,7 @@ declare function expectType<T>(value: T): void;
 // 用真实现而非占位声明, 否则实现与契约仍可能各走各的
 import { BaseModal } from '../BaseModal';
 import { ModalShell } from '../ModalShell';
-import { createModalSet, openModal, useModalId } from '../adapter';
+import { createModalSet, openModal, useModalId, useModalVisible } from '../adapter';
 import { useCloseGuard } from '../useCloseGuard';
 import { useModalForm } from '../useModalForm';
 import { useModalShell } from '../useModalShell';
@@ -38,6 +39,7 @@ import { useModalShell } from '../useModalShell';
 const _openModal = openModal satisfies OpenFn;
 const _createModalSet = createModalSet satisfies CreateModalSetFn;
 const _useModalId = useModalId satisfies UseModalIdFn;
+const _useModalVisible = useModalVisible satisfies UseModalVisibleFn;
 const _useCloseGuard = useCloseGuard satisfies UseCloseGuardFn;
 const _useModalShell = useModalShell satisfies UseModalShellFn;
 const _ModalShell = ModalShell satisfies ModalShellFn;
@@ -46,6 +48,7 @@ void [
   _openModal,
   _createModalSet,
   _useModalId,
+  _useModalVisible,
   _useCloseGuard,
   _useModalShell,
   _ModalShell,
@@ -219,6 +222,28 @@ function ModalViaDrawerBad(props: { id?: string } & ModalControl<User>) {
   return <Drawer open onCancel={close} title="侧滑编辑" />;
 }
 
+/**
+ * 只读抽屉不建外壳, 两行接底座: 显隐订阅实例状态, 关闭直接交回 cancel.
+ *
+ * 上面那条正例里 open 是写死的字面量, 而真实接线长这样.
+ */
+function ModalReadOnlyDrawer(props: { id: string } & ModalControl<void>) {
+  const visible = useModalVisible(useModalId());
+  return <Drawer open={visible} onClose={props.cancel} title="详情" />;
+}
+
+/** 交付 void 的弹窗: resolve 不收实参 */
+function ModalVoidResult(props: ModalControl<void>) {
+  props.resolve();
+  return null;
+}
+
+function ModalVoidResultBad(props: ModalControl<void>) {
+  // @ts-expect-error 交付 void 的弹窗不接受实参
+  props.resolve(1);
+  return null;
+}
+
 function ModalViaPlainModal(props: { id?: string } & ModalControl<User>) {
   const shell = useModalShell(props, { onOk: () => createUser(props.id) });
   return <Modal {...shell.modalProps} title="裸 Modal" />;
@@ -301,6 +326,9 @@ export {
   ModalViaHookWithOnError,
   ModalViaDrawer,
   ModalViaDrawerBad,
+  ModalReadOnlyDrawer,
+  ModalVoidResult,
+  ModalVoidResultBad,
   ModalViaPlainModal,
   ModalUserForm,
   ModalUserFormSubmitOnEnter,
