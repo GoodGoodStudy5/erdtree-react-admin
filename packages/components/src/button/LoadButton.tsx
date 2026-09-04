@@ -2,7 +2,7 @@ import type { MouseEvent, ReactNode } from 'react';
 import type { ButtonProps, PopconfirmProps } from 'antd';
 import { useState } from 'react';
 import { Button, Popconfirm } from 'antd';
-import { Icon } from '@iconify/react';
+import { QuestionCircleFilled } from '@ant-design/icons';
 import { propsMerge } from '../utils';
 import './LoadButton.less';
 
@@ -135,7 +135,7 @@ export function LoadButton(props: LoadButtonProps) {
   const { content, ...restConfirmProps } = popconfirmProps;
   const confirmProps = propsMerge(
     {
-      icon: <Icon icon="ant-design:question-circle-filled" />,
+      icon: <QuestionCircleFilled />,
       placement: 'topRight',
       disabled: restProps.disabled,
       open: isConfirmOpen,

@@ -4,7 +4,7 @@ import type { ItemType, MenuItemType } from 'antd/es/menu/interface';
 import { useCallback, useMemo, memo } from 'react';
 import { Menu } from 'antd';
 import { isUrl, setTitle } from '@/utils';
-import { Icon } from '@iconify/react';
+import { Icon } from '@/components';
 import { useCommonStore, useNavigateProgress } from '@/hooks';
 import { useLocation } from 'react-router-dom';
 import { useMenuStore, getTabTitle } from '@/stores';

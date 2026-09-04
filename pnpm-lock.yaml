@@ -23,33 +23,6 @@ importers:
       '@dnd-kit/utilities':
         specifier: ^3.2.2
         version: 3.2.2(react@19.2.8)
-      '@iconify-json/ant-design':
-        specifier: ^1.2.8
-        version: 1.2.8
-      '@iconify-json/cil':
-        specifier: ^1.2.3
-        version: 1.2.3
-      '@iconify-json/gg':
-        specifier: ^1.2.2
-        version: 1.2.2
-      '@iconify-json/gridicons':
-        specifier: ^1.2.5
-        version: 1.2.5
-      '@iconify-json/icon-park':
-        specifier: ^1.2.4
-        version: 1.2.4
-      '@iconify-json/icon-park-outline':
-        specifier: ^1.2.4
-        version: 1.2.4
-      '@iconify-json/ion':
-        specifier: ^1.2.7
-        version: 1.2.7
-      '@iconify-json/mdi':
-        specifier: ^1.2.3
-        version: 1.2.3
-      '@iconify-json/uil':
-        specifier: ^1.2.3
-        version: 1.2.3
       '@south/components':
         specifier: workspace:^
         version: link:packages/components
@@ -138,9 +111,33 @@ importers:
       '@eslint/js':
         specifier: ^9.39.5
         version: 9.39.5
-      '@iconify/react':
-        specifier: ^6.0.2
-        version: 6.0.2(react@19.2.8)
+      '@iconify-json/ant-design':
+        specifier: ^1.2.8
+        version: 1.2.8
+      '@iconify-json/cil':
+        specifier: ^1.2.3
+        version: 1.2.3
+      '@iconify-json/gg':
+        specifier: ^1.2.2
+        version: 1.2.2
+      '@iconify-json/gridicons':
+        specifier: ^1.2.5
+        version: 1.2.5
+      '@iconify-json/icon-park':
+        specifier: ^1.2.4
+        version: 1.2.4
+      '@iconify-json/icon-park-outline':
+        specifier: ^1.2.4
+        version: 1.2.4
+      '@iconify-json/la':
+        specifier: ^1.2.1
+        version: 1.2.1
+      '@iconify-json/mdi':
+        specifier: ^1.2.3
+        version: 1.2.3
+      '@iconify-json/uil':
+        specifier: ^1.2.3
+        version: 1.2.3
       '@sentry/react':
         specifier: ^10.38.0
         version: 10.70.0(react@19.2.8)
@@ -1347,19 +1344,14 @@ packages:
   '@iconify-json/icon-park@1.2.4':
     resolution: {integrity: sha512-S8fVl49LG/M9hvwb7ruFGInK21AHMv3IJehOJRJgXPLE39OOCP3wbfTWjro/XzsjxRwdvX/lYdGetFOZI0TaJQ==}
 
-  '@iconify-json/ion@1.2.7':
-    resolution: {integrity: sha512-ZJNG5kLCbTPr68mdP0jx6Q3lB9AMEQKO2+VvIjuJ2llGFICBLD+cvESn/qGDRIqSfk2D3PrFMf/Qg8WKIUV7cg==}
+  '@iconify-json/la@1.2.1':
+    resolution: {integrity: sha512-7VUpZ+E7PfBpCXmAzLEGRR0LqCyFQRJiJTriO/vIZtQ1BLJ4xiDlIQ8gCCQvyTnKPG4IrvencwAxXpJGhk4pYg==}
 
   '@iconify-json/mdi@1.2.3':
     resolution: {integrity: sha512-O3cLwbDOK7NNDf2ihaQOH5F9JglnulNDFV7WprU2dSoZu3h3cWH//h74uQAB87brHmvFVxIOkuBX2sZSzYhScg==}
 
   '@iconify-json/uil@1.2.3':
     resolution: {integrity: sha512-if91+UBhDQc6glPsIaXecGIcXnbQZfEO4Gdv89TV2xQ+V5e9GWbY5rNl2fsKZd8COsRQ5lRQAKimVQVL0CZZVg==}
-
-  '@iconify/react@6.0.2':
-    resolution: {integrity: sha512-SMmC2sactfpJD427WJEDN6PMyznTFMhByK9yLW0gOTtnjzzbsi/Ke/XqsumsavFPwNiXs8jSiYeZTmLCLwO+Fg==}
-    peerDependencies:
-      react: '>=16'
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -6357,7 +6349,7 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
 
-  '@iconify-json/ion@1.2.7':
+  '@iconify-json/la@1.2.1':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -6368,11 +6360,6 @@ snapshots:
   '@iconify-json/uil@1.2.3':
     dependencies:
       '@iconify/types': 2.0.0
-
-  '@iconify/react@6.0.2(react@19.2.8)':
-    dependencies:
-      '@iconify/types': 2.0.0
-      react: 19.2.8
 
   '@iconify/types@2.0.0': {}
 

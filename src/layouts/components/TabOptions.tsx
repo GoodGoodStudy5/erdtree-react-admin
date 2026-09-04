@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Dropdown } from 'antd';
-import { Icon } from '@iconify/react';
+import { Icon } from '@/components';
 import { useDropdownMenu } from '../hooks/useDropdownMenu';
 
 interface Props {

@@ -1,7 +1,7 @@
 import type { SearchModalProps } from './components/SearchModal';
 import { useRef } from 'react';
 import { Tooltip } from 'antd';
-import { Icon } from '@iconify/react';
+import { Icon } from '../Icon';
 import { SearchModal } from './components/SearchModal';
 import { $t } from '@/locales';
 
@@ -21,7 +21,7 @@ export function GlobalSearch() {
       <Tooltip title={$t('public.search')}>
         <Icon
           className="flex items-center justify-center text-lg mr-3 cursor-pointer"
-          icon="uil-search"
+          icon="uil:search"
           onClick={toggle}
         />
       </Tooltip>

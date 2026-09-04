@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd';
-import { Icon } from '@iconify/react';
+import { Icon } from '../Icon';
 import { useFullscreen } from '@/hooks';
 import { $t } from '@/locales';
 
@@ -16,10 +16,10 @@ export function Fullscreen() {
         onClick={toggleFullscreen}
       >
         <Icon
-          icon="gridicons-fullscreen-exit"
+          icon="gridicons:fullscreen-exit"
           style={{ display: isFullscreen ? 'block' : 'none' }}
         />
-        <Icon icon="gridicons-fullscreen" style={{ display: !isFullscreen ? 'block' : 'none' }} />
+        <Icon icon="gridicons:fullscreen" style={{ display: !isFullscreen ? 'block' : 'none' }} />
       </div>
     </Tooltip>
   );

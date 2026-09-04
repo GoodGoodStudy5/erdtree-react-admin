@@ -12,6 +12,7 @@ export * from './Form';
 export * from './Fullscreen';
 export * from './GlobalSearch';
 export * from './I18n';
+export * from './Icon';
 export * from './Pagination';
 export * from './PasswordStrength';
 export * from './Search';

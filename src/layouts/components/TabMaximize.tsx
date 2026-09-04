@@ -1,4 +1,4 @@
-import { Icon } from '@iconify/react';
+import { Icon } from '@/components';
 import { useCommonStore } from '@/hooks';
 import { useTabsStore } from '@/stores';
 

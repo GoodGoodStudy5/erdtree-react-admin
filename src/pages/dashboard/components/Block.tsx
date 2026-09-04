@@ -1,6 +1,5 @@
 import { Row, Col } from 'antd';
-import { Icon } from '@iconify/react';
-import { Count } from '@/components';
+import { Count, Icon } from '@/components';
 import { $t } from '@/locales';
 
 function Block() {

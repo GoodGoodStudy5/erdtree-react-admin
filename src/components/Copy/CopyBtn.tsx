@@ -1,6 +1,6 @@
 import type { ButtonProps } from 'antd';
 import { Button, message } from 'antd';
-import { Icon } from '@iconify/react';
+import { Icon } from '../Icon';
 import { useClipboard } from '@/hooks';
 import { $t } from '@/locales';
 

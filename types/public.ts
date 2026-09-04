@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { TableProps } from 'antd';
 import type { ColumnType } from 'antd/es/table';
 import type { ItemType } from 'antd/es/menu/interface';
+import type { MenuIcon } from '@/menus';
 
 // 数组
 export type ArrayData = string[] | number[] | boolean[];
@@ -27,7 +28,7 @@ export interface SideMenu extends Omit<ItemType, 'children' | 'label' | 'icon'> 
   labelZh?: string;
   labelEn: string;
   key: string;
-  icon?: React.ReactNode | string;
+  icon?: React.ReactElement | MenuIcon;
   rule?: string; // 路由权限
   nav?: string[]; // 面包屑路径
   children?: SideMenu[];

@@ -1,5 +1,5 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Icon } from '@iconify/react';
+import { Icon } from '@/components';
 import { Input, Tooltip } from 'antd';
 import type { InputProps } from 'antd';
 import { $t } from '@/locales';

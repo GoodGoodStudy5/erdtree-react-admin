@@ -3,7 +3,7 @@ import type { ModalProps } from 'antd';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 import { useRef, useState } from 'react';
 import { Modal, Spin, Tooltip } from 'antd';
-import { Icon } from '@iconify/react';
+import { CloseOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
 import Draggable from 'react-draggable';
 import { useLocale } from '../locale';
 import type { ModalLocale } from '../locale';
@@ -101,19 +101,16 @@ export function BaseModal(props: BaseModalProps) {
         title={!isFullscreen ? text.maximize : text.exitMaximized}
       >
         <div className="p-10px mt-3px cursor-pointer" onClick={onFullscreen}>
-          <Icon
-            className="text-lg"
-            icon={
-              !isFullscreen
-                ? 'ant-design:fullscreen-outlined'
-                : 'ant-design:fullscreen-exit-outlined'
-            }
-          />
+          {!isFullscreen ? (
+            <FullscreenOutlined className="text-lg" />
+          ) : (
+            <FullscreenExitOutlined className="text-lg" />
+          )}
         </div>
       </Tooltip>
       <Tooltip placement="bottom" title={text.close}>
         <div className="p-10px mt-3px cursor-pointer" onClick={handleCancel}>
-          <Icon className="text-lg" icon="ant-design:close-outlined" />
+          <CloseOutlined className="text-lg" />
         </div>
       </Tooltip>
     </div>

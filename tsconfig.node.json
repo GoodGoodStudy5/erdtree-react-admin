@@ -1,8 +1,12 @@
 {
   "compilerOptions": {
     "composite": true,
+    "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "strict": true,
+    // 构建脚本的依赖里有按更早 target 写的 .d.ts, 不跳过就把第三方的毛病记进本仓库的类型账
+    "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
     "declaration": true,
@@ -10,5 +14,12 @@
     "outDir": "node_modules/.tmp/tsconfig.node",
     "tsBuildInfoFile": "node_modules/.tmp/tsconfig.node.tsbuildinfo"
   },
-  "include": ["vite.config.ts", "build/**/*.ts"]
+  // uno 配置从 src 借菜单图标名单与类名函数, 两份都是无依赖的纯模块, 列进来给 -b 认.
+  // 根项目经 references 读这里产出的 d.ts 认它们, 所以 typecheck 脚本先跑本项目的 -b
+  "include": [
+    "vite.config.ts",
+    "build/**/*.ts",
+    "src/menus/icons.ts",
+    "src/components/Icon/iconClass.ts"
+  ]
 }

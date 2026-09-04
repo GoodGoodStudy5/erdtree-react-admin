@@ -1,6 +1,6 @@
 import type { SideMenu } from '#/public';
 import { Fragment } from 'react';
-import { Icon } from '@iconify/react';
+import { Icon } from '../../Icon';
 import { useCommonStore, useNavigateProgress } from '@/hooks';
 import { getMenuByKey, getOpenMenuByRouter } from '@/menus';
 import { useMenuStore, useTabsStore } from '@/stores';

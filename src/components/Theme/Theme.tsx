@@ -1,7 +1,7 @@
 import type { ThemeType } from '@/stores';
 import { usePublicStore } from '@/stores';
 import { Tooltip } from 'antd';
-import { Icon } from '@iconify/react';
+import { Icon } from '../Icon';
 import type { MouseEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { THEME_KEY } from '@/utils';
@@ -83,13 +83,13 @@ export function Theme() {
           style={{ display: theme === 'light' ? 'block' : 'none' }}
           onClick={(e) => onChange(e, 'dark')}
         >
-          <Icon icon="mdi-white-balance-sunny" />
+          <Icon icon="mdi:white-balance-sunny" />
         </div>
         <div
           style={{ display: theme !== 'light' ? 'block' : 'none' }}
           onClick={(e) => onChange(e, 'light')}
         >
-          <Icon icon="mdi-moon-waning-crescent" />
+          <Icon icon="mdi:moon-waning-crescent" />
         </div>
       </div>
     </Tooltip>

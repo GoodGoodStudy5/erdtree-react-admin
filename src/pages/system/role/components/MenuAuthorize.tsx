@@ -2,7 +2,7 @@ import type { PermissionData } from '@/servers';
 import { Checkbox, Spin } from 'antd';
 import { useState, useCallback } from 'react';
 import type { Key } from 'react';
-import { Icon } from '@iconify/react';
+import { Icon } from '@/components';
 import { CaretDownOutlined, CaretRightOutlined } from '@ant-design/icons';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 

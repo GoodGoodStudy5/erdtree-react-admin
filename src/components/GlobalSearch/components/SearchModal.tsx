@@ -4,7 +4,7 @@ import type { Ref } from 'react';
 import { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import { debounce } from 'lodash';
 import { Modal, Input } from 'antd';
-import { Icon } from '@iconify/react';
+import { Icon } from '../../Icon';
 import { useKeyStroke, useCommonStore, useNavigateProgress } from '@/hooks';
 import { getMenuByKey, getOpenMenuByRouter, searchMenuValue } from '@/menus';
 import { useMenuStore, useTabsStore } from '@/stores';

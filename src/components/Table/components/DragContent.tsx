@@ -2,7 +2,7 @@ import type { CheckboxList } from './TableFilter';
 import { DndContext } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { Icon } from '@iconify/react';
+import { Icon } from '../../Icon';
 import { Checkbox } from 'antd';
 import {
   SortableContext,

@@ -41,9 +41,6 @@ export function splitJSModules(id: string) {
   const pnpmName = id.includes('.pnpm') ? '.pnpm/' : '';
   const dir = id.split(`node_modules/${pnpmName}`)[1]?.split('/')[0] ?? '';
 
-  // 图标数据集保持逐个分: 它们由 utils/icons 异步注册, 合成一包等于一次要下 9.2MB
-  if (dir.startsWith('@iconify-json')) return dir;
-
   // 首屏必经的三堆: 框架 / 组件库 / 其余小包
   if (/^(react|react-dom|react-router|react-router-dom|scheduler)@/.test(dir))
     return 'vendor-react';

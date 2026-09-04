@@ -1,6 +1,6 @@
 import { MENU_ACTIONS, MENU_STATUS, MENU_TYPES } from '@/utils';
 import { getMenuList } from '@/servers';
-import { Icon } from '@iconify/react';
+import { Icon } from '@/components';
 import { IconInput, StateSwitch } from './components';
 import { $t } from '@/locales';
 

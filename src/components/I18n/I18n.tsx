@@ -1,6 +1,6 @@
 import type { MenuProps } from 'antd';
 import { Dropdown } from 'antd';
-import { Icon } from '@iconify/react';
+import { Icon } from '../Icon';
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { LANG, setTitle } from '@/utils';

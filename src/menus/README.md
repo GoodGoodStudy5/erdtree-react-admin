@@ -30,7 +30,7 @@ const menuList = defaultMenus;
 ```
 
 ### 菜单icon：
-参考 [iconify官方地址](https://icon-sets.iconify.design/)
+写 iconify 记法 `集合:名字`, 且必须先登记进 `src/menus/icons.ts` 的 `MENU_ICONS`, 名单外的名字不进产物. 集合对应的 `@iconify-json/<集合>` 要装成 devDependency. 挑图标看 [iconify 图标库](https://icon-sets.iconify.design/)
 
 ### 外链菜单：
 将key设为一个url地址，前缀为`http`或`https`，则视为外链菜单，点击后直接跳转。

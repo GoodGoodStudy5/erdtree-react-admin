@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd';
-import { Icon } from '@iconify/react';
+import { Icon } from '@/components';
 import { $t } from '@/locales';
 
 interface Props {
