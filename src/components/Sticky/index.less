@@ -1,0 +1,52 @@
+/**
+ * 吸附: 写 `data-sticky="top"` 的元素吸在基准边下, 写 `data-sticky="bottom"` 的贴在基准边上.
+ *
+ * 页面只写标记. 退让距离 (--sticky-offset) 与层级序 (--sticky-order) 由 mountStickyStack 按栈里的实际
+ * 成员写进来, 不由调用方申报.
+ *
+ * 基准边由装栈的那棵子树给: `--sticky-top` 是标签栏底, `--sticky-bottom` 是视口底.
+ */
+
+/**
+ * 属性选择器写两遍是为了多一级特异性: 成员自带的定位与层级也常写在单个类上 —— 搜索栏的
+ * `.query-bar` 就带着 `position: relative` 与 `z-index`, 与它同级时谁生效要看样式打包的先后.
+ */
+[data-sticky][data-sticky] {
+  /**
+   * 栈内靠前的压在靠后的之上, 于是后一员补的底色被前一员挡住.
+   *
+   * 基数小是有意的: 补的底色向栈外画, 首员那一份会画到标签栏所在的位置上去, 要让标签栏
+   * (`#header`, z-index 50) 压得住它.
+   */
+  z-index: calc(5 + var(--sticky-order, 0));
+
+  /* 贴住之后身后是滚动中的内容, 不给底色就透出来 */
+  background-color: var(--sticky-bg, var(--bg-container));
+}
+
+/**
+ * 成员之间的空隙也要有底色, 否则滚动中的内容从两张卡片之间那 10px 缝里穿过去.
+ *
+ * 补的高度是个够用的常量, 不去量真实空隙: 量它就要知道成员在文档流里的坐标, 而贴住的成员报回来的
+ * 坐标不可靠. 画多了不要紧 —— 多出的那截被栈里前一员或标签栏压住.
+ */
+@sticky-bleed: 24px;
+
+[data-sticky][data-sticky='top'] {
+  position: sticky;
+  top: calc(var(--sticky-top, 0px) + var(--sticky-offset, 0px));
+  box-shadow: 0 calc(-1 * var(--sticky-bleed, @sticky-bleed)) 0
+    var(--sticky-bg, var(--bg-container));
+}
+
+[data-sticky][data-sticky='bottom'] {
+  position: sticky;
+  bottom: calc(var(--sticky-bottom, 0px) + var(--sticky-offset, 0px));
+  box-shadow: 0 var(--sticky-bleed, @sticky-bleed) 0 var(--sticky-bg, var(--bg-container));
+}
+
+/**
+ * 进不了栈的元素怎么贴: 照 `--sticky-stacked-top` / `--sticky-stacked-bottom` 自己贴, 那是每条栈
+ * 当前的总高度. 给拿不到 DOM 的第三方组件用 —— antd 自己渲染的吸顶表头就是一个, 见
+ * `src/components/Table/index.less` 的 `.sticky-header`.
+ */

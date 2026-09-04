@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Children, cloneElement, isValidElement, useContext, useMemo } from 'react';
 import { Col, Row } from 'antd';
 import { propsMerge } from '../utils';
+import { breakpointsOf } from './breakpoints';
 import { DEFAULT_COLUMN_NUM, RowLayoutContext } from './context';
 import type {
   RowInnerProps,
@@ -11,10 +12,6 @@ import type {
   RowLayoutProps,
 } from './types';
 
-/** 栅格总列数 */
-const GRID_SPAN = 24;
-/** 中屏 (md/lg) 的保底列宽. 真列宽再窄也不用: 一行挤进太多字段, 谁都看不清 */
-const MEDIUM_MIN_SPAN = 8;
 const DEFAULT_GUTTER: RowLayoutProps['gutter'] = [16, 16];
 
 /**
@@ -28,22 +25,6 @@ const DEFAULT_GUTTER: RowLayoutProps['gutter'] = [16, 16];
  */
 const OWN_WIDTH_KEYS = ['span', 'flex'] as const;
 
-/** Col 的跨度上限是 24 格 */
-function limitSpan(span: number) {
-  return Math.min(GRID_SPAN, span);
-}
-
-/** 按列数与所占列格算出全套断点 */
-function breakpointsOf(colSize: number, baseSpan: number) {
-  return {
-    xs: limitSpan(colSize * GRID_SPAN),
-    sm: limitSpan(colSize * (GRID_SPAN / 2)),
-    md: limitSpan(colSize * Math.max(baseSpan, MEDIUM_MIN_SPAN)),
-    lg: limitSpan(colSize * Math.max(baseSpan, MEDIUM_MIN_SPAN)),
-    xl: limitSpan(colSize * baseSpan),
-  };
-}
-
 /**
  * 把子元素逐个裹进 Col, 断点按列数算出来.
  *
@@ -55,8 +36,6 @@ function breakpointsOf(colSize: number, baseSpan: number) {
  * 被 memo、forwardRef 或自定义包装过一层的同名组件认不出来, 会被当成普通子元素裹进 Col.
  */
 function buildCols(children: ReactNode, columnNum: RowLayoutColumnNum) {
-  const baseSpan = GRID_SPAN / columnNum;
-
   // Children.map 官方标了 legacy 但未移除. 留着它是因为 key 的分配与嵌套数组的展平都由它负责
   return Children.map(children, (child) => {
     if (!child) {
@@ -87,7 +66,7 @@ function buildCols(children: ReactNode, columnNum: RowLayoutColumnNum) {
     const { colSize = 1, ...restColProps } = childColProps ?? {};
     // 按值判断而不是按键存在: `span={undefined}` 意思是"没给宽度", 不该让库的断点让位
     const ownsWidth = OWN_WIDTH_KEYS.some((key) => restColProps[key] !== undefined);
-    const colProps = propsMerge(ownsWidth ? {} : breakpointsOf(colSize, baseSpan), restColProps);
+    const colProps = propsMerge(ownsWidth ? {} : breakpointsOf(colSize, columnNum), restColProps);
 
     return <Col {...colProps}>{content}</Col>;
   });
@@ -97,7 +76,7 @@ function buildCols(children: ReactNode, columnNum: RowLayoutColumnNum) {
  * 整页表单的行布局: 给一个 columnNum 就排完一行, 调用方不写一个 Col.
  *
  * 断点策略是本库的固执选择, 不提供配置: xs 整行、sm 半行、md/lg 不小于 8 格、
- * xl 按 columnNum 的真列宽. 全站版式因此收口在这一个文件里, 改版只改这里;
+ * xl 按 columnNum 的真列宽. 那张表住在 breakpoints.ts, 全站版式因此仍收口在一处, 改版只改那里;
  * 需要另一套版式请在外面包一层, 不要 fork 本组件.
  *
  * 逃生舱分层: 默认等宽 → 子元素带 `colProps={{ colSize: n }}` 占多列 →

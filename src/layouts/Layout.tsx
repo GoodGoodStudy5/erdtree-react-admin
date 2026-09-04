@@ -1,5 +1,5 @@
 import { useToken, useCommonStore } from '@/hooks';
-import { useCallback, useEffect, useMemo, useState, memo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, memo } from 'react';
 import { useOutlet, useLocation } from 'react-router-dom';
 import { Skeleton, message } from 'antd';
 import { debounce } from 'lodash';
@@ -12,7 +12,7 @@ import { KeepAlive, useKeepAliveRef } from 'keepalive-for-react';
 import Menu from './components/Menu';
 import Header from './components/Header';
 import Tabs from './components/Tabs';
-import { Forbidden } from '@/components';
+import { Forbidden, mountStickyStack } from '@/components';
 import ErrorBoundary from './components/ErrorBoundary';
 import styles from './index.module.less';
 
@@ -24,6 +24,7 @@ function Layout() {
   const keepaliveRef = useKeepAliveRef();
   const [isLoading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
+  const contentRef = useRef<HTMLDivElement>(null);
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
   const menuList = useMenuStore((state) => state.menuList);
   const { setAliveRef } = usePublicStore.getState();
@@ -74,6 +75,17 @@ function Layout() {
     }
   }, []);
 
+  /**
+   * 吸附栈装在内容区上, 于是页面里任何一处写了 data-sticky 的元素都吸在标签栏底下或视口底.
+   *
+   * 装在这里而不装在各页面: 基准边是标签栏底, 那是布局的事实, 页面不该各自申报一遍.
+   */
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    return mountStickyStack(contentRef.current);
+  }, []);
+
   // 监测是否需要刷新
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -122,7 +134,6 @@ function Layout() {
   const contentClassName = useMemo(
     () =>
       `
-        overflow-auto
         transition-all
         ${styles.con}
         ${isMaximize ? styles['con-maximize'] : ''}
@@ -142,7 +153,7 @@ function Layout() {
           <Header />
           {permissions.length > 0 && menuList.length > 0 && <Tabs aliveRef={keepaliveRef} />}
         </div>
-        <div id="layout-content" className={contentClassName}>
+        <div id="layout-content" ref={contentRef} className={contentClassName}>
           {isLoading && permissions.length === 0 && (
             <Skeleton active className="p-30px" paragraph={{ rows: 10 }} />
           )}

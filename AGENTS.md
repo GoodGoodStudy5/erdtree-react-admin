@@ -26,3 +26,11 @@
 图标写 `<Icon icon="集合:名字">`, 样式由 UnoCSS 在构建期只为扫到的名字生成, 没有运行时, 也没有联网兜底. 名字必须是完整字面量, 拼接出来的名字渲染为空白. 来自数据的图标名 (菜单) 先登记进 `src/menus/icons.ts` 的名单, 名单经 safelist 强制进产物. 集合装成 `@iconify-json/<集合>` 的 devDependency, 用哪个装哪个.
 
 `packages/` 不用这套: 包不能依赖应用的 uno 配置, 图标从 `@ant-design/icons` 取.
+
+### 吸附靠标记
+
+要吸顶或吸底的元素写 `data-sticky="top"` / `data-sticky="bottom"`, 不自己写 `position: sticky` —— 退让距离由栈里的实际成员算出, 手写的偏移量在成员增减那天就错. 见 `src/components/Sticky`.
+
+代价认下: 从吸附的元素到内容区之间不能有任何一层带 overflow, 那样的层没有定高就成了一个永不滚动的参照容器, 吸附于是永不触发.
+
+拿不到 DOM 的第三方组件照 `--sticky-stacked-top` / `--sticky-stacked-bottom` 自己贴, 那是每条栈当前的总高度.

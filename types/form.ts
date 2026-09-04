@@ -165,5 +165,11 @@ export interface BaseFormList extends FormItemProps {
 // 搜索数据
 export interface BaseSearchList extends BaseFormList {
   labelWidth?: number; // 临时使用
+  /**
+   * 占几列, 默认 1.
+   *
+   * 区间类字段 (日期区间, 数值上下限) 给 2: 一列装不下两端. 值超过当前断点的列数时只占满一行.
+   */
+  colSize?: number;
   // TODO...
 }

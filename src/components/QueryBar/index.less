@@ -1,0 +1,273 @@
+/**
+ * 搜索栏的两层收放全在这份样式里: JS 只写 data-locked 与几个 CSS 变量,
+ * 展开, 收起与焦点保持都不进 JS.
+ */
+
+/**
+ * 不生成盒子.
+ *
+ * 摘要行要一直吸在标签栏底下, 而 sticky 元素粘不出最近的块级祖先 —— 这一层若生成盒子, 摘要行就
+ * 只能在搜索栏自己那点高度里粘一下, 锁定后更是粘完条件区的高度就被推走.
+ *
+ * 代价: 这一层不能有背景, 边距与圆角, 那些归摘要行与条件区各自所有.
+ */
+.query-bar-form {
+  /* 六个中文字加一个冒号. 更长的 label 由那一项自己带 labelWidth */
+  --query-bar-label-w: calc(6em + 8px);
+
+  /* 与 BaseCard 的 rounded-3 对齐: 两张卡片上下挨着, 圆角不同一眼看得出来 */
+  --query-bar-radius: 12px;
+
+  display: contents;
+}
+
+.query-bar {
+  position: relative;
+
+  /* 浮层要盖在下面那张表格卡片上 */
+  z-index: 2;
+  padding: 12px 20px;
+  background-color: var(--bg-container);
+  border-radius: var(--query-bar-radius);
+}
+
+/**
+ * hover 命中区向四周外扩一圈, 向下扩得多些 —— 那是鼠标去条件区的方向.
+ * 它是本元素的子元素, 所以停在这圈上 :hover 依然成立.
+ * 代价: 吃掉表格顶部约 20px 的点击, 扩得越多越好进也越容易误触发.
+ */
+.query-bar::before {
+  position: absolute;
+  inset: -14px 0;
+  z-index: -1;
+  content: '';
+}
+
+/* 锁定后条件区已在正常占位里, 外扩的命中区没用了, 把那圈点击还给表格 */
+.query-bar-form[data-locked='true'] .query-bar::before {
+  display: none;
+}
+
+.query-bar-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 32px;
+}
+
+.query-bar-spacer {
+  flex: 1 1 auto;
+}
+
+.query-bar-chip {
+  margin: 0;
+}
+
+/* 一枚 chip 再长也不许撑满摘要行: 摘要撑满就不成其为摘要 */
+.query-bar-chip-text {
+  display: inline-block;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+/**
+ * 条件区. 紧贴摘要行, 不留 margin 间隙 —— 间隙既不属于摘要行也不属于浮层, 鼠标穿过时 hover 断.
+ *
+ * 视觉与命中分开管: opacity 照常淡出, pointer-events 随状态当帧切换 (离散属性, 不参与过渡).
+ * 于是鼠标一移出, 浮层立刻不挡表格顶部那行按钮, 而它还在淡出. visibility 仍拖到淡出之后再切,
+ * 否则动画被截断.
+ *
+ * 不留收起宽限: 宽限本是让鼠标在收起途中回得来, 而 pointer-events 一切成 none, 鼠标落回浮层
+ * 只会穿透到表格, hover 不再成立, 宽限只剩副作用. 代价认下 —— 横向擦出 .query-bar 的宽度范围
+ * 就当场收起; 正常从摘要行往下移的路径由 ::before 的外扩命中区接着.
+ *
+ * 用 visibility 而不是限高来藏, 于是收起时里面的控件不在 Tab 序里 —— 焦点不会落到看不见的输入框上.
+ * 代价: 只用键盘的人进不了条件区, 得先按锁 (锁按钮在摘要行, Tab 到得了).
+ */
+.query-bar-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  z-index: 30;
+  padding: 4px 20px 12px;
+  pointer-events: none;
+  visibility: hidden;
+  background-color: inherit;
+  border-radius: 0 0 var(--query-bar-radius) var(--query-bar-radius);
+  opacity: 0;
+  transition:
+    opacity 0.5s ease 0s,
+    transform 0.5s ease 0s,
+    visibility 0s linear 0.5s;
+  transform: translateY(-4px);
+}
+
+.query-bar:hover .query-bar-panel,
+.query-bar:focus-within .query-bar-panel {
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0s;
+  transform: none;
+}
+
+/* 展开时上下连成一张卡片: 摘要行的下两角拉直, 阴影接上 */
+.query-bar:hover,
+.query-bar:focus-within {
+  border-radius: var(--query-bar-radius) var(--query-bar-radius) 0 0;
+}
+
+.query-bar-form[data-locked='true'] .query-bar {
+  border-radius: var(--query-bar-radius);
+}
+
+/**
+ * 展开时上下是一张浮起的卡片: 阴影绕整圈画一次, 接缝上不画.
+ *
+ * 拆两半是因为浮层是 absolute 的, 不在摘要行的 border-box 里 —— 一个 box-shadow 罩不住两段.
+ * 摘要行这一半裁掉朝下的, 浮层那一半裁掉朝上的, 两者接在同一条边上正好成一圈.
+ *
+ * 画在伪元素上而不是元素本身: clip-path 连后代一起裁, 裁在浮层上会切掉条件区里 Select 的下拉.
+ * 代价: 接缝两侧的左右阴影分属两个盒子, 强度有一点落差.
+ */
+.query-bar::after,
+.query-bar-panel::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: '';
+  border-radius: inherit;
+  box-shadow: var(--query-bar-shadow);
+}
+
+/* 外扩 40px: token 阴影的模糊加扩散够得着的最远处. 收放时序照抄浮层, 否则阴影与浮层不同步 */
+.query-bar::after {
+  clip-path: inset(-40px -40px 0);
+  opacity: 0;
+  transition: opacity 0.16s ease 0.2s;
+}
+
+.query-bar:hover::after,
+.query-bar:focus-within::after {
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+/* 浮层这一半不用自己的过渡: visibility 与 opacity 都从浮层继承下来 */
+.query-bar-panel::after {
+  clip-path: inset(0 -40px -40px);
+}
+
+/**
+ * 锁定: 不再是浮层, 回到正常占位, 表格被推下去 —— 长期展开就该让表格让位.
+ *
+ * 它渲染成搜索栏的兄弟而不是后代, 于是吸顶的那一条只有摘要行的高度, 条件区照常随内容滚走.
+ * 代价: 背景与圆角要自己给, 拿不到搜索栏那一份了.
+ */
+.query-bar-panel.is-locked {
+  position: static;
+  padding: 12px 20px;
+  pointer-events: auto;
+  visibility: visible;
+  background-color: var(--bg-container);
+  border-radius: var(--query-bar-radius);
+  opacity: 1;
+  transition-delay: 0s;
+  transform: none;
+}
+
+/* 锁定后上下是两块独立的卡片, 各自有底色, 不用再拼阴影 */
+.query-bar-form[data-locked='true'] .query-bar::after,
+.query-bar-panel.is-locked::after {
+  display: none;
+}
+
+/**
+ * 第二层的限高只压在栅格上: 压在浮层根节点上会把底栏 (展开按钮) 一起切掉.
+ * 卡的是像素不是条目 —— CSS 不知道每行几列, 那是断点决定的.
+ *
+ * 两个变量都由组件写: 少了任一个 calc 整条失效, 限高退成 none —— 全露而不是全藏, 坏的那一侧朝外.
+ */
+.query-bar-grid {
+  max-height: calc(var(--query-bar-rows) * var(--query-bar-row-h));
+  overflow: hidden;
+  transition: max-height 0.2s ease;
+}
+
+.query-bar-foot {
+  display: flex;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+/* 挂在不生成盒子的那一层: 锁定后条件区已不是搜索栏的后代, 选择器够不着它 */
+
+/* 行距由栅格的 gutter 给, 再叠一层 margin 就与 --query-bar-row-h 对不上 */
+.query-bar-form .ant-form-item {
+  margin-bottom: 0;
+}
+
+/* 不设它, 长内容会把控件撑出栅格 */
+.query-bar-form .ant-form-item-control {
+  min-width: 0;
+}
+
+/* 胶囊: 左半是锁, 右半是行数 */
+.query-bar-pill {
+  display: inline-flex;
+  align-items: stretch;
+  height: 32px;
+  overflow: hidden;
+  border: 1px solid var(--query-bar-split);
+  border-radius: 16px;
+}
+
+.query-bar-pill-btn {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding: 0 12px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+.query-bar-pill-btn:hover {
+  background-color: var(--query-bar-hover-bg);
+}
+
+.query-bar-pill-btn.is-on {
+  color: var(--query-bar-active-fg);
+  background-color: var(--query-bar-active-bg);
+}
+
+.query-bar-pill-rows {
+  font-variant-numeric: tabular-nums;
+}
+
+.query-bar-pill-caret {
+  font-size: 10px;
+  opacity: 0.45;
+}
+
+.query-bar-pill-divider {
+  flex: none;
+  width: 1px;
+  background-color: var(--query-bar-split);
+}
+
+.query-bar-rows-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 92px;
+}
