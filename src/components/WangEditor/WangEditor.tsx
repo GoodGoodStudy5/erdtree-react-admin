@@ -5,6 +5,7 @@ import type { HTMLAttributes } from 'react';
 import { Editor, Toolbar } from '@wangeditor/editor-for-react';
 import { FILE_API } from '@/utils';
 import { $t } from '@/locales';
+import './index.less';
 
 /** 富文本编辑器参数 */
 export interface EditorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {

@@ -1,4 +1,18 @@
-@import url('@/assets/css/default.less');
+// 两条 :global 服务 layouts 自己渲染的元素: #layout-content 是 Layout 的内容区,
+// .change 是 Tabs 的操作按钮. 写在这里而不写进主题 mixin —— 主题只出变量, 不点名元素
+// antd 的 .ant-app 自带 color: colorText, 而它夹在 body 与 #layout 之间, 会截断 body 的字色
+// 继承. id 选择器特异性高过它, 于是压得住又不必动用 !important
+:global(#layout) {
+  color: var(--color-text);
+}
+
+:global(#layout-content) {
+  background-color: var(--bg-layout);
+}
+
+:global(.change) {
+  color: var(--color-svg);
+}
 
 .header {
   position: fixed;
@@ -10,7 +24,7 @@
   flex-direction: column;
   height: @layout-top;
   overflow: hidden;
-  background-color: #fff;
+  background-color: var(--bg-container);
   border-bottom: 1px solid #eee;
 }
 
@@ -59,6 +73,12 @@
 }
 
 .con {
+  /**
+   * 吸附栈的基准边 = 标签栏底, 与内容区自己的 top 同源, 换布局高度只改 @layout-top.
+   * 值要走插值: less 不替换自定义属性值里的变量, 直接写 @layout-top 会原样输出.
+   */
+  --sticky-top: ~'@{layout-top}';
+
   position: relative;
   inset: @layout-top 0 0 @layout-left;
   box-sizing: border-box;
@@ -72,6 +92,8 @@
 }
 
 .con-maximize {
+  --sticky-top: ~'calc(@{layout-top} / 2)';
+
   top: calc(@layout-top / 2);
   left: 0 !important;
   width: 100%;
@@ -106,27 +128,32 @@
       align-items: center;
     }
 
+    :global {
+      .ant-tabs-nav-list .ant-tabs-tab {
+        border-radius: 8px;
+      }
+    }
+
     :global(.ant-tabs-tab) {
       height: 28px;
       padding: 0 8px 0 10px;
       margin: 0;
-      color: @tab-color;
+      color: var(--color-tab-text);
       background: transparent;
       border: 0;
-      border-radius: 8px;
       transition:
         background-color 0.15s,
         color 0.15s;
     }
 
     :global(.ant-tabs-tab:hover) {
-      color: @primary-color;
-      background: @tab-hover-bg;
+      color: var(--color-tab-text-hover);
+      background: var(--bg-tab-hover);
     }
 
     :global(.ant-tabs-tab-active) {
-      color: @tab-active-color;
-      background: @tab-active-bg;
+      color: var(--color-tab-active);
+      background: var(--bg-tab-active);
     }
 
     :global(.ant-tabs-tab-btn) {
@@ -182,7 +209,7 @@
     }
 
     :global(.ant-tabs-tab .ant-tabs-tab-remove:hover) {
-      background: rgb(0 0 0 / 10%);
+      background: var(--bg-tab-remove-hover);
       opacity: 1;
     }
 
@@ -211,35 +238,6 @@
   transition: background-color 0.15s;
 
   &:hover {
-    background: @tab-hover-bg;
-  }
-}
-
-// 暗色规则比同名浅色规则多一个 .theme-dark, 特异性自然更高
-:global(.theme-dark) {
-  .layout-tabs:global(.ant-tabs-card.ant-tabs-top) {
-    :global(.ant-tabs-nav) {
-      :global(.ant-tabs-tab) {
-        color: @dark-tab-color;
-      }
-
-      :global(.ant-tabs-tab:hover) {
-        color: @dark-tab-hover-color;
-        background: @dark-tab-hover-bg;
-      }
-
-      :global(.ant-tabs-tab-active) {
-        color: @dark-tab-active-color;
-        background: @dark-tab-active-bg;
-      }
-
-      :global(.ant-tabs-tab .ant-tabs-tab-remove:hover) {
-        background: rgb(255 255 255 / 16%);
-      }
-    }
-  }
-
-  .tab-op:hover {
-    background: @dark-tab-hover-bg;
+    background: var(--bg-tab-hover);
   }
 }

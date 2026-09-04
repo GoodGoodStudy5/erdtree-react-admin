@@ -1,47 +1,23 @@
 .ant-pagination-item {
   margin-right: 7px !important;
-  background-color: #f4f4f5 !important;
+  background-color: var(--bg-pagination-item) !important;
 }
 
+// 选中态的底色明暗两档同值, 不随主题变, 因此留字面量
 .ant-pagination-item-active {
   background-color: #0960bd !important;
 }
 
 .ant-pagination-item-active a {
-  color: #fff !important;
+  color: var(--color-pagination-active-text) !important;
 }
 
 .ant-pagination-prev {
   margin-right: 7px !important;
-  background-color: #f4f4f5 !important;
+  background-color: var(--bg-pagination-item) !important;
 }
 
 .ant-pagination-next {
   margin-right: 7px !important;
-  background-color: #f4f4f5 !important;
-}
-
-.theme-dark {
-  .ant-pagination-item {
-    margin-right: 7px !important;
-    background-color: rgb(29 29 29) !important;
-  }
-
-  .ant-pagination-item-active {
-    background-color: #0960bd !important;
-  }
-
-  .ant-pagination-item-active a {
-    color: #ffffffd9 !important;
-  }
-
-  .ant-pagination-prev {
-    margin-right: 7px !important;
-    background-color: rgb(29 29 29) !important;
-  }
-
-  .ant-pagination-next {
-    margin-right: 7px !important;
-    background-color: rgb(29 29 29) !important;
-  }
+  background-color: var(--bg-pagination-item) !important;
 }

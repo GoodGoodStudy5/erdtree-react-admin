@@ -23,6 +23,17 @@
   overflow: auto visible !important;
 }
 
+/**
+ * 表格把自己的层级关起来.
+ *
+ * antd 给固定列与固定表头的 z-index 是按列数算的 (`calc(var(--columns-count) * 2 + ...)`), 30 列就到 60 上下;
+ * 而装表格的卡片 z-index 为 auto, 圈不住这些值 —— 它们会直接与卡片外面的元素比高低, 于是盖住浮在表格
+ * 上方的东西 (搜索栏悬停展开的条件区就被固定列表头盖过). isolate 之后这些值只在表格内部有效.
+ */
+.ant-table-wrapper {
+  isolation: isolate;
+}
+
 /* 列宽自适应的边界. 上限归这里, 因为 antd 的列契约只有 minWidth 没有 maxWidth */
 .ant-table {
   .ant-table-thead > tr > th {
@@ -33,5 +44,34 @@
   .ant-table-tbody > tr > td {
     /* 300px 封顶; 页面显式写了 width 的列由 onCell 的行内样式压过这一条 */
     max-width: 300px;
+  }
+}
+
+/**
+ * 表头贴顶.
+ *
+ * 走 antd 的 sticky: 表头被渲染进滚动容器之外的 holder, 那是横向可滚的表格里唯一能贴顶的路子 ——
+ * CSS sticky 的参照是最近的滚动容器, 而承担横向滚动的那一层纵向永不滚动.
+ *
+ * 代价认下: 表格拆成表头与表体两张 table, 列宽靠 rc-table 测量回填 colgroup.
+ */
+.sticky-header {
+  /**
+   * 上面那条 .ant-table-container 的横向滚动补丁正是拦住贴顶的东西.
+   * 贴顶模式下横向滚动由 rc-table 交给 .ant-table-body, 那条补丁在此模式下不仅无用, 还有害.
+   */
+  .ant-table-container {
+    overflow: visible !important;
+  }
+
+  /**
+   * 表头贴在吸附栈的下沿, 于是搜索栏或操作行增减时它自动跟着走.
+   * top 是 antd 写的行内样式, 不压过它就贴不到位.
+   *
+   * 用栈的总高度而不让 holder 自己进栈: 进栈就要吃栈的 z-index, 而 antd 给表头的层级按列数算,
+   * 降下来会被固定列盖住.
+   */
+  .ant-table-sticky-holder {
+    top: calc(var(--sticky-top, 0px) + var(--sticky-stacked-top, 0px)) !important;
   }
 }

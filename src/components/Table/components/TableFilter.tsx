@@ -1,4 +1,4 @@
-import { Button, Popover, Divider, Checkbox, theme } from 'antd';
+import { Button, Popover, Divider, Checkbox } from 'antd';
 import type { TableProps, CheckboxProps } from 'antd';
 import { useState, memo } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
@@ -62,7 +62,6 @@ function TableFilter(props: Props) {
 
     return { checked: seeded.checkedList, list: seeded.list };
   });
-  const { token } = theme.useToken();
   const pendingValues = list
     .map((item) => item.value)
     .filter((value) => checkedList.includes(value) !== applied.checked.includes(value));
@@ -157,26 +156,21 @@ function TableFilter(props: Props) {
           value={checkedList}
           onChange={onChangeCheckbox}
         >
-          <DragContent
-            list={list}
-            pendingValues={pendingValues}
-            pendingColor={token.colorWarning}
-            handleDragEnd={handleDragEnd}
-          />
+          <DragContent list={list} pendingValues={pendingValues} handleDragEnd={handleDragEnd} />
         </Checkbox.Group>
 
         <Divider className="!mt-10px !mb-5px" />
 
         <div className="flex items-center gap-4px px-5px">
-          <Button className="flex-1" type="link" size="small" onClick={handleReset}>
+          <Button className="flex-1" type="link" onClick={handleReset}>
             {$t('public.reset')}
           </Button>
           {hasPending && (
-            <Button className="flex-1" size="small" onClick={handleCancel}>
+            <Button className="flex-1" onClick={handleCancel}>
               {$t('public.cancel')}
             </Button>
           )}
-          <Button className="flex-1" type="primary" size="small" onClick={handleConfirm}>
+          <Button className="flex-1" type="primary" onClick={handleConfirm}>
             {$t('public.confirm')}
           </Button>
         </div>
@@ -198,9 +192,7 @@ function TableFilter(props: Props) {
       onOpenChange={handleClick}
     >
       <div {...params} className={`${className} inline-block`}>
-        <Button icon={<SettingOutlined />} className="small-btn">
-          {$t('public.columnFilter')}
-        </Button>
+        <Button icon={<SettingOutlined />}>{$t('public.columnFilter')}</Button>
       </div>
     </Popover>
   );

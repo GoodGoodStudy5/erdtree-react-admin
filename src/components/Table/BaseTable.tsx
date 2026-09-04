@@ -26,6 +26,8 @@ interface Props extends Omit<TableProps<object>, 'bordered'> {
   isVirtual?: boolean; // 是否开启虚拟滚动
   isOperate?: boolean; // 是否开启顶部操作栏
   isAuthHeight?: boolean; // 是否自动计算高度
+  isStickyToolbar?: boolean; // 操作行是否吸在标签栏底下
+  isStickyHeader?: boolean; // 表头是否吸在吸附栈的下沿, 判据见 index.less
   isCreate?: boolean;
   scrollX?: number;
   scrollY?: number;
@@ -45,6 +47,8 @@ export function BaseTable(props: Props) {
     isBordered = true,
     isOperate = true,
     isAuthHeight,
+    isStickyToolbar,
+    isStickyHeader,
     scrollX,
     scrollY,
     rowClassName,
@@ -285,21 +289,19 @@ export function BaseTable(props: Props) {
     <div
       id="table"
       className={`
-        overflow-auto
+        ${isStickyHeader ? 'sticky-header' : ''}
         ${isBordered !== false ? 'bordered' : ''}
         ${isZebra !== false ? 'zebra' : ''}
       `}
     >
       {isOperate && (
-        <div className="flex justify-between !mb-10px">
+        <div
+          data-sticky={isStickyToolbar ? 'top' : undefined}
+          className="flex justify-between !mb-10px"
+        >
           <div className="flex flex-wrap items-center gap-6px">
             {!!isCreate && (
-              <Button
-                type="primary"
-                className="small-btn"
-                icon={<PlusOutlined />}
-                onClick={onCreate}
-              >
+              <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
                 {$t('public.create')}
               </Button>
             )}
@@ -310,7 +312,6 @@ export function BaseTable(props: Props) {
             {rightContent ? <div>{rightContent}</div> : undefined}
 
             <Button
-              className="small-btn"
               icon={<RedoOutlined className="transform rotate-270" disabled={!!isLoading} />}
               onClick={getPage}
             >
@@ -327,7 +328,6 @@ export function BaseTable(props: Props) {
       )}
       <div ref={tableRef}>
         <Table
-          size="small"
           rowKey="id"
           // 显式声明: 靠 rc-table 推导时, 列宽自适应会取决于页面有没有写 fixed 列
           tableLayout="auto"
@@ -339,11 +339,14 @@ export function BaseTable(props: Props) {
             borderRadius: 10,
             borderRight: '1px solid rgba(0, 0, 0, .05)',
             borderBottom: '1px solid rgba(0, 0, 0, .05)',
-            overflow: 'auto',
+            // 表头贴顶时这一层不能有 overflow: 它会成为贴顶的参照容器, 而它自己从不滚动
+            ...(isStickyHeader ? undefined : { overflow: 'auto' }),
             ...props.style,
           }}
           bordered={isBordered !== false}
           scroll={scroll}
+          // 位置归 CSS, 不传 offsetHeader —— 顶栏高度归布局层, 不该复制进表格组件
+          sticky={isStickyHeader ? { offsetHeader: 0 } : undefined}
           components={components}
           columns={mergedColumns as ColumnsType<object>}
         />

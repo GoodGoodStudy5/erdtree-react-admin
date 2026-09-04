@@ -3,8 +3,14 @@ import { Pagination } from 'antd';
 import './index.less';
 import { $t } from '@/locales';
 
+interface Props extends PaginationProps {
+  /** 贴在视口底常驻. 不给则跟着内容滚到文档底 */
+  isSticky?: boolean;
+}
+
 /** 分页器, 总数文案随界面语言切换 */
-export function BasePagination(props: PaginationProps) {
+export function BasePagination(props: Props) {
+  const { isSticky, ...rest } = props;
   /**
    * 显示总数
    * @param total - 总数
@@ -16,6 +22,7 @@ export function BasePagination(props: PaginationProps) {
   return (
     <div
       id="pagination"
+      data-sticky={isSticky ? 'bottom' : undefined}
       className={`
         w-full
         flex
@@ -26,7 +33,7 @@ export function BasePagination(props: PaginationProps) {
         z-999
       `}
     >
-      <Pagination showSizeChanger showQuickJumper size="small" showTotal={showTotal} {...props} />
+      <Pagination showSizeChanger showQuickJumper showTotal={showTotal} {...rest} />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
 import { handleEnv } from './build/utils/helper.ts';
 import { createProxy } from './build/vite/proxy.ts';
@@ -31,10 +32,16 @@ export default defineConfig(({ mode }) => {
       },
     },
     css: {
+      devSourcemap: true,
       preprocessorOptions: {
         less: {
           javascriptEnabled: true,
           charset: false,
+          // less 变量只在编译期存在, 每个 less 文件都得先拿到它们; 自动注入把这份 import
+          // 收成一处, 于是搬家时路径只改 vite 配置. variable.less 自己要跳过, 否则成了自引用
+          paths: [path.resolve(root, 'src/styles')],
+          additionalData: (source: string, filename: string) =>
+            filename.endsWith('variable.less') ? source : `@import 'variable.less';\n${source}`,
         },
       },
     },

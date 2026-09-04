@@ -66,7 +66,7 @@ function AppRouter() {
   );
 
   return (
-    <ConfigProvider locale={locale} theme={themeConfig}>
+    <ConfigProvider locale={locale} theme={themeConfig} componentSize="small">
       <App>
         <StaticMessage />
         {/* 语言切换后整树重挂载, 让各处直接调用的 $t 重新取值 */}

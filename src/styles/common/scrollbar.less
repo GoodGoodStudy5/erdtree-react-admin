@@ -1,0 +1,24 @@
+/* Firefox 走浏览器默认: 加 scrollbar-color 兜它, Chrome 里整套 ::-webkit-scrollbar 伪元素就失效 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background: transparent;
+}
+
+/* 变量给回退值: 主滚动条挂在 html 上, 在 .ant-app 之外取不到 --ant-* */
+::-webkit-scrollbar-thumb {
+  background-color: var(--ant-color-text-quaternary, hsl(0deg 0% 53% / 40%));
+  background-clip: content-box;
+
+  /* 内缩两侧, 于是热区 10px 而观感 6px; 半径取槽宽一半使滑块两端为半圆 */
+  border: 2px solid transparent;
+  border-radius: 5px;
+}
+
+:hover::-webkit-scrollbar-thumb {
+  background-color: var(--ant-color-text-tertiary, hsl(0deg 0% 53% / 60%));
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

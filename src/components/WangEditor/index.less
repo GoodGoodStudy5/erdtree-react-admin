@@ -1,0 +1,12 @@
+/**
+ * 富文本的主题色. wangeditor 自带的样式表显式设了工具栏与编辑区的字色与底色,
+ * 因此必须显式覆盖, 不像别的元素那样继承 body 就够.
+ */
+.w-e-toolbar,
+.w-e-bar-item button,
+.w-e-text-container,
+.w-e-bar-item-menus-container {
+  color: var(--color-text);
+  background-color: var(--bg-container);
+  fill: var(--color-text);
+}

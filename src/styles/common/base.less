@@ -1,7 +1,17 @@
-@import url('./reset.less');
+@import url('../fragment/reset.less');
 
+/* antd v6 的 reset 不带 tabular-nums, 数字等宽要自己开 */
 body {
   margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 表单控件的 UA 样式用 font 简写把 font-variant-numeric 重置成 normal, 继承进不来, 要显式接回 */
+button,
+input,
+select,
+textarea {
+  font-variant-numeric: inherit;
 }
 
 html,
@@ -9,6 +19,7 @@ body,
 #root {
   width: 100%;
   height: 100%;
+  overscroll-behavior-x: none; /* 横向滚到边界不外溢成浏览器前进后退 */
   font-size: 16px;
 }
 
@@ -73,16 +84,6 @@ body,
   text-overflow: ellipsis;
   word-wrap: normal !important;
   white-space: nowrap !important;
-}
-
-.small-btn {
-  height: 29px !important;
-  padding: 0 10px !important;
-  line-height: 29px !important;
-
-  span {
-    font-size: 13px;
-  }
 }
 
 .content-transition {

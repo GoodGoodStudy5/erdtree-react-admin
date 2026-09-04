@@ -159,11 +159,7 @@ function MenuPage() {
       return (
         <div className="flex flex-wrap gap-5px">
           {pagePermission.create === true && (record as RowData)?.type <= 2 && (
-            <Button
-              className="small-btn"
-              type="primary"
-              onClick={() => onCreate(record as RowData)}
-            >
+            <Button type="primary" onClick={() => onCreate(record as RowData)}>
               {$t('systems:menu.addChildMenu')}
             </Button>
           )}
@@ -228,7 +224,7 @@ function MenuPage() {
                 okText={$t('public.confirm')}
                 cancelText={$t('public.cancel')}
               >
-                <Button danger className="small-btn">
+                <Button danger>
                   {$t('public.batchDelete')} ({selectedRowKeys.length})
                 </Button>
               </Popconfirm>

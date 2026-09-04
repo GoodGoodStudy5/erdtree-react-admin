@@ -1,0 +1,58 @@
+// 只被 theme-color.less 以 @import 引入, 不要加 JS import —— 那会让它多输出一份.
+
+/**
+ * 主题差异的唯一出口: mixin 只输出 CSS 变量, 元素各自 `var()` 取用.
+ *
+ * 不点名后代元素. 要底色的元素自己写 `var(--bg-container)`, 新增元素不必回本文件登记, 也不必
+ * 跟 `!important` 抢特异性.
+ *
+ * 全局基础色的名字取自 antd 的同义 token (去掉 `--ant-color-` 前缀); 标签栏与分页器那几个
+ * antd 没有对应语义, 用项目自己的名字.
+ *
+ * 值自定而不直接取 `var(--ant-color-*)`: 项目暗色是一套偏蓝灰的自定调, antd 暗色是中性黑.
+ * 两档同值的那些不在这里, 直接借 antd (见 theme-color.less 末尾).
+ *
+ * 参数命名传递 (`;` 分隔): 十几个同类型的颜色按位置传, 错位了编译器发现不了.
+ */
+.changeTheme(
+  @text;
+  @container;
+  @layout;
+  @svg;
+  @tab-text;
+  @tab-text-hover;
+  @tab-hover;
+  @tab-active;
+  @tab-active-bg;
+  @tab-remove-hover;
+  @table-border;
+  @zebra;
+  @pagination-item;
+  @pagination-active-text
+) {
+  // 全局基础色
+  --color-text: @text;
+  --bg-container: @container;
+  --bg-layout: @layout;
+  --color-svg: @svg;
+
+  // 标签栏
+  --color-tab-text: @tab-text;
+  --color-tab-text-hover: @tab-text-hover;
+  --bg-tab-hover: @tab-hover;
+  --color-tab-active: @tab-active;
+  --bg-tab-active: @tab-active-bg;
+  --bg-tab-remove-hover: @tab-remove-hover;
+
+  // 表格
+  --color-table-border: @table-border;
+  --bg-zebra: @zebra;
+
+  // 分页器
+  --bg-pagination-item: @pagination-item;
+  --color-pagination-active-text: @pagination-active-text;
+
+  // 这两条给 body 自己 (主题 class 挂在 body 上), 不是点名后代
+  color: var(--color-text);
+  background-color: var(--bg-container);
+}

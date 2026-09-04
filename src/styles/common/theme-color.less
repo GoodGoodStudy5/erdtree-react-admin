@@ -1,0 +1,64 @@
+@import url('../fragment/theme.less');
+
+// 默认
+.theme-primary {
+  .changeTheme(
+    @text: @primary-color;
+    @container: @content-bg;
+    @layout: @layout-content-bg;
+    @svg: @svg-color;
+    @tab-text: @tab-color;
+    @tab-text-hover: @primary-color;
+    @tab-hover: @tab-hover-bg;
+    @tab-active: @tab-active-color;
+    @tab-active-bg: @tab-active-bg;
+    @tab-remove-hover: @tab-remove-hover-bg;
+    @table-border: @table-border;
+    @zebra: @zebra-bg;
+    @pagination-item: @pagination-item-bg;
+    @pagination-active-text: @pagination-active-text
+  );
+}
+
+// 暗黑主题
+.theme-dark {
+  .changeTheme(
+    @text: @dark-color;
+    @container: @dark-content-bg;
+    @layout: @dark-layout-content-bg;
+    @svg: @dark-svg-color;
+    @tab-text: @dark-tab-color;
+    @tab-text-hover: @dark-tab-hover-color;
+    @tab-hover: @dark-tab-hover-bg;
+    @tab-active: @dark-tab-active-color;
+    @tab-active-bg: @dark-tab-active-bg;
+    @tab-remove-hover: @dark-tab-remove-hover-bg;
+    @table-border: @dark-table-border;
+    // 暗色本就没有斑马线. 只能给 transparent —— 表格底是 antd 的 colorBgContainer, 与项目的
+    // --bg-container 不同值, 填容器底反而显出条纹
+    @zebra: transparent;
+    @pagination-item: @dark-pagination-item-bg;
+    @pagination-active-text: @dark-pagination-active-text
+  );
+}
+
+/**
+ * 借 antd 的两个语义色. 只需一档 —— 明暗由 antd 的 algorithm 自己切, 项目不再各抄一份字面量,
+ * 换 ConfigProvider 的调色盘时这两个变量跟着走.
+ *
+ * `--color-pending` 是「待生效」: 用户改了但还没确认生效的东西 (列设置面板里勾了没点确认的
+ * 字段, 搜索栏里填了没点搜索的条件). 同一个语义共用一个色, 用户只学一遍.
+ *
+ * 做成 CSS 变量而不是 React hook: 取色的地方有 less, unocss, 内联样式与非组件代码, 而 hook
+ * 只在 React 渲染期用得上.
+ *
+ * 兜底值是各自的浅色档, 只在 `.ant-app` 外生效 —— 那里没有 `--ant-*`, 也没有元素取这两个色.
+ *
+ * 写在 `:root` 而不是 `.theme-primary`: 两者浅色时都命中 (index.html 的 body 就带
+ * `theme-primary`), 取 `:root` 是因为它不看 body 的 class, 而 `Theme` 组件用整体赋值改
+ * `body.className`.
+ */
+:root {
+  --color-pending: var(--ant-color-warning, #faad14);
+  --color-text-tertiary: var(--ant-color-text-tertiary, rgb(0 0 0 / 45%));
+}

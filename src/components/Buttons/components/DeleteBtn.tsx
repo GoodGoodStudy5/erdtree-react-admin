@@ -21,7 +21,6 @@ export function DeleteBtn(props: Props) {
     customizeTitle,
     name,
     btnType = 'delete',
-    className,
     handleDelete,
   } = props;
 
@@ -45,7 +44,6 @@ export function DeleteBtn(props: Props) {
         danger
         type="primary"
         {...params}
-        className={`${className} small-btn`}
         icon={params?.icon || (isIcon && <DeleteOutlined />)}
         loading={!!isLoading || loading}
       >
