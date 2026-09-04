@@ -19,6 +19,10 @@ export default defineConfig(({ mode }) => {
       // 浏览器环境中 process 未定义会抛出 "process is not defined"，
       // 导致拖拽回调 handleDragStart 中断、模态框无法拖动。这里将其置为 false。
       'process.env.DRAGGABLE_DEBUG': JSON.stringify(false),
+      // i18next-http-backend 与 motion 这类双环境包用 global 探测运行时, 浏览器里没有这个
+      // 全局量. 它们原先各自独立成 chunk 且跟着懒加载走, 合进 vendor 后进了首屏, 一加载即抛
+      // ReferenceError. globalThis 是标准全局对象, 两处语义一致
+      global: 'globalThis',
     },
     resolve: {
       alias: {

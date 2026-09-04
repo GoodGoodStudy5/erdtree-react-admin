@@ -1,7 +1,9 @@
 import type { PluginOption } from 'vite';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { resolveBuildId } from '../utils/helper.ts';
 import { timePlugin } from './time.ts';
 import { nojekyllPlugin } from './nojekyll.ts';
+import { indexSnapshotPlugin } from './indexSnapshot.ts';
 import { autoImportPlugin } from './autoImport.ts';
 import { versionUpdatePlugin } from './version.ts';
 import react from '@vitejs/plugin-react';
@@ -55,6 +57,8 @@ export function createVitePlugins() {
       versionUpdatePlugin(),
       // 生成 .nojekyll 空文件
       nojekyllPlugin(),
+      // index.html 存一份进构建目录, 让每个版本自包含
+      indexSnapshotPlugin(resolveBuildId()),
       // 包分析
       visualizer({
         gzipSize: true,

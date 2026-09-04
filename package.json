@@ -13,9 +13,9 @@
   },
   "scripts": {
     "dev": "vite --host",
-    "build": "pnpm typecheck && vite build",
-    "build:dev": "pnpm typecheck && vite build --mode dev",
-    "build:test": "pnpm typecheck && vite build --mode test",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "build:test": "vite build --mode test",
     "check": "lint-staged",
     "check:full": "pnpm lint && pnpm lint:stylelint && pnpm typecheck && depcruise src packages --config .dependency-cruiser.mjs --output-type err-long && pnpm test && sh scripts/check-stamp.sh save",
     "typecheck": "tsc --noEmit",

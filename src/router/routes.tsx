@@ -7,7 +7,10 @@ import NotFound from '@/pages/404';
 import Guards from './components/Guards';
 import RootLayout from './components/RootLayout';
 
-const pages = import.meta.glob('../pages/**/*.tsx', { eager: false }) as RouteModules;
+// 测试文件与页面同目录, 不排除会一并进产物
+const pages = import.meta.glob(['../pages/**/*.tsx', '!**/__tests__/**'], {
+  eager: false,
+}) as RouteModules;
 
 /** 全站路由表. 建在模块顶层, 路由才能在 React 之外装配一次, 组件外也拿得到跳转能力 */
 export const routes: RouteObject[] = [

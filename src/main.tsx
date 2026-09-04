@@ -10,8 +10,10 @@ import 'nprogress/nprogress.css';
 import '@/assets/css/scrollbar.less';
 import '@/assets/css/theme-color.less';
 
-// 静态导入icon
-import '@/utils/icons';
+// 图标集异步注册: 9.2MB 不进首屏关键路径, 不 await 让它与首屏渲染并行. 见 utils/icons
+import { registerIcons } from '@/utils/icons';
+
+registerIcons();
 
 // 国际化i18n
 import '@/locales';
