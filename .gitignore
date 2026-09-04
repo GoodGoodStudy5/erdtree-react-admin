@@ -21,6 +21,12 @@ dist-ssr
 AGENTS.override.md
 CLAUDE.local.md
 
+# 原型: 一次性代码, 只在本地验证与演示, 不进仓库.
+# 安全的前提是方向已上锁 —— 生产代码不引用原型, 由 .dependency-cruiser.mjs 的
+# no-prototype-as-dependency 拦住; 宿主页面只经 PrototypeSlot 挂载, 原型目录不在时
+# hasPrototype() 返回 false, 那一块自动不出现. 判据: 删掉整个 prototype 目录后仓库照常构建.
+**/pages/**/prototype/
+
 # Editor directories and files
 .idea
 .DS_Store

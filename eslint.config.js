@@ -150,6 +150,35 @@ const NO_MODAL_OUTLET = {
 };
 
 /**
+ * 原型挂载点: 一个文件引用了它, 就说明这一页还在验证阶段, 不该进仓库.
+ *
+ * **拦在 eslint 而不是单开一个提交脚本**: lint-staged 本来就对暂存文件跑 eslint, 于是「引用了
+ * 它的文件进不了提交」这件事不需要新增任何管道. 红线同时是给作者看的状态标记 —— 文件里有红,
+ * 就是还没定稿.
+ *
+ * 机制自身不会被误伤: `PrototypeSlot` 目录内不 import 自己, barrel 的 `export * from
+ * './PrototypeSlot'` 源路径也不是 `@/components`. 绕过 barrel 直接深引由
+ * dependency-cruiser 的 no-deep-cross-dir 拦.
+ */
+const NO_PROTOTYPE_SLOT = {
+  name: '@/components',
+  importNames: ['PrototypeSlot', 'hasPrototype'],
+  message:
+    '引用 PrototypeSlot 说明这个页面还在验证阶段, 不能提交. 本地演示照常跑, 提交前把这个文件撤出暂存区',
+};
+
+/**
+ * 反向 import 原型目录, 与 dependency-cruiser 的 no-prototype-as-dependency 同一判据.
+ * 这里重列一条只为把它提前到 pre-commit: depcruise 只在 pre-push 的 check:full 里跑,
+ * 在那之前错的提交已经进了本地历史.
+ */
+const NO_PROTOTYPE_IMPORT = {
+  group: ['**/prototype', '**/prototype/**'],
+  message:
+    '生产代码不引用原型目录 —— 它不进版本库, 这条 import 一提交别人 clone 后 tsc 就报 Cannot find module. 要嵌进页面用 @/components 的 PrototypeSlot',
+};
+
+/**
  * 语言变化只由路由出口订阅一次, 切语言时整树重挂载, 各处直接调用的 $t 借此重新取值.
  * 多处订阅会让部分文案更新, 部分留在旧语言.
  */
@@ -158,6 +187,20 @@ const NO_USE_TRANSLATION = {
   importNames: ['useTranslation'],
   message: '国际化直接 import { $t } from "@/locales", 语言订阅只在 AppRouter 一处',
 };
+
+/**
+ * src 全域的导入红线. 公共封装自己要包 antd 原件, 传入自己那一条免掉.
+ * @param except - 免掉的那一条
+ */
+const srcRestrictedImports = (except) => [
+  'error',
+  {
+    paths: [NO_MODAL_OUTLET, NO_USE_TRANSLATION, NO_PROTOTYPE_SLOT].filter(
+      (one) => one !== except,
+    ),
+    patterns: [NO_PROTOTYPE_IMPORT],
+  },
+];
 
 /**
  * 跳转只从导航门面取件. useNavigate 拿到的是组件内专属入口, 有了它就必须把「想跳转的东西」
@@ -473,7 +516,7 @@ export default tseslint.config(
     files: ['src/**/*.{ts,tsx}'],
     ignores: ['src/router/**'],
     rules: {
-      'no-restricted-imports': ['error', { paths: [NO_MODAL_OUTLET, NO_USE_TRANSLATION] }],
+      'no-restricted-imports': srcRestrictedImports(),
     },
   },
   {
@@ -487,8 +530,14 @@ export default tseslint.config(
   {
     // 路由生成把 PascalCase 视为"不参与路由", 命名走小写会让页面多出一条路由
     files: ['src/pages/**/*.tsx'],
-    // index 与 model 是机制文件, 403 / 404 错误页沿用扁平数字命名
-    ignores: ['src/pages/**/index.tsx', 'src/pages/**/model.tsx', 'src/pages/40[0-9].tsx'],
+    // index 与 model 是机制文件, 403 / 404 错误页沿用扁平数字命名;
+    // 原型挂载点同理 —— PrototypeSlot 的 import.meta.glob 把路径写死成 mount.tsx, 改名插槽当场扫不到
+    ignores: [
+      'src/pages/**/index.tsx',
+      'src/pages/**/model.tsx',
+      'src/pages/40[0-9].tsx',
+      'src/pages/**/prototype/mount.tsx',
+    ],
     plugins: { 'check-file': checkFile },
     rules: {
       'check-file/filename-naming-convention': [

@@ -49,6 +49,16 @@ export default {
       to: { path: '^src/pages/' },
     },
     {
+      name: 'no-prototype-as-dependency',
+      comment:
+        '原型是一次性的, 生产代码不能依赖它. 判据: 删掉整个 prototype 目录后仓库照常构建 —— 反向 import 做不到这一点, 删了目录 tsc 当场报 Cannot find module. ' +
+        '要把原型嵌进真实页面请用 PrototypeSlot: 它靠 import.meta.glob 扫 prototype/mount.tsx, 匹配不到时返回空对象而不报错, 因此不产生编译期依赖. ' +
+        '本规则零豁免 —— 「就破例这一个文件」的名单一旦开口, 第二个名字就没有判据可以拦',
+      severity: 'error',
+      from: { pathNot: '/prototype/' },
+      to: { path: '/prototype/' },
+    },
+    {
       name: 'no-package-to-src',
       comment:
         'packages 是与本应用无关的可复用包, 依赖 src 会把它绑死在这个应用上. 需要的东西请由调用方注入, 或下沉到包内自足',
