@@ -567,13 +567,15 @@ export default tseslint.config(
     rules: { 'no-restricted-imports': srcRestrictedImports(NO_ANTD_DESCRIPTIONS) },
   },
   {
-    // 「挂载点只此一处」防的是产物, 而用例不进产物 —— 要覆盖 openModal 那条路径就得挂一个.
-    // 导航门面同理: 用例自己建 MemoryRouter, 门面持有的是另一个 router 实例, 调它跳不动这一个
+    // 「挂载点只此一处」防的是产物, 而用例不进产物 —— 要覆盖 openModal 那条路径就得挂一个
     files: ['src/**/__tests__/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': srcRestrictedImports(NO_MODAL_OUTLET),
-      'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER],
-    },
+    rules: { 'no-restricted-imports': srcRestrictedImports(NO_MODAL_OUTLET) },
+  },
+  {
+    // 抽屉路由的用例自己建 MemoryRouter, 导航门面持有的是另一个 router 实例, 调它跳不动这一个.
+    // 辖区只收这一个目录: no-restricted-syntax 整条覆盖, 放宽到全部用例会连带摘掉另外三条
+    files: ['src/components/Drawer/__tests__/**/*.{ts,tsx}'],
+    rules: { 'no-restricted-syntax': ['error', ...NO_MODAL_PROPS_ON_OTHER_CARRIER] },
   },
   {
     // 路由生成把 PascalCase 视为"不参与路由", 命名走小写会让页面多出一条路由
