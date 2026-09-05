@@ -2,9 +2,15 @@
 .search-select-table-popup {
   padding-top: 0;
 
+  /*
+   * 两者都显式撑满. 行不写这一条就退回内容宽 —— 它是 `.ant-select-item-option-content` 的
+   * flex item, 默认 `flex: 0 1 auto`; 单元格的 `flex: 1` 于是在内容宽里等分, 而表头在弹层
+   * 整宽里等分, 两边的列对不齐.
+   */
   .search-select-table-header,
   .search-select-table-row {
     display: flex;
+    width: 100%;
     white-space: nowrap;
   }
 
@@ -37,6 +43,14 @@
   /* 选项本身不再留内边距, 内边距归单元格 */
   .ant-select-item-option {
     padding: 0;
+  }
+
+  /*
+   * 多选的选中勾挂在选项行右侧, 会占掉一截宽度, 于是行比表头窄, 两者的列就错开了.
+   * 选中与否由 antd 自己的背景色表达, 表格式下拉里再放一个勾也会压坏列对齐.
+   */
+  .ant-select-item-option-state {
+    display: none;
   }
 
   .ant-select-item-option-content {
