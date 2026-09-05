@@ -1,4 +1,7 @@
 import type { MenuProps } from 'antd';
+
+/** antd 没把 onClick 的入参类型单独导出, 从 props 上取比摸 rc-menu 的内部路径稳 */
+type MenuClickInfo = Parameters<NonNullable<MenuProps['onClick']>>[0];
 import type { SideMenu } from '#/public';
 import type { ItemType, MenuItemType } from 'antd/es/menu/interface';
 import { useCallback, useMemo, memo } from 'react';
@@ -19,6 +22,30 @@ import {
 import styles from '../index.module.less';
 import Logo from '@/assets/images/logo.svg';
 import { $t, i18n } from '@/locales';
+
+/**
+ * 叶子菜单的 label 包一层 `a`.
+ *
+ * 没有 href 就没有浏览器的原生能力 —— 中键、Ctrl / Cmd 点击、右键「在新标签页打开」、
+ * 悬停看地址全都没有. 只包叶子: 有子菜单的那一层点下去是展开, 不是跳转.
+ *
+ * 路由是 `createHashRouter`, 所以内部地址要带上 `#`; 外链原样.
+ * @param items - 已转成 antd 形状的菜单项
+ */
+function withLinks(items: ItemType<MenuItemType>[]): ItemType<MenuItemType>[] {
+  return items.map((item) => {
+    if (!item || !('key' in item) || item.key === undefined || item.key === null) return item;
+
+    const children = 'children' in item ? item.children : undefined;
+    if (children?.length) {
+      return { ...item, children: withLinks(children as ItemType<MenuItemType>[]) };
+    }
+
+    const key = String(item.key);
+    const label = (item as MenuItemType).label;
+    return { ...item, label: <a href={isUrl(key) ? key : `#${key}`}>{label}</a> };
+  });
+}
 
 /**
  * 转换菜单icon格式
@@ -94,7 +121,12 @@ function LayoutMenu() {
    * 点击菜单
    */
   const onClickMenu: MenuProps['onClick'] = useCallback(
-    ({ key }: { key: string }) => {
+    ({ key, domEvent }: MenuClickInfo) => {
+      // 带修饰键的点击让浏览器自己开新标签: 拦下来 label 上那个 href 就白给了
+      if (domEvent.ctrlKey || domEvent.metaKey || domEvent.shiftKey) return;
+      // 其余情况由下面的 SPA 导航负责, 不让 href 再写一次 hash
+      domEvent.preventDefault();
+
       // 如果点击的菜单是当前菜单则退出
       if (key === pathname) return;
 
@@ -184,7 +216,7 @@ function LayoutMenu() {
 
   // 缓存菜单项
   const menuItems = useMemo(
-    () => handleFilterMenus(filteredMenus) as ItemType<MenuItemType>[],
+    () => withLinks(handleFilterMenus(filteredMenus) as ItemType<MenuItemType>[]),
     [filteredMenus],
   );
 
