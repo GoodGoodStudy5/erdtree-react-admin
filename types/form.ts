@@ -20,7 +20,6 @@ import type {
   ApiTreeSelectProps,
   ApiPageSelectProps,
 } from '@/components/Selects/types';
-import type { ServerResult } from '@south/request';
 import type { Key, ReactNode } from 'react';
 import type { RangePickerProps } from 'antd/lib/date-picker';
 import type { DefaultOptionType } from 'antd/lib/select';
@@ -93,7 +92,7 @@ export interface ApiResult extends Omit<DefaultOptionType, 'value'> {
 }
 
 /** API 请求函数, 入参个数与形状由具体接口决定 */
-export type ApiFn = (...params: unknown[]) => Promise<ServerResult<unknown>>;
+export type ApiFn = (...params: unknown[]) => Promise<unknown>;
 
 // 组件参数
 export type ComponentProps =

@@ -28,8 +28,7 @@ function ApiSelect(props: ApiSelectProps) {
       setLoading(true);
       if (api) {
         const apiFun = Array.isArray(params) ? api(...params) : api(params);
-        const { code, data } = await apiFun;
-        if (Number(code) !== 200) return;
+        const data = await apiFun;
         const result = apiResultKey
           ? (data as { [apiResultKey: string]: unknown })?.[apiResultKey]
           : data;

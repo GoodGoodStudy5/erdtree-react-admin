@@ -8,10 +8,9 @@ interface Row {
 
 /** 造一个立刻成功的取数函数, 记下每次收到的入参 */
 function okFetch(items: Row[] = [], total = 0) {
-  return vi.fn(async () => ({
-    code: '200',
-    data: { items, total },
-  })) as unknown as QueryFetcher<Row> & { mock: { calls: unknown[][] } };
+  return vi.fn(async () => ({ items, total })) as unknown as QueryFetcher<Row> & {
+    mock: { calls: unknown[][] };
+  };
 }
 
 /** 出口层在用例里退化成恒等, 转换本身归 transform 的用例 */
@@ -71,7 +70,7 @@ describe('createQueryStore', () => {
       await new Promise((resolve) => setTimeout(resolve, tag === 'slow' ? 20 : 0));
       order.push(tag);
 
-      return { code: '200', data: { items: [{ id: tag }], total: 1 } };
+      return { items: [{ id: tag }], total: 1 };
     }) as unknown as QueryFetcher<Row>;
     const store = createQueryStore<Row>({ fetch, toParams: identity, readDraft: emptyDraft });
 
@@ -87,11 +86,11 @@ describe('createQueryStore', () => {
   it('取数失败时保住上一次的数据, 并收掉 loading', async () => {
     vi.spyOn(console, 'error').mockReturnValue(undefined);
     let ok = true;
-    const fetch = vi.fn(async () =>
-      ok
-        ? { code: '200', data: { items: [{ id: 'a' }], total: 1 } }
-        : { code: '500', message: '炸了' },
-    ) as unknown as QueryFetcher<Row>;
+    const fetch = vi.fn(async () => {
+      // 失败走 reject: 业务码非成功由请求层抛出, 不进返回值
+      if (!ok) throw new Error('炸了');
+      return { items: [{ id: 'a' }], total: 1 };
+    }) as unknown as QueryFetcher<Row>;
     const store = createQueryStore<Row>({ fetch, toParams: identity, readDraft: emptyDraft });
 
     store.reload();
@@ -219,7 +218,7 @@ describe('createQueryStore', () => {
     const fetch = vi.fn(async () => {
       await new Promise((resolve) => setTimeout(resolve, 20));
 
-      return { code: '200', data: { items: [{ id: 'late' }], total: 1 } };
+      return { items: [{ id: 'late' }], total: 1 };
     }) as unknown as QueryFetcher<Row>;
     const store = createQueryStore<Row>({ fetch, toParams: identity, readDraft: emptyDraft });
 

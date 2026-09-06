@@ -46,10 +46,7 @@ function MenuPage() {
 
     try {
       setLoading(true);
-      const res = await getMenuPage(params);
-      const { code, data } = res;
-      if (Number(code) !== 200) return;
-      const { items, total } = data;
+      const { items, total } = await getMenuPage(params);
       setTotal(total || 0);
       setTableData(items || []);
     } finally {
@@ -107,11 +104,9 @@ function MenuPage() {
   const onDelete = async (id: string) => {
     try {
       setLoading(true);
-      const { code, message } = await deleteMenu(id);
-      if (Number(code) === 200) {
-        messageApi.success(message || $t('public.successfullyDeleted'));
-        getPage();
-      }
+      await deleteMenu(id);
+      messageApi.success($t('public.successfullyDeleted'));
+      getPage();
     } finally {
       setLoading(false);
     }
@@ -127,12 +122,10 @@ function MenuPage() {
     }
     try {
       setLoading(true);
-      const { code, message } = await batchDeleteMenu(selectedRowKeys as string[]);
-      if (Number(code) === 200) {
-        messageApi.success(message || $t('public.successfullyDeleted'));
-        setSelectedRowKeys([]);
-        getPage();
-      }
+      await batchDeleteMenu(selectedRowKeys as string[]);
+      messageApi.success($t('public.successfullyDeleted'));
+      setSelectedRowKeys([]);
+      getPage();
     } finally {
       setLoading(false);
     }

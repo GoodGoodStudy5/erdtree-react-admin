@@ -1,8 +1,9 @@
-import type { CreateRequestOptions, RequestCancel } from './types';
+import type { CreateRequestOptions, RequestCancel, ServerResult } from './types';
 import { message } from '@south/message';
 import { getLocalInfo, removeLocalInfo } from '@south/utils';
 import axios from 'axios';
 import AxiosRequest from './request';
+import { RequestError } from './requestError';
 
 /**
  * 权限过期提示在 localStorage 中的存储 key
@@ -32,7 +33,7 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
       // 请求拦截超时
       requestInterceptorsCatch(err) {
         message.error('请求超时！');
-        return err;
+        return Promise.reject(new RequestError(0, err?.message || '请求超时'));
       },
       // 接口响应拦截
       responseInterceptors(res) {
@@ -45,7 +46,7 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
             '',
           );
           if (currentToken && requestToken !== currentToken) {
-            return res;
+            throw new RequestError(401, '换会话前发出的请求, 结论不作数');
           }
 
           const lang = localStorage.getItem('lang');
@@ -64,7 +65,8 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
             const redirect = current && current !== '/login' ? `?redirect=${current}` : '';
             window.location.href = `/login${redirect}`;
           }
-          return res;
+          // 跳转已经是反馈, 不再弹提示
+          throw new RequestError(401, msg);
         }
 
         // blob 响应（文件下载）跳过业务 code 校验，交由调用方处理（如 ExportModal 解析错误 blob）
@@ -74,21 +76,23 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
 
         // 错误处理（FastAPI HTTPException 返回 {detail} 无 message/code，故兜底 detail）
         if (data?.code !== 200) {
-          handleError(data?.message || data?.detail);
-          return res;
+          const msg = data?.message || data?.detail;
+          handleError(msg);
+          throw new RequestError(data?.code ?? 0, msg || '请求失败');
         }
 
+        // 业务信封止步于本层: 调用方拿到的是 data 本身
+        res.data = (data as ServerResult).data;
         return res;
       },
       responseInterceptorsCatch(err) {
-        // 取消重复请求则不报错
-        if (axios.isCancel(err)) {
-          err.data = err.data || {};
-          return err;
-        }
+        // 清场时会 abort 在飞请求: 取消不是失败, 不提示
+        if (axios.isCancel(err)) return Promise.reject(err);
 
-        handleError((err as RequestCancel)?.response?.data?.message || '服务器错误！');
-        return err;
+        const response = (err as RequestCancel)?.response;
+        const msg = response?.data?.message || '服务器错误！';
+        handleError(msg);
+        return Promise.reject(new RequestError(response?.status ?? 0, msg));
       },
     },
   });
@@ -108,4 +112,6 @@ const handleError = (error: string, content?: string) => {
 };
 
 export { creteRequest, LOGIN_EXPIRED_MSG };
-export type * from './types';
+export { RequestError } from './requestError';
+// 后端信封与拦截器内部的错误形状不外泄, 调用方拿到的是剥好的业务数据
+export type { CreateRequestConfig, CreateRequestOptions, RequestInterceptors } from './types';

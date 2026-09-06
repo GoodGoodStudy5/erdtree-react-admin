@@ -14,13 +14,10 @@ function NotFound() {
   /** 获取用户权限 */
   const fetchPermissions = async (): Promise<string[]> => {
     try {
-      const { code, data } = await getUserRefreshPermissions({ refresh_cache: false });
-      if (Number(code) === 200 && data) {
-        const { user, permissions } = data;
-        setUserInfo(user);
-        setPermissions(permissions);
-        return permissions;
-      }
+      const { user, permissions } = await getUserRefreshPermissions({ refresh_cache: false });
+      setUserInfo(user);
+      setPermissions(permissions);
+      return permissions;
     } catch (err) {
       console.error('获取权限数据失败:', err);
     }
@@ -30,11 +27,9 @@ function NotFound() {
   /** 获取菜单数据 */
   const fetchMenuList = async (): Promise<SideMenu[]> => {
     try {
-      const { code, data } = await getMenuList();
-      if (Number(code) === 200 && data) {
-        setMenuList(data);
-        return data;
-      }
+      const data = (await getMenuList()) || [];
+      setMenuList(data);
+      return data;
     } catch (err) {
       console.error('获取菜单数据失败:', err);
     }

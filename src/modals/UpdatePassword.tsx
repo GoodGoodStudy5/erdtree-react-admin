@@ -29,11 +29,9 @@ export function UpdatePassword(props: ModalControl<boolean>) {
       throw new ModalAbort('confirm password mismatch');
     }
 
-    const { code, message: messageInfo } = await updatePassword(values);
-    // 请求层已经弹过错误提示, 这里抛出只为让弹窗停在原地
-    if (Number(code) !== 200) throw new Error(messageInfo || 'update password failed');
+    await updatePassword(values);
 
-    message.success(messageInfo);
+    message.success($t('public.successfulOperation'));
     return true;
   };
 

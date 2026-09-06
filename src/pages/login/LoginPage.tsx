@@ -63,9 +63,7 @@ function LoginPage() {
   const getUserPermissions = async () => {
     try {
       setLoading(true);
-      const { code, data } = await getUserRefreshPermissions({ refresh_cache: false });
-      if (Number(code) !== 200) return;
-      const { user, permissions } = data;
+      const { user, permissions } = await getUserRefreshPermissions({ refresh_cache: false });
       setUserInfo(user);
       setPermissions(permissions);
       handleGoMenu(permissions);
@@ -82,8 +80,7 @@ function LoginPage() {
 
     try {
       setLoading(true);
-      const { code, data } = await getMenuList();
-      if (Number(code) !== 200) return;
+      const data = await getMenuList();
       setMenuList(data || []);
       result = data;
     } finally {
@@ -171,9 +168,7 @@ function LoginPage() {
   const handleFinish: FormProps['onFinish'] = async (values: LoginData) => {
     try {
       setLoading(true);
-      const { code, data } = await login(values);
-      if (Number(code) !== 200) return;
-      const { token, user, permissions } = data;
+      const { token, user, permissions } = await login(values);
 
       // 处理记住我逻辑
       const passwordObj = { value: values.password, expire: 0 };

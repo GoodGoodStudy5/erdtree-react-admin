@@ -46,9 +46,7 @@ function UserPage() {
 
     try {
       setLoading(true);
-      const { code, data } = await getUserPage(params);
-      if (Number(code) !== 200) return;
-      const { items, total } = data;
+      const { items, total } = await getUserPage(params);
       setTotal(total || 0);
       setTableData(items || []);
     } finally {
@@ -102,11 +100,9 @@ function UserPage() {
   const onDelete = async (id: string) => {
     try {
       setLoading(true);
-      const { code, message } = await deleteUser(id);
-      if (Number(code) === 200) {
-        messageApi.success(message || $t('public.successfullyDeleted'));
-        getPage();
-      }
+      await deleteUser(id);
+      messageApi.success($t('public.successfullyDeleted'));
+      getPage();
     } finally {
       setLoading(false);
     }
@@ -123,11 +119,9 @@ function UserPage() {
       }
       setLoading(true);
       const params = { ids: selectedRowKeys };
-      const { code, message } = await batchDeleteUser(params);
-      if (Number(code) === 200) {
-        messageApi.success(message || $t('public.successfullyDeleted'));
-        getPage();
-      }
+      await batchDeleteUser(params);
+      messageApi.success($t('public.successfullyDeleted'));
+      getPage();
     } finally {
       setLoading(false);
     }

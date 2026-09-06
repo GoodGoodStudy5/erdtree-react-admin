@@ -43,9 +43,7 @@ function Layout() {
   /** 获取用户信息和权限 */
   const getUserInfo = useCallback(async () => {
     try {
-      const { code, data } = await getUserRefreshPermissions({ refresh_cache: false });
-      if (Number(code) !== 200) return;
-      const { user, permissions } = data;
+      const { user, permissions } = await getUserRefreshPermissions({ refresh_cache: false });
       setUserInfo(user);
       setPermissions(permissions);
     } catch (err) {
@@ -59,9 +57,7 @@ function Layout() {
   /** 获取菜单数据 */
   const getMenuData = useCallback(async () => {
     try {
-      const { code, data } = await getMenuList();
-      if (Number(code) !== 200) return;
-      setMenuList(data || []);
+      setMenuList((await getMenuList()) || []);
     } finally {
       setLoading(false);
     }

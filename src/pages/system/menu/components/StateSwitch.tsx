@@ -28,14 +28,12 @@ function StateSwitch(props: Props) {
 
     try {
       setLoading(true);
-      const { code, message } = await changeMenuState(params);
-      if (Number(code) === 200) {
-        messageApi.success({
-          content: message || $t('public.successfulOperation'),
-          key: 'success',
-        });
-        setLocalValue(value);
-      }
+      await changeMenuState(params);
+      messageApi.success({
+        content: $t('public.successfulOperation'),
+        key: 'success',
+      });
+      setLocalValue(value);
     } finally {
       setLoading(false);
     }

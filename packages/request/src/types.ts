@@ -2,7 +2,6 @@ import type { AxiosResponse, InternalAxiosRequestConfig, CreateAxiosDefaults, Ca
 
 /** 拦截器拿到的错误形状: axios 的取消对象加上后端返回的响应体 */
 export interface RequestCancel extends Cancel {
-  data: object;
   response: {
     status: number;
     data: {
@@ -16,10 +15,10 @@ export interface RequestCancel extends Cancel {
 export interface RequestInterceptors<T> {
   // 请求拦截
   requestInterceptors?: (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig;
-  requestInterceptorsCatch?: (err: RequestCancel) => void;
+  requestInterceptorsCatch?: (err: RequestCancel) => unknown;
   // 响应拦截
   responseInterceptors?: (config: T) => T;
-  responseInterceptorsCatch?: (err: RequestCancel) => void;
+  responseInterceptorsCatch?: (err: RequestCancel) => unknown;
 }
 
 /** 自定义传入的参数: axios 原生配置外加本包的拦截器 */

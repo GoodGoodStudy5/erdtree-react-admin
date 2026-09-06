@@ -20,9 +20,7 @@ function AuthorizeSelect(props: Props) {
 
     try {
       setLoading(true);
-      const res = await getRolePermission(params);
-      const { code, data } = res;
-      if (Number(code) !== 200) return;
+      const data = await getRolePermission(params);
       setList(data?.treeData || []);
     } finally {
       setLoading(false);

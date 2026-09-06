@@ -65,8 +65,7 @@ function ForgetPage() {
 
     try {
       setLoading(true);
-      const { code } = await forgetPassword(values);
-      if (Number(code) !== 200) return;
+      await forgetPassword(values);
 
       globalMessage.success({
         content: $t('login.verificationPassed'),

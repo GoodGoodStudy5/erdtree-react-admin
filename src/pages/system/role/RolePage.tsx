@@ -55,10 +55,7 @@ function RolePage() {
 
     try {
       setLoading(true);
-      const res = await getRolePage(params);
-      const { code, data } = res;
-      if (Number(code) !== 200) return;
-      const { items, total } = data;
+      const { items, total } = await getRolePage(params);
       setTotal(total || 0);
       setTableData(items || []);
     } finally {
@@ -109,9 +106,7 @@ function RolePage() {
       setCreateTitle(EDIT_TITLE(id));
       setCreateId(id);
       setCreateLoading(true);
-      const { code, data } = await getRoleById(id);
-      if (Number(code) !== 200) return;
-      setCreateData(data);
+      setCreateData(await getRoleById(id));
     } finally {
       setCreateLoading(false);
     }
@@ -127,9 +122,7 @@ function RolePage() {
       setCreateTitle(ADD_TITLE());
       setCreateId('');
       setCreateLoading(true);
-      const { code, data } = await getRoleById(id);
-      if (Number(code) !== 200) return;
-      const { id: _id, createdAt, updatedAt, ...rest } = data;
+      const { id: _id, createdAt, updatedAt, ...rest } = await getRoleById(id);
       setCreateData(rest);
     } finally {
       setCreateLoading(false);
@@ -154,9 +147,8 @@ function RolePage() {
     try {
       setCreateLoading(true);
       const functions = () => (createId ? updateRole(createId, values) : createRole(values));
-      const { code, message } = await functions();
-      if (Number(code) !== 200) return;
-      messageApi.success(message || $t('public.successfulOperation'));
+      await functions();
+      messageApi.success($t('public.successfulOperation'));
       setCreateOpen(false);
       getPage();
     } finally {
@@ -171,11 +163,9 @@ function RolePage() {
   const onDelete = async (id: string) => {
     try {
       setLoading(true);
-      const { code, message } = await deleteRole(id);
-      if (Number(code) === 200) {
-        messageApi.success(message || $t('public.successfullyDeleted'));
-        getPage();
-      }
+      await deleteRole(id);
+      messageApi.success($t('public.successfullyDeleted'));
+      getPage();
     } finally {
       setLoading(false);
     }

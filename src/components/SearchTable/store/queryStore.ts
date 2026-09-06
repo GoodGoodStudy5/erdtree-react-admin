@@ -1,4 +1,3 @@
-import type { ServerResult } from '@south/request';
 import type { ReadableSliceStore } from '../../SliceStore';
 import { createSliceStore } from '../../SliceStore';
 // 显式引而不靠自动导入: 用例跑在没有那个插件的环境里, 靠自动导入的值在测试中是 undefined
@@ -43,7 +42,7 @@ export interface QuerySliceConfig<T> {
 /** 取数函数. 收平铺的条件与分页, 与 servers 层现有签名对齐, 页面可直接把 service 传进来 */
 export type QueryFetcher<TItem> = (
   input: PaginationData & Record<string, unknown>,
-) => Promise<ServerResult<PageServerResult<TItem[]>>>;
+) => Promise<PageServerResult<TItem[]>>;
 
 /** 造 store 要的东西 */
 export interface QueryStoreConfig<TItem> {
@@ -163,13 +162,12 @@ export function createQueryStore<TItem>(config: QueryStoreConfig<TItem>): QueryS
 
     slices.set('result', (result) => ({ ...result, loading: true }));
     try {
-      const res = await config.fetch({ ...toParams(), ...get('pagination') });
+      const page = await config.fetch({ ...toParams(), ...get('pagination') });
 
       if (current !== ticket || slices.isDestroyed()) return;
-      if (Number(res.code) !== 200) throw new Error(res.message ?? '分页查询失败');
       slices.set('result', () => ({
-        items: res.data.items ?? [],
-        total: res.data.total,
+        items: page.items ?? [],
+        total: page.total,
         loading: false,
       }));
     } catch (error) {

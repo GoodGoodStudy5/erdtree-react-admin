@@ -32,12 +32,8 @@ export function MenuEditModal(props: Props) {
     onSubmit: async (raw) => {
       // BaseForm 的 form 是 FormInstance<object>, 泛型不变性下只能按 object 取, 值在此收窄
       const values = raw as BaseFormData;
-      const { code, message: messageInfo } = await (id
-        ? updateMenu(id, values)
-        : createMenu(values));
-      // 请求层已弹过错误提示, 这里抛出只为让弹窗停在原地
-      if (Number(code) !== 200) throw new Error(messageInfo || 'submit failed');
-      messageApi.success(messageInfo || $t('public.successfulOperation'));
+      await (id ? updateMenu(id, values) : createMenu(values));
+      messageApi.success($t('public.successfulOperation'));
       return true;
     },
   });
@@ -51,13 +47,10 @@ export function MenuEditModal(props: Props) {
     const fetchDetail = async () => {
       try {
         setLoading(true);
-        const { code, data: detail, message: messageInfo } = await getMenuById(id);
+        setData(await getMenuById(id));
+      } catch {
         // 详情拉不到就不能编辑: 空表单提交会把已有数据抹成空
-        if (Number(code) !== 200) {
-          setLoadError(messageInfo || $t('public.loadDetailFailed'));
-          return;
-        }
-        setData(detail);
+        setLoadError($t('public.loadDetailFailed'));
       } finally {
         setLoading(false);
       }
