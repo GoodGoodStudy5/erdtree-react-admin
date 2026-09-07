@@ -157,7 +157,7 @@ export function createQueryStore<TItem>(config: QueryStoreConfig<TItem>): QueryS
     return slices.isDestroyed();
   };
 
-  async function runFetch() {
+  async function asyncRunFetch() {
     const current = (ticket += 1);
 
     slices.set('result', (result) => ({ ...result, loading: true }));
@@ -195,7 +195,7 @@ export function createQueryStore<TItem>(config: QueryStoreConfig<TItem>): QueryS
 
     // 两片一起改, 只走一轮通知: 分两次改会让「新条件配旧页码」那个半截状态被订阅者看见
     slices.patch({ committed: next, pagination: nextPage });
-    void runFetch();
+    void asyncRunFetch();
   };
 
   const set: QueryStore<TItem>['set'] = (slice, updater) => {
@@ -205,14 +205,14 @@ export function createQueryStore<TItem>(config: QueryStoreConfig<TItem>): QueryS
     if (slice !== 'pagination') throw new Error(`[QueryStore] ${slice} 片不可 set`);
 
     slices.set('pagination', updater);
-    void runFetch();
+    void asyncRunFetch();
   };
 
   const getDraft: QueryStore<TItem>['getDraft'] = () => config.readDraft();
 
   const reload: QueryStore<TItem>['reload'] = () => {
     if (isGone('reload')) return;
-    void runFetch();
+    void asyncRunFetch();
   };
 
   const destroy: QueryStore<TItem>['destroy'] = () => {

@@ -38,7 +38,7 @@ function LogPage() {
   };
 
   /** 获取表格数据 */
-  const getPage = useCallback(async () => {
+  const asyncGetPage = useCallback(async () => {
     const params = { ...searchData, page, pageSize };
 
     try {
@@ -53,17 +53,17 @@ function LogPage() {
   }, [page, pageSize, searchData]);
 
   useEffect(() => {
-    if (isFetch) getPage();
+    if (isFetch) asyncGetPage();
   }, [isFetch]);
 
   // 首次进入自动加载接口数据
   useEffect(() => {
-    if (pagePermission.page) getPage();
+    if (pagePermission.page) asyncGetPage();
   }, [pagePermission.page]);
 
   // 每次进入调用
   useEffectOnActive(() => {
-    getPage();
+    asyncGetPage();
   }, []);
 
   /**
@@ -85,7 +85,7 @@ function LogPage() {
       setLoading(true);
       await deleteLog(id);
       messageApi.success($t('public.successfullyDeleted'));
-      getPage();
+      asyncGetPage();
     } finally {
       setLoading(false);
     }
@@ -105,7 +105,7 @@ function LogPage() {
       await batchDeleteLog(params);
       messageApi.success($t('public.successfullyDeleted'));
       setSelectedRowKeys([]);
-      getPage();
+      asyncGetPage();
     } finally {
       setLoading(false);
     }
@@ -190,7 +190,7 @@ function LogPage() {
           dataSource={tableData}
           rowSelection={rowSelection}
           leftContent={leftContentRender}
-          getPage={getPage}
+          getPage={asyncGetPage}
         />
 
         <BasePagination

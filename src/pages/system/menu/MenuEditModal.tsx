@@ -44,7 +44,7 @@ export function MenuEditModal(props: Props) {
   // 编辑时打开即拉详情, 期间内容区转圈
   useEffect(() => {
     if (!id) return;
-    const fetchDetail = async () => {
+    const asyncFetchDetail = async () => {
       try {
         setLoading(true);
         setData(await getMenuById(id));
@@ -55,7 +55,7 @@ export function MenuEditModal(props: Props) {
         setLoading(false);
       }
     };
-    fetchDetail();
+    asyncFetchDetail();
   }, [id]);
 
   return (

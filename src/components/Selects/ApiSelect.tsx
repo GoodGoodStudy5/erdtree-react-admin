@@ -20,7 +20,7 @@ function ApiSelect(props: ApiSelectProps) {
   delete params.apiResultKey;
 
   /** 获取接口数据 */
-  const getApiData = useCallback(async () => {
+  const asyncGetApiData = useCallback(async () => {
     if (!props.api) return;
     try {
       const { api, params, apiResultKey } = props;
@@ -42,7 +42,7 @@ function ApiSelect(props: ApiSelectProps) {
   useEffect(() => {
     // 当有值且列表为空时，自动获取接口
     if (props.value && options.length === 0) {
-      getApiData();
+      asyncGetApiData();
     }
   }, [props.value]);
 
@@ -51,7 +51,7 @@ function ApiSelect(props: ApiSelectProps) {
    * @param open - 是否展开
    */
   const onOpenChange = (open: boolean) => {
-    if (open) getApiData();
+    if (open) asyncGetApiData();
 
     props.onOpenChange?.(open);
   };

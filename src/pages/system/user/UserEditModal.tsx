@@ -37,7 +37,7 @@ export function UserEditModal(props: Props) {
   // 编辑时打开即拉详情, 期间内容区转圈
   useEffect(() => {
     if (!id) return;
-    const fetchDetail = async () => {
+    const asyncFetchDetail = async () => {
       try {
         setLoading(true);
         setData(await getUserById(id));
@@ -48,7 +48,7 @@ export function UserEditModal(props: Props) {
         setLoading(false);
       }
     };
-    fetchDetail();
+    asyncFetchDetail();
   }, [id]);
 
   return (

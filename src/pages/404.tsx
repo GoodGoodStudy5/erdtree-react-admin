@@ -12,7 +12,7 @@ function NotFound() {
   const { addTabs, setActiveKey } = useTabsStore.getState();
 
   /** 获取用户权限 */
-  const fetchPermissions = async (): Promise<string[]> => {
+  const asyncFetchPermissions = async (): Promise<string[]> => {
     try {
       const { user, permissions } = await getUserRefreshPermissions({ refresh_cache: false });
       setUserInfo(user);
@@ -25,7 +25,7 @@ function NotFound() {
   };
 
   /** 获取菜单数据 */
-  const fetchMenuList = async (): Promise<SideMenu[]> => {
+  const asyncFetchMenuList = async (): Promise<SideMenu[]> => {
     try {
       const data = (await getMenuList()) || [];
       setMenuList(data);
@@ -37,18 +37,18 @@ function NotFound() {
   };
 
   /** 跳转首页 */
-  const goIndex = async () => {
+  const asyncGoIndex = async () => {
     let currentPermissions = permissions;
     let currentMenuList = menuList;
 
     // 如果 permissions 为空，先获取权限
     if (currentPermissions.length === 0) {
-      currentPermissions = await fetchPermissions();
+      currentPermissions = await asyncFetchPermissions();
     }
 
     // 如果 menuList 为空，获取菜单数据
     if (currentMenuList.length === 0) {
-      currentMenuList = await fetchMenuList();
+      currentMenuList = await asyncFetchMenuList();
     }
 
     // 如果仍然为空，直接返回
@@ -72,7 +72,7 @@ function NotFound() {
     <div className="absolute left-50% top-50% -translate-x-1/2 -translate-y-1/2 text-center">
       <h1 className="animate-shake w-full text-6rem font-bold">404</h1>
       <p className="w-full text-20px font-bold mt-15px">{$t('public.notFindMessage')}</p>
-      <Button className="mt-25px margin-auto" onClick={goIndex}>
+      <Button className="mt-25px margin-auto" onClick={asyncGoIndex}>
         {$t('public.returnHome')}
       </Button>
     </div>

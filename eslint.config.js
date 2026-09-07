@@ -56,6 +56,42 @@ const NO_IMPERATIVE_HANDLE = {
 };
 
 /**
+ * 异步函数名以 async 开头.
+ *
+ * 事件处理器 (on / handle 开头) 豁免: 那两个前缀已经是角色标记, 再叠一层是重复.
+ * 代价认下 —— 「算不算处理器」从此有得辩, 换来的是双前缀不进代码.
+ */
+const ASYNC_NAMING = [
+  {
+    selector: 'FunctionDeclaration[async=true][id.name!=/^(async|on|handle)/]',
+    message: '异步函数名以 async 开头, 如 asyncGetBills',
+  },
+  {
+    selector: 'VariableDeclarator[init.async=true][id.name!=/^(async|on|handle)/]',
+    message: '异步函数名以 async 开头, 如 asyncGetBills',
+  },
+  {
+    selector:
+      "VariableDeclarator[init.callee.name='useCallback'][init.arguments.0.async=true][id.name!=/^(async|on|handle)/]",
+    message: '异步函数名以 async 开头, 如 asyncGetBills',
+  },
+];
+
+/**
+ * useRequest 取 runAsync, 不取 run.
+ *
+ * 结果与异常都该到得了调用点; 没人接的那次失败由 main.tsx 的 unhandledrejection 兜住,
+ * 不必每个调用点手抄一遍 catch.
+ *
+ * 辖区只到 src: packages 的 SearchSelect 靠 run 的防抖, 而防抖只作用于 run.
+ */
+const NO_SYNC_RUN = {
+  selector:
+    "VariableDeclarator[init.callee.name='useRequest'] > ObjectPattern > Property[key.name='run']",
+  message: 'useRequest 取 runAsync, 不取 run',
+};
+
+/**
  * 请求函数的动作词. 资源型是封闭集合; 命令型按需增补 —— 增补要改这张表, 那次修改就是评审.
  * 若允许命令型用自由动词, 门禁就退化成只校 api 前缀, 封闭性当场失效.
  */
@@ -525,7 +561,36 @@ export default tseslint.config(
     },
   },
   {
-    // 页面本体: 三条规则都要列全, 后写的块会整条覆盖先写的
+    // 页面里自定义的函数: 上一块那三条要重列, 否则这里会把它们盖掉
+    files: ['src/pages/**/*.{ts,tsx}'],
+    ignores: ['src/pages/**/index.tsx', 'src/**/__tests__/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...NO_MODAL_PROPS_ON_OTHER_CARRIER,
+        NO_IMPERATIVE_HANDLE,
+        NO_USE_NAVIGATE,
+        ...ASYNC_NAMING,
+        NO_SYNC_RUN,
+      ],
+    },
+  },
+  {
+    // 组件里自定义的函数. 通用块那两条要重列 —— 抽屉路由的用例另有一块窄豁免, 那块在后面
+    files: ['src/components/**/*.{ts,tsx}'],
+    ignores: ['src/components/**/index.{ts,tsx}', 'src/**/__tests__/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...NO_MODAL_PROPS_ON_OTHER_CARRIER,
+        NO_USE_NAVIGATE,
+        ...ASYNC_NAMING,
+        NO_SYNC_RUN,
+      ],
+    },
+  },
+  {
+    // 页面本体: 六条规则都要列全, 后写的块会整条覆盖先写的
     files: ['src/pages/**/*Page.tsx'],
     rules: {
       'no-restricted-syntax': [
@@ -535,6 +600,8 @@ export default tseslint.config(
         NO_SHELL_IN_PAGE,
         NO_UNSAFE_DRAWER_NAME,
         NO_USE_NAVIGATE,
+        ...ASYNC_NAMING,
+        NO_SYNC_RUN,
       ],
     },
   },

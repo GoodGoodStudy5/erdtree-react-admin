@@ -60,7 +60,7 @@ function LoginPage() {
   }, [i18n.language]);
 
   /** 获取用户权限 */
-  const getUserPermissions = async () => {
+  const asyncGetUserPermissions = async () => {
     try {
       setLoading(true);
       const { user, permissions } = await getUserRefreshPermissions({ refresh_cache: false });
@@ -73,7 +73,7 @@ function LoginPage() {
   };
 
   /** 获取菜单数据 */
-  const getMenuData = async () => {
+  const asyncGetMenuData = async () => {
     const cached = useMenuStore.getState().menuList;
     if (cached?.length) return cached;
     let result: SideMenu[] = [];
@@ -106,7 +106,7 @@ function LoginPage() {
   const handleGoMenu = async (permissions: string[]) => {
     let menuData = useMenuStore.getState().menuList;
     if (!menuData?.length) {
-      menuData = (await getMenuData()) as SideMenu[];
+      menuData = (await asyncGetMenuData()) as SideMenu[];
     }
 
     // 菜单仍为空（接口失败或返回空），无法确定跳转目标
@@ -139,7 +139,7 @@ function LoginPage() {
     if (getToken()) {
       // 如果不存在缓存则获取权限
       if (!permissions.length) {
-        getUserPermissions();
+        asyncGetUserPermissions();
       } else {
         // 有权限则直接跳转
         handleGoMenu(permissions);

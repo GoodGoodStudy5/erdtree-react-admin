@@ -41,7 +41,7 @@ function MenuPage() {
   };
 
   /** 获取表格数据 */
-  const getPage = useCallback(async () => {
+  const asyncGetPage = useCallback(async () => {
     const params = { ...searchData, page, pageSize };
 
     try {
@@ -56,17 +56,17 @@ function MenuPage() {
   }, [page, pageSize, searchData]);
 
   useEffect(() => {
-    if (isFetch) getPage();
-  }, [getPage, isFetch]);
+    if (isFetch) asyncGetPage();
+  }, [asyncGetPage, isFetch]);
 
   // 首次进入自动加载接口数据
   useEffect(() => {
-    if (pagePermission.page) getPage();
+    if (pagePermission.page) asyncGetPage();
   }, [pagePermission.page]);
 
   // 每次进入调用
   useEffectOnActive(() => {
-    getPage();
+    asyncGetPage();
   }, []);
 
   /**
@@ -86,7 +86,7 @@ function MenuPage() {
     // 在某个菜单下新增时, 默认落到它的下一层
     let type = record?.id ? record?.type : undefined;
     if (type && type < 3) type = type + 1;
-    if (await openModal(MenuEditModal, { parentId: record?.id, type })) getPage();
+    if (await openModal(MenuEditModal, { parentId: record?.id, type })) asyncGetPage();
   };
 
   /**
@@ -94,7 +94,7 @@ function MenuPage() {
    * @param id - 唯一值
    */
   const onUpdate = async (id: string) => {
-    if (await openModal(MenuEditModal, { id })) getPage();
+    if (await openModal(MenuEditModal, { id })) asyncGetPage();
   };
 
   /**
@@ -106,7 +106,7 @@ function MenuPage() {
       setLoading(true);
       await deleteMenu(id);
       messageApi.success($t('public.successfullyDeleted'));
-      getPage();
+      asyncGetPage();
     } finally {
       setLoading(false);
     }
@@ -125,7 +125,7 @@ function MenuPage() {
       await batchDeleteMenu(selectedRowKeys as string[]);
       messageApi.success($t('public.successfullyDeleted'));
       setSelectedRowKeys([]);
-      getPage();
+      asyncGetPage();
     } finally {
       setLoading(false);
     }
@@ -202,7 +202,7 @@ function MenuPage() {
           isCreate={pagePermission.create}
           columns={columns}
           dataSource={tableData}
-          getPage={getPage}
+          getPage={asyncGetPage}
           onCreate={onCreate}
           rowSelection={{
             selectedRowKeys,

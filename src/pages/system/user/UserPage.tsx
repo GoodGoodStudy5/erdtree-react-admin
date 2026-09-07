@@ -41,7 +41,7 @@ function UserPage() {
   };
 
   /** 获取表格数据 */
-  const getPage = useCallback(async () => {
+  const asyncGetPage = useCallback(async () => {
     const params = { ...searchData, page, pageSize };
 
     try {
@@ -56,17 +56,17 @@ function UserPage() {
   }, [page, pageSize, searchData]);
 
   useEffect(() => {
-    if (isFetch) getPage();
-  }, [getPage, isFetch]);
+    if (isFetch) asyncGetPage();
+  }, [asyncGetPage, isFetch]);
 
   // 首次进入自动加载接口数据
   useEffect(() => {
-    if (pagePermission.page) getPage();
+    if (pagePermission.page) asyncGetPage();
   }, [pagePermission.page]);
 
   // 每次进入调用
   useEffectOnActive(() => {
-    getPage();
+    asyncGetPage();
   }, []);
 
   /**
@@ -82,7 +82,7 @@ function UserPage() {
 
   /** 点击新增 */
   const onCreate = async () => {
-    if (await openModal(UserEditModal)) getPage();
+    if (await openModal(UserEditModal)) asyncGetPage();
   };
 
   /**
@@ -90,7 +90,7 @@ function UserPage() {
    * @param id - 唯一值
    */
   const onUpdate = async (id: string) => {
-    if (await openModal(UserEditModal, { id })) getPage();
+    if (await openModal(UserEditModal, { id })) asyncGetPage();
   };
 
   /**
@@ -102,7 +102,7 @@ function UserPage() {
       setLoading(true);
       await deleteUser(id);
       messageApi.success($t('public.successfullyDeleted'));
-      getPage();
+      asyncGetPage();
     } finally {
       setLoading(false);
     }
@@ -121,7 +121,7 @@ function UserPage() {
       const params = { ids: selectedRowKeys };
       await batchDeleteUser(params);
       messageApi.success($t('public.successfullyDeleted'));
-      getPage();
+      asyncGetPage();
     } finally {
       setLoading(false);
     }
@@ -212,7 +212,7 @@ function UserPage() {
           rowSelection={rowSelection}
           leftContent={leftContentRender}
           rightContent={<div>（搜索将参数放入url）</div>}
-          getPage={getPage}
+          getPage={asyncGetPage}
           onCreate={onCreate}
         />
 

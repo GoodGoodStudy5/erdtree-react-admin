@@ -15,7 +15,7 @@ function AuthorizeSelect(props: Props) {
   const [isLoading, setLoading] = useState(false);
 
   /** 获取数据 */
-  const getList = async () => {
+  const asyncGetList = async () => {
     const params = { roleId: id };
 
     try {
@@ -28,7 +28,7 @@ function AuthorizeSelect(props: Props) {
   };
 
   useEffect(() => {
-    getList();
+    asyncGetList();
   }, []);
 
   /** 点击复选框 */

@@ -50,7 +50,7 @@ function RolePage() {
   };
 
   /** 获取表格数据 */
-  const getPage = useCallback(async () => {
+  const asyncGetPage = useCallback(async () => {
     const params = { ...searchData, page, pageSize };
 
     try {
@@ -65,17 +65,17 @@ function RolePage() {
   }, [page, pageSize, searchData]);
 
   useEffect(() => {
-    if (isFetch) getPage();
-  }, [getPage, isFetch]);
+    if (isFetch) asyncGetPage();
+  }, [asyncGetPage, isFetch]);
 
   // 首次进入自动加载接口数据
   useEffect(() => {
-    if (pagePermission.page) getPage();
+    if (pagePermission.page) asyncGetPage();
   }, [pagePermission.page]);
 
   // 每次进入调用
   useEffectOnActive(() => {
-    getPage();
+    asyncGetPage();
   }, []);
 
   /**
@@ -150,7 +150,7 @@ function RolePage() {
       await functions();
       messageApi.success($t('public.successfulOperation'));
       setCreateOpen(false);
-      getPage();
+      asyncGetPage();
     } finally {
       setCreateLoading(false);
     }
@@ -165,7 +165,7 @@ function RolePage() {
       setLoading(true);
       await deleteRole(id);
       messageApi.success($t('public.successfullyDeleted'));
-      getPage();
+      asyncGetPage();
     } finally {
       setLoading(false);
     }
@@ -239,7 +239,7 @@ function RolePage() {
           isCreate={pagePermission.create}
           columns={columns}
           dataSource={tableData}
-          getPage={getPage}
+          getPage={asyncGetPage}
           onCreate={onCreate}
         />
 

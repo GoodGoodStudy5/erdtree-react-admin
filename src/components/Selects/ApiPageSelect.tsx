@@ -42,7 +42,7 @@ function ApiPageSelect(props: ApiPageSelectProps) {
    * @param query - 搜索关键字
    * @param isReset - 换关键字时重新允许翻页
    */
-  const getApiData = useCallback(
+  const asyncGetApiData = useCallback(
     async (nextPage: number, query: string, isReset = false) => {
       if (isReset) hasMore.current = true;
       if (!props.api || !hasMore.current) return;
@@ -113,7 +113,7 @@ function ApiPageSelect(props: ApiPageSelectProps) {
   useEffect(() => {
     // 当有值且列表为空时，自动获取接口
     if (props.value && options.length === 0) {
-      getApiData(currentPage, searchValue);
+      asyncGetApiData(currentPage, searchValue);
     }
   }, [props.value]);
 
@@ -122,7 +122,7 @@ function ApiPageSelect(props: ApiPageSelectProps) {
    * @param open - 是否展开
    */
   const onOpenChange = (open: boolean) => {
-    if (open && !options?.length) getApiData(currentPage, searchValue);
+    if (open && !options?.length) asyncGetApiData(currentPage, searchValue);
 
     props.onOpenChange?.(open);
   };
@@ -137,10 +137,10 @@ function ApiPageSelect(props: ApiPageSelectProps) {
       if (scrollTop + clientHeight >= scrollHeight - threshold && !isLoading && hasMore.current) {
         const nextPage = currentPage + 1;
         setCurrentPage(nextPage);
-        getApiData(nextPage, searchValue);
+        asyncGetApiData(nextPage, searchValue);
       }
     },
-    [isLoading, currentPage, searchValue, getApiData],
+    [isLoading, currentPage, searchValue, asyncGetApiData],
   );
 
   /** 自定义下拉框内容 */
@@ -164,7 +164,7 @@ function ApiPageSelect(props: ApiPageSelectProps) {
       setOptions([]);
       setCurrentPage(page);
       setSearchValue(value);
-      getApiData(page, value, true);
+      asyncGetApiData(page, value, true);
     }, 200);
   };
 
