@@ -67,7 +67,7 @@ interface Props<TItem, TPagination extends SliceProp<PaginationData> | undefined
   /** 搜索项定义, 声明顺序就是排布顺序 */
   searchList: BaseSearchList[];
   /** 表格列定义 */
-  columns: TableColumn[];
+  columns: TableColumn<TItem>[];
   /** 取数函数. 收平铺的条件与分页, 可以把 service 直接传进来 */
   fetchPage: QueryFetcher<TItem>;
   /** 已提交条件那一片. 不传即由组件自己维护 */

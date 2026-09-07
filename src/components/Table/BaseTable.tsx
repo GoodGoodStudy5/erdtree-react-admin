@@ -19,7 +19,8 @@ import { $t } from '@/locales';
 
 type Components = TableProps<object>['components'];
 
-interface Props extends Omit<TableProps<object>, 'bordered'> {
+interface Props<T extends object = object> extends Omit<TableProps<T>, 'bordered' | 'columns'> {
+  columns: TableColumn<T>[];
   isLoading?: boolean; // 是否加载
   isBordered?: boolean; // 是否开启边框
   isZebra?: boolean; // 是否开启斑马线
@@ -38,7 +39,7 @@ interface Props extends Omit<TableProps<object>, 'bordered'> {
 }
 
 /** 表格, 支持虚拟滚动、列筛选、列宽拖拽与斑马纹 */
-export function BaseTable(props: Props) {
+export function BaseTable<T extends object = object>(props: Props<T>) {
   const {
     isLoading,
     isVirtual,
@@ -60,18 +61,20 @@ export function BaseTable(props: Props) {
   } = props;
   const { isPhone } = useCommonStore();
   const [handleFilterTable] = useFiler();
-  const [columns, setColumns] = useState(filterTableColumns(props.columns as TableColumn[]));
+  // 列在组件内部一律按 object 视角处理: 泛型只服务调用点的 record 推导, 筛选与排序不认识 T
+  const inputColumns = props.columns as unknown as TableColumn[];
+  const [columns, setColumns] = useState(filterTableColumns(inputColumns));
   const tableRef = useRef<HTMLDivElement>(null);
   const [tableFilters, setTableFilters] = useState<string[]>([]);
   const [sortList, setSortList] = useState<string[]>([]);
   // 初值留空: 首次渲染也要走下面那段播种, 否则勾选列表是空的而表格一列都不显示
-  const [prevColumns, setPrevColumns] = useState<Props['columns']>(undefined);
+  const [prevColumns, setPrevColumns] = useState<TableColumn[] | undefined>(undefined);
   // 行高取自真实渲染结果, 虚拟滚动需要它换算可视条数
   /* eslint-disable-next-line react-hooks/refs */
   const rows = tableRef.current?.querySelectorAll('.ant-table-row');
 
   // 清除自定义属性
-  const params: Partial<Props> = { ...props };
+  const params: Partial<Props<T>> = { ...props };
   delete params.isLoading;
   delete params.isVirtual;
   delete params.isCreate;
@@ -80,15 +83,15 @@ export function BaseTable(props: Props) {
   delete (params as TableColumn).enum;
 
   // 外部换掉列定义时丢弃用户的筛选、排序与列宽调整
-  if (prevColumns !== props.columns) {
-    const newColumns = filterTableColumns(props.columns as TableColumn[]);
+  if (prevColumns !== inputColumns) {
+    const newColumns = filterTableColumns(inputColumns);
     const checkedKeys = newColumns
       ?.filter((col) => !(col as TableColumn).hidden)
       .map((col) => col.dataIndex)
       .filter(Boolean) as string[];
     // 顺序必须含隐藏列: useFiler 按 sortList 下标排序, 缺列的 indexOf 得 -1 会把隐藏列甩到最前
     const sortKeys = newColumns?.map((col) => col.dataIndex).filter(Boolean) as string[];
-    setPrevColumns(props.columns);
+    setPrevColumns(inputColumns);
     setColumns(newColumns);
     setTableFilters(checkedKeys);
     setSortList(sortKeys);
@@ -266,16 +269,16 @@ export function BaseTable(props: Props) {
 
   // 滚动
   const scroll = {
-    ...props.scroll,
     x: scrollX ?? 'max-content',
     y: scrollY ?? (isAuthHeight ? tableHeight : undefined),
+    ...props.scroll,
   };
 
   /**
    * 处理行内样式
    */
-  const handleRowClassName: TableProps<object>['rowClassName'] = (
-    record: object,
+  const handleRowClassName: TableProps<T>['rowClassName'] = (
+    record: T,
     index: number,
     indent: number,
   ) => {
@@ -320,14 +323,14 @@ export function BaseTable(props: Props) {
 
             <TableFilter
               columns={columns}
-              cacheColumns={props.columns}
+              cacheColumns={inputColumns}
               getTableChecks={getTableChecks}
             />
           </div>
         </div>
       )}
       <div ref={tableRef}>
-        <Table
+        <Table<T>
           rowKey="id"
           // 显式声明: 靠 rc-table 推导时, 列宽自适应会取决于页面有没有写 fixed 列
           tableLayout="auto"
@@ -348,7 +351,7 @@ export function BaseTable(props: Props) {
           // 位置归 CSS, 不传 offsetHeader —— 顶栏高度归布局层, 不该复制进表格组件
           sticky={isStickyHeader ? { offsetHeader: 0 } : undefined}
           components={components}
-          columns={mergedColumns as ColumnsType<object>}
+          columns={mergedColumns as unknown as ColumnsType<T>}
         />
       </div>
     </div>
