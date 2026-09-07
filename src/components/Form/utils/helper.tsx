@@ -1,6 +1,5 @@
 import type { FormItemProps } from 'antd';
 import type { BaseFormList, BaseSearchList, ComponentProps, ComponentType } from '#/form';
-import { cloneDeep } from 'lodash';
 import { DATE_FORMAT, TIME_PICKER_FORMAT } from '@/utils';
 import { $t } from '@/locales';
 
@@ -112,12 +111,9 @@ const handleUploadData: FormItemProps['getValueFromEvent'] = (e) => {
  * @param data - 表单数据
  */
 export const filterFormItem = (data: BaseFormList): FormItemProps => {
-  const result = cloneDeep(data) as BaseSearchList;
-  delete result.wrapperWidth;
-  delete result.componentProps;
-  delete result.render;
-  // 布局协议归栅格读, 不是 Form.Item 的参数
-  delete result.colSize;
+  // 布局协议归栅格读, 不是 Form.Item 的参数, 与另外三项一并摘掉
+  const { wrapperWidth, componentProps, render, colSize, ...rest } = data as BaseSearchList;
+  const result = rest as BaseSearchList;
 
   // 如果当前项时隐藏且存在规则，则移除规则校验
   if (result.hidden && result.rules?.length) {

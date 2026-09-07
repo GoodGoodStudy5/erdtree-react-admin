@@ -45,6 +45,22 @@ describe('BaseTable', () => {
     expect(screen.getByText('-')).toBeTruthy();
   });
 
+  it('列标题是 JSX 也渲染得出: 列不做深拷贝, 否则会顺着 React 元素爬进 Fiber 图爆栈', () => {
+    render(
+      <BaseTable
+        columns={[
+          { title: <span>入档预判</span>, dataIndex: 'outcome' },
+          { title: '单号', dataIndex: 'billNo' },
+        ]}
+        dataSource={[{ outcome: '会入档', billNo: 'AP001' }]}
+      />,
+    );
+
+    // 列名在表头与列设置面板各出一次
+    expect(screen.getAllByText('入档预判').length).toBeGreaterThan(0);
+    expect(screen.getByText('会入档')).toBeTruthy();
+  });
+
   it('列设置面板的勾选要点确认才作用到表格', () => {
     render(
       <BaseTable

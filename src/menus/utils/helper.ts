@@ -1,6 +1,5 @@
 import type { SideMenu } from '#/public';
 import type { Langs } from '@/components';
-import { cloneDeep } from 'lodash';
 import { LANG } from '@/utils';
 
 /**
@@ -289,17 +288,18 @@ export const getMenuName = (list: SideMenu[], path: string, lang: string) => {
  */
 export function filterMenus(menus: SideMenu[], permissions: string[]): SideMenu[] {
   const result: SideMenu[] = [];
-  const newMenus = cloneDeep(menus);
   const lang = localStorage.getItem(LANG);
 
-  for (let i = 0; i < newMenus.length; i++) {
-    const item = newMenus[i];
+  for (let i = 0; i < menus.length; i++) {
+    // 逐层浅拷贝: 下面要改 children 与 label, 而 defaultMenus 是模块级常量, 改进去会留到下一次调用
+    const item = { ...menus[i] };
+
     // 处理子数组
     if (hasChildren(item)) {
-      const result = filterMenus(item.children as SideMenu[], permissions);
+      const children = filterMenus(item.children as SideMenu[], permissions);
 
       // 有子权限数据则保留
-      item.children = result?.length ? result : undefined;
+      item.children = children?.length ? children : undefined;
     }
 
     // 有权限或有子数据累加

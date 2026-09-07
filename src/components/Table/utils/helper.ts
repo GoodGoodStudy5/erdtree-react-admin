@@ -2,7 +2,6 @@ import type { TableColumn } from '#/public';
 import type { ReactNode } from 'react';
 import type { SizeType } from 'antd/es/config-provider/SizeContext';
 import { eR } from '@south/utils';
-import { cloneDeep } from 'lodash';
 
 /** 计算表格高度 */
 export function getTableHeight(element: HTMLDivElement | null): number {
@@ -40,18 +39,14 @@ export function handleRowHeight(size: SizeType): number {
 }
 
 /**
- * 表格处理，空值转为‘-’
- * @param columns - 表格数据
+ * 没写 render 的列补一个空值兜底.
+ *
+ * 逐列浅拷贝而不深拷贝: 列的 title 可以是 JSX, 深拷贝会顺着 React 元素的 _owner 爬进 Fiber 图,
+ * 当场爆栈.
+ * @param columns - 表格的列
  */
 export function filterTableColumns(columns: TableColumn[]) {
-  const newColumns = cloneDeep(columns);
-
-  for (let i = 0; i < newColumns?.length; i++) {
-    const element = newColumns[i];
-    if (!element.render) {
-      element.render = (text: ReactNode) => eR(text);
-    }
-  }
-
-  return newColumns;
+  return (columns ?? []).map((column) =>
+    column.render ? column : { ...column, render: (text: ReactNode) => eR(text) },
+  );
 }

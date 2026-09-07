@@ -4,7 +4,6 @@ import type { FormInstance, InputProps } from 'antd';
 import { Input, Spin } from 'antd';
 import { lazy, Suspense } from 'react';
 import type { KeyboardEvent } from 'react';
-import { cloneDeep } from 'lodash';
 
 /**
  * 注册表容纳任意表单组件, props 形状随组件而异
@@ -182,20 +181,12 @@ function LazyComponentWrapper({
  * @param componentProps - 组件参数
  */
 const handleInputProps = (componentProps?: ComponentProps) => {
-  interface CurrentInputProps {
-    children: unknown;
-    api: unknown;
-    apiResultKey: unknown;
-    fieldNames: unknown;
-  }
+  const { children, api, apiResultKey, fieldNames, ...rest } = (componentProps ?? {}) as Record<
+    string,
+    unknown
+  >;
 
-  const newComponentProps = cloneDeep(componentProps) as unknown as CurrentInputProps;
-  delete newComponentProps?.children;
-  delete newComponentProps?.api;
-  delete newComponentProps?.apiResultKey;
-  delete newComponentProps?.fieldNames;
-
-  return (newComponentProps || {}) as unknown as InputProps;
+  return rest as unknown as InputProps;
 };
 
 /**
