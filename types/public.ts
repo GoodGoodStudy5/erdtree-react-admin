@@ -10,6 +10,16 @@ export type ArrayData = string[] | number[] | boolean[];
 // 空值
 export type EmptyData = null | undefined;
 
+/**
+ * 报文原样的形状: 每个字段额外允许 null.
+ *
+ * 前端契约按 `.claude/rules/nullable.md` 一律写 `?: T`, 而 JSON 里没有 undefined —— 后端给的是
+ * null. 逐字抄真实报文的测试样本用这个类型标注, 才能既留住 null 又受字段名与类型的校验.
+ *
+ * 不动可选修饰符: 报文里本来就没有的字段该省略, 逼着补一个 null 就是伪造.
+ */
+export type Wire<T> = { [K in keyof T]: T[K] | null };
+
 // 分页接口响应数据
 export interface PageServerResult<T = unknown> {
   items: T;
