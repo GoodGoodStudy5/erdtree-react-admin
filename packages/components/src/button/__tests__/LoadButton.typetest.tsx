@@ -75,7 +75,7 @@ function 回调参数形状() {
 function ButtonProps透传() {
   return (
     <>
-      <LoadButton danger size="small" type="primary" htmlType="submit">
+      <LoadButton danger type="primary" htmlType="submit">
         删除
       </LoadButton>
       {/* @ts-expect-error 拼错的 props 要当场报, 不静默落到 DOM 上 */}
