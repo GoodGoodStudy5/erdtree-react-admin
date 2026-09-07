@@ -19,8 +19,37 @@
    * (`#header`, z-index 50) 压得住它.
    */
   z-index: calc(5 + var(--sticky-order, 0));
+}
 
-  /* 贴住之后身后是滚动中的内容, 不给底色就透出来 */
+/**
+ * 铺底色的那一层, 由 mountStickyStack 注入.
+ *
+ * 为什么另起一个元素: 底色只能落在容器的后代上 —— 容器查询改不了容器自己; 而 `::before` 与
+ * `::after` 归调用点, 搜索栏两个都用着 (hover 外扩命中区与阴影), 机制抢过来就顶掉它们.
+ *
+ * `z-index: -1` 画在成员内容之下. 成员自己是 stacking context (上面那个 z-index), 负值出不去,
+ * 盖不到页面上的别处.
+ */
+[data-sticky-backdrop] {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/**
+ * 吸住的样子, 标记由 mountStickyStack 写, 判据见那边的 markStuck.
+ *
+ * 上底色是因为身后已经是滚动中的内容, 不给底色就透出来. 没吸住时不上 —— 那时成员坐在页面自己的
+ * 底色上, 刷一层 `--bg-container` 会在灰底容器里显出一块白.
+ *
+ * 底色向上下各外扩 6px, 而不给成员加 padding: 加了会改成员高度, 退让距离跟着变, 吸住那一刻
+ * 页面要跳一下.
+ *
+ * 限直接子代: 嵌套的成员各归各的标记, 内层那块不跟着外层吸住一起上色.
+ */
+[data-sticky][data-sticky-stuck] > [data-sticky-backdrop] {
+  inset: -6px 0;
   background-color: var(--sticky-bg, var(--bg-container));
 }
 
@@ -35,8 +64,10 @@
 [data-sticky][data-sticky='top'] {
   position: sticky;
   top: calc(var(--sticky-top, 0px) + var(--sticky-offset, 0px));
-  box-shadow: 0 calc(-1 * var(--sticky-bleed, @sticky-bleed)) 0
-    var(--sticky-bg, var(--bg-container));
+
+  /* 暂时注释 */
+  // box-shadow: 0 calc(-1 * var(--sticky-bleed, @sticky-bleed)) 0
+  //   var(--sticky-bg, var(--bg-container));
 }
 
 [data-sticky][data-sticky='bottom'] {
