@@ -1,6 +1,7 @@
 import type { TableColumn } from '#/public';
+import type { ReactNode } from 'react';
 import type { SizeType } from 'antd/es/config-provider/SizeContext';
-import { EMPTY_VALUE } from '@/utils';
+import { eR } from '@south/utils';
 import { cloneDeep } from 'lodash';
 
 /** 计算表格高度 */
@@ -48,9 +49,7 @@ export function filterTableColumns(columns: TableColumn[]) {
   for (let i = 0; i < newColumns?.length; i++) {
     const element = newColumns[i];
     if (!element.render) {
-      element.render = (text: string | number) => {
-        return text ? text : text === 0 ? text : EMPTY_VALUE;
-      };
+      element.render = (text: ReactNode) => eR(text);
     }
   }
 

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { includesInArray } from './array';
 
 /** 全站空值的统一显示 */
-const emptyText = '-' as const;
+export const emptyText = '-' as const;
 
 /**
  * 算作空的取值. 只此三个 —— 0 与 false 不在内: 数量为 0、开关为关都是有效值, 显示成 "-" 会丢信息.

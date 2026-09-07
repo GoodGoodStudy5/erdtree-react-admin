@@ -30,6 +30,23 @@ describe('BaseDescriptions 默认值', () => {
     expect(container.querySelector('td:last-child')?.getAttribute('colspan')).toBe('3');
   });
 
+  it('空值填占位符: null 与空串都算空, 0 与 false 是真值', () => {
+    const { container } = render(
+      <BaseDescriptions
+        column={1}
+        items={[
+          { key: 'a', label: '空串', children: '' },
+          { key: 'b', label: '没给', children: null },
+          { key: 'c', label: '零', children: 0 },
+          { key: 'd', label: '假', children: String(false) },
+        ]}
+      />,
+    );
+    const cells = [...container.querySelectorAll('.ant-descriptions-item-content')];
+
+    expect(cells.map((cell) => cell.textContent)).toEqual(['-', '-', '0', 'false']);
+  });
+
   it('三项默认都能被调用方覆盖', () => {
     const { container } = render(
       <BaseDescriptions items={ITEMS} bordered={false} column={1} size="medium" />,

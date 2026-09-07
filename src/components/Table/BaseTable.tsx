@@ -6,7 +6,7 @@ import type { TableProps } from 'antd';
 import { useMemo, useState, useRef, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { useFiler } from './hooks/useFiler';
-import { EMPTY_VALUE } from '@/utils';
+import { emptyText } from '@south/utils';
 import { useCommonStore } from '@/hooks';
 import { PlusOutlined, RedoOutlined } from '@ant-design/icons';
 import { getTableHeight, handleRowHeight, filterTableColumns } from './utils/helper';
@@ -198,11 +198,11 @@ export function BaseTable(props: Props) {
           // 如果是字符串数组则用逗号分隔
           if (Array.isArray(showValue)) {
             isStringArr = showValue?.every((item) => typeof item === 'string');
-            if (isStringArr) showValue = showValue?.join(', ') || EMPTY_VALUE;
+            if (isStringArr) showValue = showValue?.join(', ') || emptyText;
           }
 
           if (!['object', 'function'].includes(typeof renderContent) || isStringArr) {
-            const textContent = String(showValue ?? EMPTY_VALUE);
+            const textContent = String(showValue ?? emptyText);
 
             // 如果显示类型为标签
             if (showType === 'tag') {

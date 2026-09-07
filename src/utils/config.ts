@@ -10,8 +10,6 @@ export const TOKEN = 'admin_token';
 export const LANG = 'lang';
 /** 前端版本号在 localStorage 中的键名, 版本监控据此判断是否提示刷新 */
 export const VERSION = 'admin_version';
-/** 列表与详情中空值的占位显示 */
-export const EMPTY_VALUE = '-';
 /** 主题在 localStorage 中的键名 */
 export const THEME_KEY = 'theme_key';
 

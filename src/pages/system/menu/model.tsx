@@ -1,4 +1,5 @@
 import { MENU_ACTIONS, MENU_STATUS, MENU_TYPES } from '@/utils';
+import { eR } from '@south/utils';
 import { getMenuList } from '@/servers';
 import { Icon } from '@/components';
 import { IconInput, StateSwitch } from './components';
@@ -44,7 +45,9 @@ export const tableColumns = (optionRender: TableOptions<object>): TableColumn[] 
       width: 50,
       render: (text: string) => (
         <div className="text-center">
-          {text ? <Icon className="text-16px" icon={text} /> : EMPTY_VALUE}
+          {eR(text, (name) => (
+            <Icon className="text-16px" icon={name} />
+          ))}
         </div>
       ),
     },

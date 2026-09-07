@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
-import { EMPTY_VALUE } from '@/utils';
+import { emptyText } from '@south/utils';
 import { Money } from '../Money';
 
 describe('Money', () => {
@@ -33,8 +33,8 @@ describe('Money', () => {
   });
 
   it('空值给占位符, 不显示 0', () => {
-    expect(render(<Money value={null} />).container.textContent).toBe(EMPTY_VALUE);
-    expect(render(<Money />).container.textContent).toBe(EMPTY_VALUE);
+    expect(render(<Money value={null} />).container.textContent).toBe(emptyText);
+    expect(render(<Money />).container.textContent).toBe(emptyText);
   });
 
   it('超过两位小数按四舍五入呈现, 存的值不变', () => {
