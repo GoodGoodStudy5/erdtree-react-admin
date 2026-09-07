@@ -20,9 +20,9 @@ interface Loaded {
  * 归档文件的内嵌预览
  *
  * 不把地址直接交给 iframe: 归档对象一律 `Content-Disposition: attachment`, 直连会触发下载而不是渲染
- * (判据见后端 ADR-0025). 取回字节转成同源的 blob 地址之后, 渲染方式只由 MIME 类型决定。
+ * (判据见后端 ADR-0025). 取回字节转成同源的 blob 地址之后, 渲染方式只由 MIME 类型决定.
  *
- * 整份字节过一遍内存是这条路的代价, 认下的 —— 它是预览不是下载, 下载仍走 `downloadFile` 交给浏览器。
+ * 整份字节过一遍内存是这条路的代价, 认下的 —— 它是预览不是下载, 下载仍走 `downloadFile` 交给浏览器.
  * @param props - 地址与外框样式
  */
 export function FilePreview({ url, className }: Props) {

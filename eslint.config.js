@@ -561,9 +561,10 @@ export default tseslint.config(
     },
   },
   {
-    // 页面里自定义的函数: 上一块那三条要重列, 否则这里会把它们盖掉
+    // 页面里自定义的函数: 上一块压在页面上的规则要重列, 否则这里会把它们盖掉
     files: ['src/pages/**/*.{ts,tsx}'],
-    ignores: ['src/pages/**/index.tsx', 'src/**/__tests__/**/*.{ts,tsx}'],
+    // index 连 .ts 一起排除: 只写 index.tsx 会让 components/index.ts 落进这一块, 门面那条当场被盖掉
+    ignores: ['src/pages/**/index.{ts,tsx}', 'src/**/__tests__/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-syntax': [
         'error',
@@ -576,7 +577,7 @@ export default tseslint.config(
     },
   },
   {
-    // 组件里自定义的函数. 通用块那两条要重列 —— 抽屉路由的用例另有一块窄豁免, 那块在后面
+    // 组件里自定义的函数. 通用块压在组件上的规则要重列 —— 抽屉路由的用例另有一块窄豁免, 那块在后面
     files: ['src/components/**/*.{ts,tsx}'],
     ignores: ['src/components/**/index.{ts,tsx}', 'src/**/__tests__/**/*.{ts,tsx}'],
     rules: {
@@ -590,7 +591,7 @@ export default tseslint.config(
     },
   },
   {
-    // 页面本体: 六条规则都要列全, 后写的块会整条覆盖先写的
+    // 页面本体: 前面各块压在页面上的规则这里要一条不漏地重列, 后写的块会整条覆盖先写的
     files: ['src/pages/**/*Page.tsx'],
     rules: {
       'no-restricted-syntax': [

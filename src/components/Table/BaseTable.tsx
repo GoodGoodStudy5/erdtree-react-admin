@@ -267,7 +267,7 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
         },
       };
 
-  // 滚动
+  // props.scroll 排在最后, 于是它压得住上面两行 —— 开虚拟滚动的表要自己定 y, 拿不到自适应那个值
   const scroll = {
     x: scrollX ?? 'max-content',
     y: scrollY ?? (isAuthHeight ? tableHeight : undefined),

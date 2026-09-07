@@ -30,7 +30,8 @@ describe('BaseDescriptions 默认值', () => {
     expect(container.querySelector('td:last-child')?.getAttribute('colspan')).toBe('3');
   });
 
-  it('空值填占位符: null 与空串都算空, 0 与 false 是真值', () => {
+  // 布尔 false 不走这里: eR 对它的口径归 packages/utils 的 render 用例, 这条只验兜底接进了 items
+  it('空值填占位符: null 与空串都算空, 0 与文本照原样', () => {
     const { container } = render(
       <BaseDescriptions
         column={1}

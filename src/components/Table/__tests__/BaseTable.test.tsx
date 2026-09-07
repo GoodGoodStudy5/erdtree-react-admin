@@ -4,6 +4,19 @@ import { BaseTable } from '../BaseTable';
 import { $t } from '@/locales';
 
 describe('BaseTable', () => {
+  it('不改调用方的列定义: 列设置面板改的是组件自己那份', () => {
+    // 写了 render 的列最容易漏 —— 兜底不必给它加, 于是它是唯一可能被原样交出去的一种
+    const columns: TableColumn[] = [
+      { title: '单号', dataIndex: 'billNo', render: (text) => text },
+      { title: '开票人', dataIndex: 'drawer' },
+    ];
+    const snapshot = columns.map((column) => ({ ...column }));
+
+    render(<BaseTable columns={columns} dataSource={[{ billNo: 'AP001', drawer: '张三' }]} />);
+
+    expect(columns).toEqual(snapshot);
+  });
+
   it('没有自定义 render 的列显示原值', () => {
     render(
       <BaseTable

@@ -43,10 +43,14 @@ export function handleRowHeight(size: SizeType): number {
  *
  * 逐列浅拷贝而不深拷贝: 列的 title 可以是 JSX, 深拷贝会顺着 React 元素的 _owner 爬进 Fiber 图,
  * 当场爆栈.
+ *
+ * 每列都拷, 写了 render 的也拷: 列设置面板靠就地写 `hidden` 藏列, 原样交出去就会盖到调用方
+ * memo 住的那份列定义上.
  * @param columns - 表格的列
  */
 export function filterTableColumns(columns: TableColumn[]) {
-  return (columns ?? []).map((column) =>
-    column.render ? column : { ...column, render: (text: ReactNode) => eR(text) },
-  );
+  return (columns ?? []).map((column) => ({
+    ...column,
+    render: column.render ?? ((text: ReactNode) => eR(text)),
+  }));
 }
