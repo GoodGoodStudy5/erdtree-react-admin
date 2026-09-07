@@ -28,7 +28,7 @@ import type { BusinessComponents } from '@/components/Business';
 import type { EditorProps } from '@/components/WangEditor';
 import type { TextAreaProps } from 'antd/es/input';
 
-// 数据类型
+/** 表单数据的通用形状: 字段名到值, 无契约约束 */
 export type BaseFormData = Record<string, unknown>;
 
 // 基础数据组件
@@ -68,7 +68,7 @@ type EditorComponents = 'RichEditor';
 // 密码强度组件
 type PasswordStrength = 'PasswordStrength';
 
-// 组件集合
+/** 表单项可用的组件名全集, BaseFormList.component 的值域 */
 export type ComponentType =
   | DefaultDataComponents
   | SelectComponents
@@ -84,17 +84,22 @@ export type ComponentType =
   | TransferComponents
   | BusinessComponents;
 
+/** Api 系下拉组件的选项形状 */
 export interface ApiResult extends Omit<DefaultOptionType, 'value'> {
+  /** 选项文案 */
   label: ReactNode;
+  /** 悬浮提示 */
   title?: ReactNode;
+  /** React key */
   key?: Key;
+  /** 选项值 */
   value?: string | number;
 }
 
 /** API 请求函数, 入参个数与形状由具体接口决定 */
 export type ApiFn = (...params: unknown[]) => Promise<unknown>;
 
-// 组件参数
+/** 各表单组件入参的联合: 按 component 分发, 单个组件只收自己那份 */
 export type ComponentProps =
   | InputProps
   | InputNumberProps
@@ -117,7 +122,7 @@ export type ComponentProps =
   | SwitchProps
   | EditorProps;
 
-// 组件参数
+/** 各表单组件入参的交叉: 自定义渲染函数一次拿到全部可能的入参 */
 export type RenderComponentProps = InputProps &
   InputNumberProps &
   TextAreaProps &
@@ -138,37 +143,49 @@ export type RenderComponentProps = InputProps &
   ApiPageSelectProps &
   EditorProps;
 
-// 表单规则
+/** 表单校验规则: antd 规则加触发时机 */
 export type FormRule = RuleObject & {
+  /** 校验触发时机 */
   trigger?: 'blur' | 'change' | ['change', 'blur'];
 };
 
-// 表单自定义渲染类型
+/** 表单自定义渲染函数 */
 export type CustomizeRender = (props: RenderComponentProps) => ReactNode;
 
-// 表单数据
+/** 一个表单项的配置 */
 export interface BaseFormList extends FormItemProps {
-  name: string | string[]; // 表单域字段
-  label: string; // 标签
-  placeholder?: string; // 占位符
-  hidden?: boolean; // 是否隐藏
-  unit?: string; // 单位，无法和extra一起显示
-  rules?: FormRule[]; // 规则
-  labelWidth?: number; // label宽度
-  wrapperWidth?: number; // 内容宽度
-  component: ComponentType; // 组件
-  componentProps?: ComponentProps; // 组件参数
-  render?: CustomizeRender; // 自定义渲染
+  /** 表单域字段名, 数组表示嵌套路径 */
+  name: string | string[];
+  /** 标签 */
+  label: string;
+  /** 占位符 */
+  placeholder?: string;
+  /** 是否隐藏 */
+  hidden?: boolean;
+  /** 单位, 无法和 extra 一起显示 */
+  unit?: string;
+  /** 校验规则 */
+  rules?: FormRule[];
+  /** label 宽度 */
+  labelWidth?: number;
+  /** 内容宽度 */
+  wrapperWidth?: number;
+  /** 渲染成哪个组件 */
+  component: ComponentType;
+  /** 组件参数 */
+  componentProps?: ComponentProps;
+  /** 自定义渲染 */
+  render?: CustomizeRender;
 }
 
-// 搜索数据
+/** 搜索区的一个表单项配置 */
 export interface BaseSearchList extends BaseFormList {
-  labelWidth?: number; // 临时使用
+  /** label 宽度, 单位 px; 不给则用搜索栏的统一宽度 */
+  labelWidth?: number;
   /**
    * 占几列, 默认 1.
    *
    * 区间类字段 (日期区间, 数值上下限) 给 2: 一列装不下两端. 值超过当前断点的列数时只占满一行.
    */
   colSize?: number;
-  // TODO...
 }
