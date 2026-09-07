@@ -1,3 +1,4 @@
+export * from './download';
 export * from './local';
 export * from './crypto';
 export * from './array';

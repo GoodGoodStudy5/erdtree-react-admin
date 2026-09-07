@@ -9,6 +9,7 @@ export * from './Dates';
 export * from './Descriptions';
 export * from './Drawer';
 export * from './Ellipsis';
+export * from './FilePreview';
 export * from './Forbidden';
 export * from './Form';
 export * from './Fullscreen';
