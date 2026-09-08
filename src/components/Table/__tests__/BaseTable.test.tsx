@@ -1,3 +1,4 @@
+import type { TableProps } from 'antd';
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { BaseTable } from '../BaseTable';
@@ -123,5 +124,65 @@ describe('BaseTable', () => {
 
     expect(drawer.checked).toBe(true);
     expect(screen.queryByRole('button', { name: cancelName })).toBeNull();
+  });
+
+  it('关掉 isOperate 只去掉刷新与列筛选, 两侧内容照渲染', () => {
+    render(
+      <BaseTable
+        isOperate={false}
+        leftContent={<button type="button">入档选中的</button>}
+        columns={[{ title: '单号', dataIndex: 'no', width: 200 }]}
+        dataSource={[{ no: '1' }]}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: '入档选中的' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: RegExp($t('public.refresh')) })).toBeNull();
+    expect(screen.queryByRole('button', { name: RegExp($t('public.columnFilter')) })).toBeNull();
+  });
+
+  /** 三行数据, 分页那几条用例共用 */
+  const threeRows = [{ no: '1' }, { no: '2' }, { no: '3' }];
+
+  /**
+   * 渲染一张只有单号列的表.
+   * @param pagination - 分页给法, 不给就是不传
+   */
+  function renderRows(pagination?: TableProps<object>['pagination']) {
+    render(
+      <BaseTable
+        rowKey="no"
+        columns={[{ title: '单号', dataIndex: 'no', width: 200 }]}
+        dataSource={threeRows}
+        pagination={pagination}
+      />,
+    );
+  }
+
+  it('不给 pagination 时不分页', () => {
+    renderRows();
+
+    expect(document.querySelectorAll('.ant-table-row')).toHaveLength(3);
+    expect(document.querySelector('.ant-pagination')).toBeNull();
+  });
+
+  it('给空对象时按内置口径分页', () => {
+    renderRows({});
+
+    expect(screen.getByText($t('public.totalNum', { num: 3 }))).toBeTruthy();
+  });
+
+  it('给具体属性只覆盖对应那项, 内置的其余项还在', () => {
+    renderRows({ pageSize: 1 });
+
+    // 数行数而不是找文本: 分页器自己也渲染出「2」这个页码
+    expect(document.querySelectorAll('.ant-table-row')).toHaveLength(1);
+    expect(screen.getByText($t('public.totalNum', { num: 3 }))).toBeTruthy();
+  });
+
+  it('给 false 时不分页', () => {
+    renderRows(false);
+
+    expect(document.querySelector('.ant-pagination')).toBeNull();
   });
 });

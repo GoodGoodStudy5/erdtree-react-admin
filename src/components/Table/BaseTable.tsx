@@ -2,7 +2,7 @@ import type { ResizeCallbackData } from 'react-resizable';
 import type { ColumnsType } from 'antd/es/table';
 import type { EnumShowType, TableColumn } from '#/public';
 import { Table, Button, message, Tag } from 'antd';
-import type { TableProps } from 'antd';
+import type { TableProps, TablePaginationConfig } from 'antd';
 import { useMemo, useState, useRef, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { useFiler } from './hooks/useFiler';
@@ -19,13 +19,25 @@ import { $t } from '@/locales';
 
 type Components = TableProps<object>['components'];
 
+/**
+ * 本地分页的内置口径, 与 BasePagination 同一套.
+ *
+ * 三种给法结果不同: 给 `{}` 用这套, 给具体属性只覆盖对应那项, 不给或给 `false` 都不分页 ——
+ * 服务端分页的表格照旧走 BasePagination, 不该因为漏传而冒出一个只切当前一页数据的分页器.
+ */
+const LOCAL_PAGINATION: TablePaginationConfig = {
+  showSizeChanger: true,
+  showQuickJumper: false,
+  showTotal: (total: number) => $t('public.totalNum', { num: total }),
+};
+
 interface Props<T extends object = object> extends Omit<TableProps<T>, 'bordered' | 'columns'> {
   columns: TableColumn<T>[];
   isLoading?: boolean; // 是否加载
   isBordered?: boolean; // 是否开启边框
   isZebra?: boolean; // 是否开启斑马线
   isVirtual?: boolean; // 是否开启虚拟滚动
-  isOperate?: boolean; // 是否开启顶部操作栏
+  isOperate?: boolean; // 是否开启刷新与列筛选. 两侧内容各自按有无渲染, 不受它管
   isAuthHeight?: boolean; // 是否自动计算高度
   isStickyToolbar?: boolean; // 操作行是否吸在标签栏底下
   isStickyHeader?: boolean; // 表头是否吸在吸附栈的下沿, 判据见 index.less
@@ -38,7 +50,7 @@ interface Props<T extends object = object> extends Omit<TableProps<T>, 'bordered
   onCreate?: () => void;
 }
 
-/** 表格, 支持虚拟滚动、列筛选、列宽拖拽与斑马纹 */
+/** 表格, 支持虚拟滚动、列筛选、列宽拖拽、斑马纹与本地分页 */
 export function BaseTable<T extends object = object>(props: Props<T>) {
   const {
     isLoading,
@@ -112,6 +124,12 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
       key: 'getPageWarning',
     });
   }
+
+  // 刷新与列筛选归 isOperate, 两侧内容各自按有无算, 四项都没有才连这条工具栏一起不渲染
+  const hasToolbar = [isOperate, isCreate, leftContent, rightContent].some(Boolean);
+
+  // 全量数据在手时由 antd 自己切片, 判据见 LOCAL_PAGINATION
+  const pagination = props.pagination ? { ...LOCAL_PAGINATION, ...props.pagination } : false;
 
   // 表格高度, 虚拟滚动需要在渲染期得到它才能算出这一帧的可视条数
   /* eslint-disable-next-line react-hooks/refs */
@@ -297,7 +315,7 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
         ${isZebra !== false ? 'zebra' : ''}
       `}
     >
-      {isOperate && (
+      {hasToolbar && (
         <div
           data-sticky={isStickyToolbar ? 'top' : undefined}
           className="flex justify-between !mb-10px"
@@ -314,18 +332,22 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
           <div className="flex flex-wrap items-center justify-end gap-6px">
             {rightContent ? <div>{rightContent}</div> : undefined}
 
-            <Button
-              icon={<RedoOutlined className="transform rotate-270" disabled={!!isLoading} />}
-              onClick={getPage}
-            >
-              {$t('public.refresh')}
-            </Button>
+            {isOperate && (
+              <>
+                <Button
+                  icon={<RedoOutlined className="transform rotate-270" disabled={!!isLoading} />}
+                  onClick={getPage}
+                >
+                  {$t('public.refresh')}
+                </Button>
 
-            <TableFilter
-              columns={columns}
-              cacheColumns={inputColumns}
-              getTableChecks={getTableChecks}
-            />
+                <TableFilter
+                  columns={columns}
+                  cacheColumns={inputColumns}
+                  getTableChecks={getTableChecks}
+                />
+              </>
+            )}
           </div>
         </div>
       )}
@@ -334,9 +356,9 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
           rowKey="id"
           // 显式声明: 靠 rc-table 推导时, 列宽自适应会取决于页面有没有写 fixed 列
           tableLayout="auto"
-          pagination={false}
           loading={isLoading}
           {...props}
+          pagination={pagination}
           rowClassName={handleRowClassName}
           style={{
             borderRadius: 10,
