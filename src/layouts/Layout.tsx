@@ -12,7 +12,7 @@ import { KeepAlive, useKeepAliveRef } from 'keepalive-for-react';
 import Menu from './components/Menu';
 import Header from './components/Header';
 import Tabs from './components/Tabs';
-import { Forbidden, mountStickyStack } from '@/components';
+import { Forbidden, WatchData, mountStickyStack } from '@/components';
 import ErrorBoundary from './components/ErrorBoundary';
 import styles from './index.module.less';
 
@@ -30,7 +30,8 @@ function Layout() {
   const { setPermissions, setUserInfo } = useUserStore.getState();
   const { setMenuList, toggleCollapsed, togglePhone } = useMenuStore.getState();
 
-  const { permissions, userId, isMaximize, isCollapsed, isPhone } = useCommonStore();
+  // 样式字段不在这里读: 一读 Layout 就因折叠重渲, useOutlet() 跟着重新调用, 当前页面整棵重建
+  const { permissions, userId } = useCommonStore();
 
   // keepalive 实例挂载后发布到 store, 供跨页面刷新调用
   useEffect(() => {
@@ -108,44 +109,31 @@ function Layout() {
     };
   }, [handleIsPhone]);
 
-  // 使用 useMemo 缓存 className，避免每次渲染都重新计算
-  const headerClassName = useMemo(
-    () =>
-      `
-        border-bottom
-        transition-all
-        z-50!
-        ${styles.header}
-        ${isCollapsed ? styles['header-close-menu'] : ''}
-        ${isMaximize ? styles['header-none'] : ''}
-        ${isPhone ? `!left-0 z-999` : ''}
-      `,
-    [isCollapsed, isMaximize, isPhone],
-  );
-
-  const contentClassName = useMemo(
-    () =>
-      `
-        transition-all
-        ${styles.con}
-        ${isMaximize ? styles['con-maximize'] : ''}
-        ${isCollapsed ? styles['con-close-menu'] : ''}
-        ${isPhone ? `!left-0 !w-full` : ''}
-      `,
-    [isMaximize, isCollapsed, isPhone],
-  );
-
   return (
     <div id="layout">
       {contextHolder}
       {permissions.length > 0 && menuList.length > 0 && <Menu />}
 
       <div className={styles.layout_right}>
-        <div id="header" className={headerClassName}>
+        <WatchData
+          use={useHeaderClassName}
+          render={(className, children) => (
+            <div id="header" className={className}>
+              {children}
+            </div>
+          )}
+        >
           <Header />
           {permissions.length > 0 && menuList.length > 0 && <Tabs aliveRef={keepaliveRef} />}
-        </div>
-        <div id="layout-content" className={contentClassName}>
+        </WatchData>
+        <WatchData
+          use={useContentClassName}
+          render={(className, children) => (
+            <div id="layout-content" className={className}>
+              {children}
+            </div>
+          )}
+        >
           {isLoading && permissions.length === 0 && (
             <Skeleton active className="p-30px" paragraph={{ rows: 10 }} />
           )}
@@ -162,10 +150,36 @@ function Layout() {
               </motion.div>
             )}
           </KeepAlive>
-        </div>
+        </WatchData>
       </div>
     </div>
   );
+}
+
+function useHeaderClassName() {
+  const { isCollapsed, isMaximize, isPhone } = useCommonStore();
+
+  return `
+    border-bottom
+    transition-all
+    z-50!
+    ${styles.header}
+    ${isCollapsed ? styles['header-close-menu'] : ''}
+    ${isMaximize ? styles['header-none'] : ''}
+    ${isPhone ? `!left-0 z-999` : ''}
+  `;
+}
+
+function useContentClassName() {
+  const { isCollapsed, isMaximize, isPhone } = useCommonStore();
+
+  return `
+    transition-all
+    ${styles.con}
+    ${isMaximize ? styles['con-maximize'] : ''}
+    ${isCollapsed ? styles['con-close-menu'] : ''}
+    ${isPhone ? `!left-0 !w-full` : ''}
+  `;
 }
 
 export default memo(Layout);
