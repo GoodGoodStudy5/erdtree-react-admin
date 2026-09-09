@@ -1,10 +1,11 @@
 /**
  * 吸附: 写 `data-sticky="top"` 的元素吸在基准边下, 写 `data-sticky="bottom"` 的贴在基准边上.
  *
- * 页面只写标记. 退让距离 (--sticky-offset) 与层级序 (--sticky-order) 由 mountStickyStack 按栈里的实际
- * 成员写进来, 不由调用方申报.
+ * 页面只写标记. 退让距离 (--sticky-offset), 层级序 (--sticky-order) 与容器内边距 (--sticky-pad)
+ * 由 mountStickyStack 按栈里的实际成员写进来, 不由调用方申报.
  *
- * 基准边由装栈的那棵子树给: `--sticky-top` 是标签栏底, `--sticky-bottom` 是视口底.
+ * 基准边由成员继承到的 `--sticky-top` / `--sticky-bottom` 给: 内容区那份是标签栏底, 而抽屉
+ * portal 到 body 继承不到它, 取默认 0 就是抽屉自己的边 —— 抽屉不必再申报一遍.
  */
 
 /**
@@ -13,29 +14,25 @@
  */
 [data-sticky][data-sticky] {
   /**
-   * 栈内靠前的压在靠后的之上, 于是后一员补的底色被前一员挡住.
+   * 栈内靠前的压在靠后的之上, 于是后一员向外铺的底色被前一员挡住.
    *
-   * 基数小是有意的: 补的底色向栈外画, 首员那一份会画到标签栏所在的位置上去, 要让标签栏
+   * 基数小是有意的: 底色向栈外铺, 首员那一份会铺到标签栏所在的位置上去, 要让标签栏
    * (`#header`, z-index 50) 压得住它.
    */
   z-index: calc(5 + var(--sticky-order, 0));
 }
 
+/** 成员之间的空隙: 铺过去才不让滚动内容从两张卡片之间那道缝里穿过去 */
+@sticky-gap: 6px;
+
 /**
- * 铺底色的那一层, 由 mountStickyStack 注入.
+ * 吸附线之外那一段: 参照容器自己的内边距落在线外, 滚动内容从那里穿过去 (抽屉 body 带 24px).
  *
- * 为什么另起一个元素: 底色只能落在容器的后代上 —— 容器查询改不了容器自己; 而 `::before` 与
- * `::after` 归调用点, 搜索栏两个都用着 (hover 外扩命中区与阴影), 机制抢过来就顶掉它们.
- *
- * `z-index: -1` 画在成员内容之下. 成员自己是 stacking context (上面那个 z-index), 负值出不去,
- * 盖不到页面上的别处.
+ * 给得比那 24px 宽, 因为成员自己的边框也要退掉, 而边框宽由调用点定. 不去量容器的内边距:
+ * 量它就要把容器传进样式. 铺多了不要紧 —— 多出的那截在页面里被标签栏 (5rem) 压住, 在抽屉里
+ * 被容器的 overflow 裁掉.
  */
-[data-sticky-backdrop] {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-}
+@sticky-inset: 32px;
 
 /**
  * 吸住的样子, 标记由 mountStickyStack 写, 判据见那边的 markStuck.
@@ -43,41 +40,54 @@
  * 上底色是因为身后已经是滚动中的内容, 不给底色就透出来. 没吸住时不上 —— 那时成员坐在页面自己的
  * 底色上, 刷一层 `--bg-container` 会在灰底容器里显出一块白.
  *
- * 底色向上下各外扩 6px, 而不给成员加 padding: 加了会改成员高度, 退让距离跟着变, 吸住那一刻
- * 页面要跳一下.
- *
- * 限直接子代: 嵌套的成员各归各的标记, 内层那块不跟着外层吸住一起上色.
+ * 底色落在成员自己的 background 上, 不落在注入的子元素上: 负 z-index 的子元素画在父元素的
+ * border 之上, 会盖掉调用点的上下边框. 也不落在 `::before` 与 `::after` —— 那两个归调用点,
+ * 搜索栏都用着 (hover 外扩命中区与阴影).
  */
-[data-sticky][data-sticky-stuck] > [data-sticky-backdrop] {
-  inset: -6px 0;
+[data-sticky][data-sticky-stuck] {
   background-color: var(--sticky-bg, var(--bg-container));
 }
 
 /**
- * 成员之间的空隙也要有底色, 否则滚动中的内容从两张卡片之间那 10px 缝里穿过去.
+ * 减掉参照容器的内边距, 成员才吸到容器的边框内沿: 吸附线量在内容区顶, 容器那道内边距落在线外,
+ * 不减的话抽屉里的成员停在标题栏下方 24px 处, 空出的那截透出滚动中的内容.
  *
- * 补的高度是个够用的常量, 不去量真实空隙: 量它就要知道成员在文档流里的坐标, 而贴住的成员报回来的
- * 坐标不可靠. 画多了不要紧 —— 多出的那截被栈里前一员或标签栏压住.
+ * 值由 mountStickyStack 量参照容器写进来, 不写死 —— 抽屉, 弹窗与将来任何带内边距的滚动容器各
+ * 一个数, 而 antd 改 paddingLG 那天写死的那个不跟着变.
  */
-@sticky-bleed: 24px;
-
 [data-sticky][data-sticky='top'] {
   position: sticky;
-  top: calc(var(--sticky-top, 0px) + var(--sticky-offset, 0px));
-
-  /* 暂时注释 */
-  // box-shadow: 0 calc(-1 * var(--sticky-bleed, @sticky-bleed)) 0
-  //   var(--sticky-bg, var(--bg-container));
+  top: calc(var(--sticky-top, 0px) + var(--sticky-offset, 0px) - var(--sticky-pad, 0px));
 }
 
 [data-sticky][data-sticky='bottom'] {
   position: sticky;
-  bottom: calc(var(--sticky-bottom, 0px) + var(--sticky-offset, 0px));
-  box-shadow: 0 var(--sticky-bleed, @sticky-bleed) 0 var(--sticky-bg, var(--bg-container));
+  bottom: calc(var(--sticky-bottom, 0px) + var(--sticky-offset, 0px) - var(--sticky-pad, 0px));
 }
 
 /**
- * 进不了栈的元素怎么贴: 照 `--sticky-stacked-top` / `--sticky-stacked-bottom` 自己贴, 那是每条栈
- * 当前的总高度. 给拿不到 DOM 的第三方组件用 —— antd 自己渲染的吸顶表头就是一个, 见
- * `src/components/Table/index.less` 的 `.sticky-header`.
+ * 线外那一段与成员间隙交给 box-shadow, 因为 background 只铺到 border box, 而给成员加 padding
+ * 会改它的高度 —— 退让距离跟着变, 吸住那一刻页面要跳一下.
+ *
+ * 两条阴影按吸附方向反着给: 吸顶的成员线在上方, 内容在下方, 所以往上铺到线外, 往下只铺一道缝.
+ *
+ * 认下的代价: box-shadow 跟随成员的圆角, 于是线外那一段的两个角上各露一个圆角大小的缺口,
+ * 背后是滚动中的内容.
+ */
+[data-sticky][data-sticky-stuck][data-sticky='top'] {
+  box-shadow:
+    0 calc(-1 * @sticky-inset) 0 var(--sticky-bg, var(--bg-container)),
+    0 @sticky-gap 0 var(--sticky-bg, var(--bg-container));
+}
+
+[data-sticky][data-sticky-stuck][data-sticky='bottom'] {
+  box-shadow:
+    0 @sticky-inset 0 var(--sticky-bg, var(--bg-container)),
+    0 calc(-1 * @sticky-gap) 0 var(--sticky-bg, var(--bg-container));
+}
+
+/**
+ * 进不了栈的元素怎么贴: 照 `--sticky-stacked-top` / `--sticky-stacked-bottom` 自己贴, 那是它所在
+ * 滚动容器那条栈当前的总高度, 由 mountStickyStack 发布在容器上. 给拿不到 DOM 的第三方组件用
+ * —— antd 自己渲染的吸顶表头就是一个, 见 `src/components/Table/index.less` 的 `.sticky-header`.
  */

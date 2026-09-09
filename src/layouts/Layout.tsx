@@ -1,5 +1,5 @@
 import { useToken, useCommonStore } from '@/hooks';
-import { useCallback, useEffect, useMemo, useRef, useState, memo } from 'react';
+import { useCallback, useEffect, useMemo, useState, memo } from 'react';
 import { useOutlet, useLocation } from 'react-router-dom';
 import { Skeleton, message } from 'antd';
 import { debounce } from 'lodash';
@@ -24,7 +24,6 @@ function Layout() {
   const keepaliveRef = useKeepAliveRef();
   const [isLoading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
-  const contentRef = useRef<HTMLDivElement>(null);
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
   const menuList = useMenuStore((state) => state.menuList);
   const { setAliveRef } = usePublicStore.getState();
@@ -72,15 +71,12 @@ function Layout() {
   }, []);
 
   /**
-   * 吸附栈装在内容区上, 于是页面里任何一处写了 data-sticky 的元素都吸在标签栏底下或视口底.
+   * 吸附栈装在 body 上, 于是页面里任何一处写了 data-sticky 的元素都吸在它所在滚动容器的边上.
    *
-   * 装在这里而不装在各页面: 基准边是标签栏底, 那是布局的事实, 页面不该各自申报一遍.
+   * 装在 body 而不装在内容区: 抽屉与弹窗 portal 到 body, 装在内容区就扫不到它们的成员.
+   * 装在布局层而不装在各页面: 基准边是标签栏底, 那是布局的事实, 页面不该各自申报一遍.
    */
-  useEffect(() => {
-    if (!contentRef.current) return;
-
-    return mountStickyStack(contentRef.current);
-  }, []);
+  useEffect(() => mountStickyStack(document.body), []);
 
   // 监测是否需要刷新
   useEffect(() => {
@@ -149,7 +145,7 @@ function Layout() {
           <Header />
           {permissions.length > 0 && menuList.length > 0 && <Tabs aliveRef={keepaliveRef} />}
         </div>
-        <div id="layout-content" ref={contentRef} className={contentClassName}>
+        <div id="layout-content" className={contentClassName}>
           {isLoading && permissions.length === 0 && (
             <Skeleton active className="p-30px" paragraph={{ rows: 10 }} />
           )}
