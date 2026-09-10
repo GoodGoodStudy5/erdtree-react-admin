@@ -1,0 +1,9 @@
+// 只被同目录的 index.less 与 SimpleTable.less 以 @import 引入, 不要加 JS import —— 那会让它多输出一份.
+
+/* 单元格宽度上限: 撞上它就折行, 整张表仍装不下才横向滚. 原生与 antd 两种渲染形态共用这一个数 */
+@cell-max-width: 300px;
+
+/* 密排小表的字号与内距. 原生与 antd 两种渲染形态共用这三个数 */
+@simple-font-size: 12px;
+@simple-padding-block: 5px;
+@simple-padding-inline: 8px;

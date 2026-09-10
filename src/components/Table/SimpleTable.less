@@ -1,0 +1,81 @@
+@import url('./variable.less');
+
+/**
+ * 原生形态: 一个格子一个 `<td>`, 吃不到 antd 表格的任何一条样式, 密排与素色都得自己写一遍.
+ * 数值取自同目录的 variable.less, 与下面的 antd 形态共用 —— 各写一份的那天改一边不会报错.
+ */
+.simple-table.is-native {
+  /* 列宽撞上上限后仍装不下, 整张表才在这里横向滚 */
+  overflow: auto hidden;
+
+  > table {
+    width: 100%;
+    font-size: var(--simple-table-font-size, @simple-font-size);
+
+    /* 浏览器按内容分列宽. 显式写了 width 的列由 colgroup 给出偏好, 都不做 JS 测量 */
+    table-layout: auto;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: @simple-padding-block @simple-padding-inline;
+    text-align: left;
+
+    /* 分隔线与素色态同一条口径, 判据见下 */
+    border-bottom: 1px solid var(--ant-color-split);
+  }
+
+  th {
+    /* 表头不换行, 于是表头文字宽成为该列事实上的下限, 不必另给 minWidth */
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  td {
+    max-width: @cell-max-width;
+  }
+}
+
+/**
+ * 密排小表的素色态: 它住在卡片里, 没有独立的容器身份, 底色归卡片.
+ *
+ * 分隔线改走半透明的 `--ant-color-split`, 不用表格自己那条实色 `--ant-table-border-color`
+ * (`#f0f0f0`) —— 实色那条在白卡片上刚好, 换到橙底的未平桶卡上就偏.
+ */
+.simple-table.is-plain {
+  .ant-table {
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .ant-table-thead > tr > th {
+    background: transparent;
+  }
+
+  /* 悬浮不变色: 小表不可点不可选, 变色是个假信号 */
+  .ant-table-tbody .ant-table-row > .ant-table-cell-row-hover {
+    background: transparent;
+  }
+
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    border-bottom-color: var(--ant-color-split);
+  }
+}
+
+/**
+ * 密排: 字号与内距. 数值与原生形态共用 variable.less 那一份, 全部小表统一走它.
+ *
+ * 必须落在 `.ant-table` 这个元素上 —— antd v6 的 cssVar 把整套 `--ant-table-*` 声明在它自己身上
+ * (`.ant-table-css-var`), 祖先上的同名变量到这里会被它本地那份顶掉, 继承进不去.
+ * 三个类压过 antd 的两个类; 调用点要改就设 `--simple-table-font-size`, 不必再懂上面这一层.
+ */
+.simple-table .ant-table.ant-table-css-var {
+  --ant-table-cell-font-size: var(--simple-table-font-size, @simple-font-size);
+  --ant-table-cell-font-size-sm: var(--simple-table-font-size, @simple-font-size);
+  --ant-table-cell-padding-block: @simple-padding-block;
+  --ant-table-cell-padding-block-sm: @simple-padding-block;
+  --ant-table-cell-padding-inline: @simple-padding-inline;
+  --ant-table-cell-padding-inline-sm: @simple-padding-inline;
+}

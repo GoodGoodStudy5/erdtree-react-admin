@@ -70,11 +70,17 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
     rightContent,
     getPage,
     onCreate,
+    columns: inputColumnsProp,
+    pagination: paginationProp,
+    style: styleProp,
+    scroll: scrollProp,
+    // 上面逐个解出来的都由本组件消化; 剩下的原样透传, 展开在 JSX 最后一位, 于是调用点压得过内置值
+    ...params
   } = props;
   const { isPhone } = useCommonStore();
   const [handleFilterTable] = useFiler();
   // 列在组件内部一律按 object 视角处理: 泛型只服务调用点的 record 推导, 筛选与排序不认识 T
-  const inputColumns = props.columns as unknown as TableColumn[];
+  const inputColumns = inputColumnsProp as unknown as TableColumn[];
   const [columns, setColumns] = useState(filterTableColumns(inputColumns));
   const tableRef = useRef<HTMLDivElement>(null);
   const [tableFilters, setTableFilters] = useState<string[]>([]);
@@ -84,15 +90,6 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
   // 行高取自真实渲染结果, 虚拟滚动需要它换算可视条数
   /* eslint-disable-next-line react-hooks/refs */
   const rows = tableRef.current?.querySelectorAll('.ant-table-row');
-
-  // 清除自定义属性
-  const params: Partial<Props<T>> = { ...props };
-  delete params.isLoading;
-  delete params.isVirtual;
-  delete params.isCreate;
-  delete params.isBordered;
-  delete params.isOperate;
-  delete (params as TableColumn).enum;
 
   // 外部换掉列定义时丢弃用户的筛选、排序与列宽调整
   if (prevColumns !== inputColumns) {
@@ -129,7 +126,7 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
   const hasToolbar = [isOperate, isCreate, leftContent, rightContent].some(Boolean);
 
   // 全量数据在手时由 antd 自己切片, 判据见 LOCAL_PAGINATION
-  const pagination = props.pagination ? { ...LOCAL_PAGINATION, ...props.pagination } : false;
+  const pagination = paginationProp ? { ...LOCAL_PAGINATION, ...paginationProp } : false;
 
   // 表格高度, 虚拟滚动需要在渲染期得到它才能算出这一帧的可视条数
   /* eslint-disable-next-line react-hooks/refs */
@@ -285,11 +282,11 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
         },
       };
 
-  // props.scroll 排在最后, 于是它压得住上面两行 —— 开虚拟滚动的表要自己定 y, 拿不到自适应那个值
+  // scrollProp 排在最后, 于是它压得住上面两行 —— 开虚拟滚动的表要自己定 y, 拿不到自适应那个值
   const scroll = {
     x: scrollX ?? 'max-content',
     y: scrollY ?? (isAuthHeight ? tableHeight : undefined),
-    ...props.scroll,
+    ...scrollProp,
   };
 
   /**
@@ -357,7 +354,7 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
           // 显式声明: 靠 rc-table 推导时, 列宽自适应会取决于页面有没有写 fixed 列
           tableLayout="auto"
           loading={isLoading}
-          {...props}
+          size={size}
           pagination={pagination}
           rowClassName={handleRowClassName}
           style={{
@@ -366,7 +363,7 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
             borderBottom: '1px solid rgba(0, 0, 0, .05)',
             // 表头贴顶时这一层不能有 overflow: 它会成为贴顶的参照容器, 而它自己从不滚动
             ...(isStickyHeader ? undefined : { overflow: 'auto' }),
-            ...props.style,
+            ...styleProp,
           }}
           bordered={isBordered !== false}
           scroll={scroll}
@@ -374,6 +371,7 @@ export function BaseTable<T extends object = object>(props: Props<T>) {
           sticky={isStickyHeader ? { offsetHeader: 0 } : undefined}
           components={components}
           columns={mergedColumns as unknown as ColumnsType<T>}
+          {...(params as TableProps<T>)}
         />
       </div>
     </div>

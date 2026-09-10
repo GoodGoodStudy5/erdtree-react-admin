@@ -185,4 +185,36 @@ describe('BaseTable', () => {
 
     expect(document.querySelector('.ant-pagination')).toBeNull();
   });
+
+  it('不给 components 时表头自带列宽拖拽把手', () => {
+    const { container } = render(
+      <BaseTable columns={[{ title: '单号', dataIndex: 'billNo', width: 200 }]} dataSource={[]} />,
+    );
+
+    expect(container.querySelector('.react-resizable-handle')).toBeTruthy();
+  });
+
+  it('调用点给的 components 压过内置的: 通用件不替调用点设限', () => {
+    const { container } = render(
+      <BaseTable
+        columns={[{ title: '单号', dataIndex: 'billNo', width: 200 }]}
+        dataSource={[]}
+        components={{ header: {} }}
+      />,
+    );
+
+    expect(container.querySelector('.react-resizable-handle')).toBeNull();
+  });
+
+  it('调用点给的 tableLayout 压过内置的 auto', () => {
+    const { container } = render(
+      <BaseTable
+        columns={[{ title: '单号', dataIndex: 'billNo' }]}
+        dataSource={[]}
+        tableLayout="fixed"
+      />,
+    );
+
+    expect((container.querySelector('table') as HTMLElement).style.tableLayout).toBe('fixed');
+  });
 });
