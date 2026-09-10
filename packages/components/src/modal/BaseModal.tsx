@@ -148,6 +148,8 @@ export function BaseModal(props: BaseModalProps) {
       destroyOnHidden
       closable={false}
       keyboard={false}
+      // 垂直居中: 非居中态 antd 给 `.ant-modal` 的 top 是 100px, 那 100px 会把 95vh 的下沿顶出视口
+      centered
       mask={{ closable: false }}
       modalRender={!isPhone ? modalRender : undefined}
       {...props}

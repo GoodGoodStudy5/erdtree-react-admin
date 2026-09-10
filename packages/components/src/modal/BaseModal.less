@@ -3,7 +3,14 @@
     margin-bottom: 0;
   }
 
+  /**
+   * 高不过一屏的 95%: 内容再长也由 body 自己滚, 不把整个弹窗顶出视口 —— 顶出去之后滚的是遮罩层,
+   * 标题与按钮一起滚走, 人找不到「关闭」.
+   */
   .ant-modal-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 95vh;
     padding: 0 !important;
 
     .modal-custom-title {
@@ -24,6 +31,18 @@
     }
   }
 
+  /* 头与脚不参与压缩: 要压的是 body */
+  .ant-modal-header,
+  .ant-modal-footer {
+    flex-shrink: 0;
+  }
+
+  /* flex 子项的 min-height 默认是 auto, 不写这条它不肯缩, 上面的 max-height 就白设 */
+  .ant-modal-body {
+    min-height: 0;
+    overflow: auto;
+  }
+
   .base-modal-content {
     padding: 24px;
   }
@@ -41,7 +60,10 @@
   .ant-modal-container {
     display: flex;
     flex-direction: column;
+
+    /* 解开 .base-modal 的 95vh: 全屏就是整屏, 两条同为两个类, 光靠源码次序压不住 */
     height: calc(100vh);
+    max-height: none;
   }
 
   .ant-modal-body {

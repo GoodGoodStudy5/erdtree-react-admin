@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useSyncExternalStore } from 'react';
+import { memo, useEffect, useMemo, useSyncExternalStore } from 'react';
 import { ModalIdContext } from './instance';
 import { modalStore } from './store';
 import type { ModalInstance } from './store';
@@ -9,7 +9,8 @@ import type { ModalInstance } from './store';
  */
 let mounted = false;
 
-function InstanceHost({ instance }: { instance: ModalInstance }) {
+/** memo 不是优化: 实例是平级兄弟, 任一实例开合都重渲染挂载点, 不隔断就连最重的那层内容一起白重渲 */
+const InstanceHost = memo(function InstanceHost({ instance }: { instance: ModalInstance }) {
   const { id, Comp, props } = instance;
 
   // id 在本实例存续期间不变, 所以控制面算一次就够; 它是弹窗组件的 props, 身份要稳
@@ -26,7 +27,7 @@ function InstanceHost({ instance }: { instance: ModalInstance }) {
       <Comp {...props} resolve={control.resolve} cancel={control.cancel} />
     </ModalIdContext.Provider>
   );
-}
+});
 
 /**
  * 命令式弹窗的挂载点. 它只是显示器 —— 事实来源在 store,
