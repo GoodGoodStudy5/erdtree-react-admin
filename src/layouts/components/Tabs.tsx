@@ -141,7 +141,7 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
    */
   const remove = useCallback(
     (targetKey: string) => {
-      // 落点由 store 交回, 这里只管跳过去; 跳完由 pathname 那条 effect 补面包屑与标题
+      // 落点由 closeTabs 交回; 跳完由 pathname 那条 effect 补面包屑与标题
       const nextPath = closeTabs(targetKey, aliveRef.current?.destroy);
       if (nextPath) navigate(nextPath);
     },

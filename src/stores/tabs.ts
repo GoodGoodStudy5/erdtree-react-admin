@@ -16,12 +16,7 @@ export interface TabsData extends Omit<TabPaneProps, 'tab'> {
   pinned?: boolean; // 固定标签: 不参与批量关闭, 且排在非固定标签之前
 }
 
-/**
- * 固定的标签不可关闭; 只剩一个标签时也不可关闭.
- *
- * 交出新数组与新成员, 不在原地改: zustand 按引用比对快照, 原地改等于写进去了却没人被叫醒 ——
- * 关掉非当前标签时一个字段都没变, 界面于是停在旧的一栏.
- */
+/** 固定的标签不可关闭; 只剩一个标签时也不可关闭 */
 const withClosable = (tabs: TabsData[]): TabsData[] =>
   tabs.map((item) => ({ ...item, closable: !item.pinned && tabs.length > 1 }));
 
@@ -52,7 +47,7 @@ interface TabsState {
   setTabs: (key: string, searchParams?: string) => void;
   sortTabs: (payload: TabsData[]) => void;
   toggleTabPin: (payload: string) => void;
-  /** 关掉一个标签. 关的是当前标签时交回落点路径, 由调用方跳过去 —— 落点只在这里算一遍 */
+  /** 关掉一个标签. 关的是当前标签时交回落点路径, 由调用方跳过去 —— 落点不在调用点重复算 */
   closeTabs: (
     payload: string,
     dropScope: KeepAliveRef['destroy'] | undefined,
@@ -64,7 +59,7 @@ interface TabsState {
   closeAllTab: () => void;
 }
 
-/** 标签页导航状态: 已打开的标签、当前激活项、最大化与关闭锁 */
+/** 标签页导航状态. 写操作一律交出新数组与新成员: 原地改的引用没变, zustand 比对快照后不叫醒任何人 */
 export const useTabsStore = create<TabsState>()(
   devtools(
     persist(
@@ -87,7 +82,7 @@ export const useTabsStore = create<TabsState>()(
           })),
         addTabs: (payload) =>
           set((state) => {
-            // 已在栏里的不再入栏, 也不换数组引用 —— 换一次是全栏重渲染, 而路由每变一次都会走到这里
+            // 已在栏里的不再入栏, 也不换数组引用 —— 换一次是全栏重渲染, 而路由每变一次都会走到 addTabs
             if (state.tabs.some((item) => item.key === payload.key)) return {};
 
             return { tabs: withClosable([...state.tabs, payload]) };
@@ -157,7 +152,6 @@ export const useTabsStore = create<TabsState>()(
             return {
               tabs,
               activeKey: payload,
-              // 如果当前标签不是要关闭的标签，就导航到要关闭的标签
               ...(state.activeKey !== payload ? { isCloseTabsLock: true } : {}),
             };
           }),
@@ -174,13 +168,11 @@ export const useTabsStore = create<TabsState>()(
             return {
               tabs,
               activeKey: payload,
-              // 如果当前标签不是要关闭的标签，就导航到要关闭的标签
               ...(state.activeKey !== payload ? { isCloseTabsLock: true } : {}),
             };
           }),
         closeOther: (payload, dropScope) =>
           set((state) => {
-            // 保留当前标签与固定标签，关闭其他标签
             const isKept = (item: TabsData) => item.key === payload || item.pinned;
 
             // 清除非当前的keepalive缓存
@@ -191,7 +183,6 @@ export const useTabsStore = create<TabsState>()(
             return {
               tabs: withClosable(state.tabs.filter(isKept)),
               activeKey: payload,
-              // 如果当前标签不是要关闭的标签，就导航到要关闭的标签
               ...(state.activeKey !== payload ? { isCloseTabsLock: true } : {}),
             };
           }),
