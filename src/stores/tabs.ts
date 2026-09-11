@@ -16,12 +16,14 @@ export interface TabsData extends Omit<TabPaneProps, 'tab'> {
   pinned?: boolean; // 固定标签: 不参与批量关闭, 且排在非固定标签之前
 }
 
-/** 固定的标签不可关闭; 只剩一个标签时也不可关闭 */
-const syncClosable = (tabs: TabsData[]) => {
-  for (let i = 0; i < tabs.length; i++) {
-    tabs[i].closable = !tabs[i].pinned && tabs.length > 1;
-  }
-};
+/**
+ * 固定的标签不可关闭; 只剩一个标签时也不可关闭.
+ *
+ * 交出新数组与新成员, 不在原地改: zustand 按引用比对快照, 原地改等于写进去了却没人被叫醒 ——
+ * 关掉非当前标签时一个字段都没变, 界面于是停在旧的一栏.
+ */
+const withClosable = (tabs: TabsData[]): TabsData[] =>
+  tabs.map((item) => ({ ...item, closable: !item.pinned && tabs.length > 1 }));
 
 /** 固定标签集中排在左侧, 组内保持既有顺序 */
 const sortByPinned = (tabs: TabsData[]): TabsData[] => [
@@ -50,7 +52,11 @@ interface TabsState {
   setTabs: (key: string, searchParams?: string) => void;
   sortTabs: (payload: TabsData[]) => void;
   toggleTabPin: (payload: string) => void;
-  closeTabs: (payload: string, dropScope: KeepAliveRef['destroy'] | undefined) => void;
+  /** 关掉一个标签. 关的是当前标签时交回落点路径, 由调用方跳过去 —— 落点只在这里算一遍 */
+  closeTabs: (
+    payload: string,
+    dropScope: KeepAliveRef['destroy'] | undefined,
+  ) => string | undefined;
   closeTabGoNext: (payload: TabsGoNext) => void;
   closeLeft: (payload: string, dropScope: KeepAliveRef['destroy'] | undefined) => void;
   closeRight: (payload: string, dropScope: KeepAliveRef['destroy'] | undefined) => void;
@@ -62,7 +68,7 @@ interface TabsState {
 export const useTabsStore = create<TabsState>()(
   devtools(
     persist(
-      (set) => ({
+      (set, get) => ({
         isCloseTabsLock: false,
         isMaximize: false,
         activeKey: '',
@@ -73,182 +79,123 @@ export const useTabsStore = create<TabsState>()(
         setActiveKey: (key) => set({ activeKey: key }),
         setNav: (nav) => set({ nav }),
         switchTabsLang: (label) =>
-          set((state) => {
-            const { tabs } = state;
-            for (let i = 0; i < tabs?.length; i++) {
-              const item = tabs[i];
-              item.label = label === 'en' ? item.labelEn : item.labelZh;
-            }
-            return { tabs };
-          }),
+          set((state) => ({
+            tabs: state.tabs.map((item) => ({
+              ...item,
+              label: label === 'en' ? item.labelEn : item.labelZh,
+            })),
+          })),
         addTabs: (payload) =>
           set((state) => {
-            const { tabs } = state;
-            const has = tabs.find((item) => item.key === payload.key);
-            if (!has) tabs.push(payload);
+            // 已在栏里的不再入栏, 也不换数组引用 —— 换一次是全栏重渲染, 而路由每变一次都会走到这里
+            if (state.tabs.some((item) => item.key === payload.key)) return {};
 
-            syncClosable(tabs);
-
-            return { tabs };
+            return { tabs: withClosable([...state.tabs, payload]) };
           }),
         setTabs: (key, searchParams) =>
           set((state) => {
-            const { tabs } = state;
-            const has = tabs.find((item) => item.key === key);
-            if (has) {
-              has.urlParams = searchParams;
-            }
-            return { tabs };
-          }),
-        sortTabs: (payload) => {
-          const tabs = sortByPinned(payload);
-          syncClosable(tabs);
-          set({ tabs });
-        },
-        toggleTabPin: (payload) =>
-          set((state) => {
-            const tabs = sortByPinned(
-              state.tabs.map((item) =>
-                item.key === payload ? { ...item, pinned: !item.pinned } : item,
+            const has = state.tabs.find((item) => item.key === key);
+            if (!has || has.urlParams === searchParams) return {};
+
+            return {
+              tabs: state.tabs.map((item) =>
+                item.key === key ? { ...item, urlParams: searchParams } : item,
               ),
-            );
-            syncClosable(tabs);
-            return { tabs };
+            };
           }),
-        closeTabs: (payload, dropScope) =>
-          set((state) => {
-            const { tabs } = state;
-            const index = tabs.findIndex((item) => item.key === payload);
-            if (index >= 0) tabs.splice(index, 1);
+        sortTabs: (payload) => set({ tabs: withClosable(sortByPinned(payload)) }),
+        toggleTabPin: (payload) =>
+          set((state) => ({
+            tabs: withClosable(
+              sortByPinned(
+                state.tabs.map((item) =>
+                  item.key === payload ? { ...item, pinned: !item.pinned } : item,
+                ),
+              ),
+            ),
+          })),
+        closeTabs: (payload, dropScope) => {
+          const { tabs: current, activeKey } = get();
+          const index = current.findIndex((item) => item.key === payload);
+          if (index < 0) return undefined;
 
-            if (payload === state.activeKey) {
-              let target = '';
-              if (index < tabs.length) {
-                target = tabs?.[index]?.key || '';
-              } else {
-                target = tabs[index - 1]?.key || '';
-              }
-              set({ activeKey: target, isCloseTabsLock: true });
-            }
+          const tabs = withClosable(current.filter((item) => item.key !== payload));
+          const isActive = payload === activeKey;
+          // 关掉的是当前标签时落到右邻; 关的是最后一个则落到左邻
+          const nextPath = isActive ? ((tabs[index] ?? tabs[index - 1])?.key ?? '') : '';
 
-            syncClosable(tabs);
+          set(isActive ? { tabs, activeKey: nextPath, isCloseTabsLock: true } : { tabs });
 
-            // 清除当前标签的keepalive缓存
-            dropScope?.(payload);
+          // 清除当前标签的keepalive缓存
+          dropScope?.(payload);
 
-            return { tabs };
-          }),
+          return nextPath || undefined;
+        },
         closeTabGoNext: (payload) =>
           set((state) => {
-            const { tabs } = state;
             const { key, nextPath, dropScope } = payload;
-            const index = tabs.findIndex((item) => item.key === key);
-            if (index >= 0) tabs.splice(index, 1);
-
-            if (key === state.activeKey) {
-              set({ activeKey: nextPath, isCloseTabsLock: true });
-            }
-
-            syncClosable(tabs);
+            if (!state.tabs.some((item) => item.key === key)) return {};
 
             // 清除非当前的keepalive缓存
             dropScope?.(key);
 
-            return { tabs };
+            return {
+              tabs: withClosable(state.tabs.filter((item) => item.key !== key)),
+              ...(key === state.activeKey ? { activeKey: nextPath, isCloseTabsLock: true } : {}),
+            };
           }),
         closeLeft: (payload, dropScope) =>
           set((state) => {
-            const { tabs, activeKey } = state;
-            const index = tabs.findIndex((item) => item.key === payload);
-            const remain = tabs.filter((item, i) => i >= index || item.pinned);
-            tabs.splice(0, tabs.length, ...remain);
-            set({ activeKey: payload });
-
-            // 如果当前标签不是要关闭的标签，就导航到要关闭的标签
-            if (activeKey !== payload) {
-              set({ isCloseTabsLock: true });
-            }
-
-            syncClosable(tabs);
+            const index = state.tabs.findIndex((item) => item.key === payload);
+            const tabs = withClosable(state.tabs.filter((item, i) => i >= index || item.pinned));
 
             // 清除非当前的keepalive缓存
-            for (let i = 0; i < tabs?.length; i++) {
-              const item = tabs[i];
-              if (item.key !== payload) {
-                dropScope?.(item.key);
-              }
+            for (const item of tabs) {
+              if (item.key !== payload) dropScope?.(item.key);
             }
 
-            return { tabs };
+            return {
+              tabs,
+              activeKey: payload,
+              // 如果当前标签不是要关闭的标签，就导航到要关闭的标签
+              ...(state.activeKey !== payload ? { isCloseTabsLock: true } : {}),
+            };
           }),
         closeRight: (payload, dropScope) =>
           set((state) => {
-            const { tabs, activeKey } = state;
-
             // 清除非当前的keepalive缓存
-            for (let i = 0; i < tabs?.length; i++) {
-              const item = tabs[i];
-              if (item.key !== payload) {
-                dropScope?.(item.key);
-              }
+            for (const item of state.tabs) {
+              if (item.key !== payload) dropScope?.(item.key);
             }
 
-            const index = tabs.findIndex((item) => item.key === payload);
-            const remain = tabs.filter((item, i) => i <= index || item.pinned);
-            tabs.splice(0, tabs.length, ...remain);
-            set({ activeKey: payload });
+            const index = state.tabs.findIndex((item) => item.key === payload);
+            const tabs = withClosable(state.tabs.filter((item, i) => i <= index || item.pinned));
 
-            // 如果当前标签不是要关闭的标签，就导航到要关闭的标签
-            if (activeKey !== payload) {
-              set({ isCloseTabsLock: true });
-            }
-
-            syncClosable(tabs);
-
-            return { tabs };
+            return {
+              tabs,
+              activeKey: payload,
+              // 如果当前标签不是要关闭的标签，就导航到要关闭的标签
+              ...(state.activeKey !== payload ? { isCloseTabsLock: true } : {}),
+            };
           }),
         closeOther: (payload, dropScope) =>
           set((state) => {
-            const { tabs, activeKey } = state;
-            // 保留当前标签，关闭其他标签
-            const filteredTabs: TabsData[] = [];
+            // 保留当前标签与固定标签，关闭其他标签
+            const isKept = (item: TabsData) => item.key === payload || item.pinned;
 
-            for (let i = 0; i < tabs?.length; i++) {
-              const item = tabs[i];
-
-              // 如果当前标签不是要关闭的标签，就保留
-              if (item.key === payload || item.pinned) {
-                filteredTabs.push(item);
-              } else {
-                // 清除非当前的keepalive缓存
-                dropScope?.(item.key);
-              }
+            // 清除非当前的keepalive缓存
+            for (const item of state.tabs) {
+              if (!isKept(item)) dropScope?.(item.key);
             }
-
-            tabs.filter((item) => item.key === payload);
-
-            // 如果当前标签不是要关闭的标签，就导航到要关闭的标签
-            if (activeKey !== payload) {
-              set({ isCloseTabsLock: true });
-            }
-
-            set({ tabs: filteredTabs, activeKey: payload });
-
-            syncClosable(filteredTabs);
 
             return {
-              tabs: filteredTabs,
+              tabs: withClosable(state.tabs.filter(isKept)),
               activeKey: payload,
+              // 如果当前标签不是要关闭的标签，就导航到要关闭的标签
+              ...(state.activeKey !== payload ? { isCloseTabsLock: true } : {}),
             };
           }),
-        closeAllTab: () => {
-          set({ tabs: [], activeKey: '' });
-
-          return {
-            tabs: [],
-            activeKey: '',
-          };
-        },
+        closeAllTab: () => set({ tabs: [], activeKey: '' }),
       }),
       {
         name: 'tabs_storage', // 存储中的项目名称，必须是唯一的

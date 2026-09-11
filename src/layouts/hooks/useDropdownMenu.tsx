@@ -114,17 +114,11 @@ export function useDropdownMenu(props: Props) {
         break;
 
       // 关闭当前
-      case ITabEnums.CLOSE_CURRENT:
-        if (activeKey === pathname) {
-          const currentIndex = tabs.findIndex((tab) => tab.key === activeKey);
-          const nextPath = tabs[currentIndex > 0 ? currentIndex - 1 : 0].key;
-          if (nextPath) {
-            navigate(nextPath);
-          }
-        }
-        closeTabs(key, aliveRef.current?.destroy);
-
+      case ITabEnums.CLOSE_CURRENT: {
+        const nextPath = closeTabs(key, aliveRef.current?.destroy);
+        if (nextPath) navigate(nextPath);
         break;
+      }
 
       // 关闭其他
       case ITabEnums.CLOSE_OTHER:

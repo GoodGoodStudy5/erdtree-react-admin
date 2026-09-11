@@ -141,19 +141,11 @@ function LayoutTabs({ aliveRef }: LayoutTabsProps) {
    */
   const remove = useCallback(
     (targetKey: string) => {
-      // 如果删除的是当前选中的，则跳转至上一个
-      if (activeKey === targetKey) {
-        const currentIndex = tabs.findIndex((tab) => tab.key === activeKey);
-        const nextPath = tabs[currentIndex > 0 ? currentIndex - 1 : 0].key;
-        if (nextPath) {
-          handleAddTab(nextPath);
-          navigate(nextPath);
-        }
-      }
-
-      closeTabs(targetKey, aliveRef.current?.destroy);
+      // 落点由 store 交回, 这里只管跳过去; 跳完由 pathname 那条 effect 补面包屑与标题
+      const nextPath = closeTabs(targetKey, aliveRef.current?.destroy);
+      if (nextPath) navigate(nextPath);
     },
-    [closeTabs, aliveRef, activeKey],
+    [closeTabs, aliveRef, navigate],
   );
 
   /**
