@@ -1,3 +1,4 @@
+import type { ModalFuncProps } from 'antd';
 import type { MessageInstance } from 'antd/es/message/interface';
 import type { NotificationInstance } from 'antd/es/notification/interface';
 import type { ModalStaticFunctions } from 'antd/es/modal/confirm';
@@ -33,6 +34,19 @@ function StaticMessage() {
 }
 
 export { message, notification, modal };
+
+/**
+ * 二次确认: 点确定给 true, 取消或关掉给 false.
+ *
+ * 结局走 await 的返回值, 因此 `onOk` / `onCancel` 不开放 —— 两处都能收结局的那天,
+ * 同一个动作会写成回调与后续语句两份.
+ * @param props - 原样透传给 `modal.confirm`, 结局两支除外
+ */
+export function asyncConfirm(props: Omit<ModalFuncProps, 'onOk' | 'onCancel'>): Promise<boolean> {
+  return new Promise((resolve) => {
+    modal.confirm({ ...props, onOk: () => resolve(true), onCancel: () => resolve(false) });
+  });
+}
 
 /** 静态调用的挂载点: 渲染它一次, message / notification / modal 三个静态方法才有 antd 上下文 */
 export default StaticMessage;
