@@ -57,4 +57,15 @@ describe('BaseDescriptions 默认值', () => {
     expect(root().classList.contains('ant-descriptions-medium')).toBe(true);
     expect(container.querySelectorAll('tr').length).toBe(2);
   });
+
+  it('标签不折行, 调用方另设别的档位也带着', () => {
+    const { container } = render(
+      <BaseDescriptions items={ITEMS} styles={{ content: { color: 'red' } }} />,
+    );
+    const label = container.querySelector<HTMLElement>('.ant-descriptions-item-label');
+    const content = container.querySelector<HTMLElement>('.ant-descriptions-item-content');
+
+    expect(label?.style.whiteSpace).toBe('nowrap');
+    expect(content?.style.color).toBe('red');
+  });
 });

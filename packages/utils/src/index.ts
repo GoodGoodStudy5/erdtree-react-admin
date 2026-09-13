@@ -6,3 +6,4 @@ export * from './promise';
 export * from './render';
 export * from './string';
 export * from './typeof';
+export * from './object';
