@@ -6,6 +6,7 @@ import Forget from '@/pages/forget';
 import NotFound from '@/pages/404';
 import Guards from './components/Guards';
 import RootLayout from './components/RootLayout';
+import './mountBusiness';
 
 // 测试文件与页面同目录, 不排除会一并进产物
 const pages = import.meta.glob(['../pages/**/*.tsx', '!**/__tests__/**'], {

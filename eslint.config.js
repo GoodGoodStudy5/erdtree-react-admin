@@ -649,12 +649,14 @@ export default tseslint.config(
     // 路由生成把 PascalCase 视为"不参与路由", 命名走小写会让页面多出一条路由
     files: ['src/pages/**/*.tsx'],
     // index 与 model 是机制文件, 403 / 404 错误页沿用扁平数字命名;
-    // 原型挂载点同理 —— PrototypeSlot 的 import.meta.glob 把路径写死成 mount.tsx, 改名插槽当场扫不到
+    // 两种挂载点同理, 名字是被 import.meta.glob 写死的约定: 原型的 mount.tsx 与业务挂给
+    // @/modules 插座的 *.mount.tsx, 改名当场扫不到
     ignores: [
       'src/pages/**/index.tsx',
       'src/pages/**/model.tsx',
       'src/pages/40[0-9].tsx',
       'src/pages/**/prototype/mount.tsx',
+      'src/pages/**/*.mount.tsx',
     ],
     plugins: { 'check-file': checkFile },
     rules: {

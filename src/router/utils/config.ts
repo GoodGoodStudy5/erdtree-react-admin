@@ -7,5 +7,7 @@ export const ROUTER_EXCLUDE = [
   'lib',
   'hooks',
   'model.tsx',
+  // 业务挂给 @/modules 的实现文件, 不是页面
+  '.mount.tsx',
   '404.tsx',
 ];
