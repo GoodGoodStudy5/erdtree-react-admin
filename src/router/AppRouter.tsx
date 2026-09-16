@@ -34,6 +34,31 @@ const SIDER_MENU_TOKEN = {
   itemMarginInline: 10,
 };
 
+/**
+ * 西文等宽的字体栈: 字母没有 tabular-nums 那样的 OpenType 特性, 只能整族换掉;
+ * 后半段是 antd 默认栈, 留给等宽族都没有的中文字形与 emoji.
+ */
+const MONO_FONT_FAMILY = [
+  'ui-monospace',
+  'SFMono-Regular',
+  'Menlo',
+  'Consolas',
+  "'Liberation Mono'",
+  "'Courier New'",
+  '-apple-system',
+  'BlinkMacSystemFont',
+  "'Segoe UI'",
+  'Roboto',
+  "'Helvetica Neue'",
+  'Arial',
+  "'Noto Sans'",
+  'sans-serif',
+  "'Apple Color Emoji'",
+  "'Segoe UI Emoji'",
+  "'Segoe UI Symbol'",
+  "'Noto Color Emoji'",
+].join(', ');
+
 function AppRouter() {
   const { i18n } = useTranslation();
   const { theme } = useCommonStore();
@@ -60,6 +85,7 @@ function AppRouter() {
   const themeConfig = useMemo(
     () => ({
       algorithm: [theme === 'dark' ? darkAlgorithm : defaultAlgorithm],
+      token: { fontFamily: MONO_FONT_FAMILY },
       components: { Menu: SIDER_MENU_TOKEN },
     }),
     [theme],
