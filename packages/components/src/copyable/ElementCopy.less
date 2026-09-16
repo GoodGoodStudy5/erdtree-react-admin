@@ -3,8 +3,11 @@
   align-items: center;
   width: 100%;
 
-  /* Paragraph 自带段落间距, 嵌在表格行或表单里时不需要 */
-  &.ant-typography {
+  /*
+   * Paragraph 自带段落间距, 嵌在表格行或表单里时不需要.
+   * 类名叠两次才压得过 antd 的 div&.ant-typography —— 它的 cssinjs hash 类也计一个类.
+   */
+  &.ant-typography.ant-typography {
     margin-bottom: 0;
   }
 
