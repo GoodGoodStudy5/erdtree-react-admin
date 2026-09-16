@@ -211,22 +211,25 @@ export function QueryBar(props: Props) {
 
           <span className="query-bar-spacer" />
 
-          <QueryPill
-            locked={locked}
-            rows={rows}
-            options={options}
-            totalRows={plan.total}
-            getPopupContainer={() => barRef.current as HTMLElement}
-            onLockedChange={setLocked}
-            onRowsChange={setRows}
-          />
+          {/* 单包一层是为了给淡化态一个命中区: 停在这组操作上, 条件区淡到看得见它盖住的表格 */}
+          <div className="query-bar-actions">
+            <QueryPill
+              locked={locked}
+              rows={rows}
+              options={options}
+              totalRows={plan.total}
+              getPopupContainer={() => barRef.current as HTMLElement}
+              onLockedChange={setLocked}
+              onRowsChange={setRows}
+            />
 
-          <Button type="primary" htmlType="submit" loading={isLoading} icon={<SearchOutlined />}>
-            搜索
-          </Button>
-          <Button icon={<ReloadOutlined />} onClick={onReset}>
-            重置
-          </Button>
+            <Button type="primary" htmlType="submit" loading={isLoading} icon={<SearchOutlined />}>
+              搜索
+            </Button>
+            <Button icon={<ReloadOutlined />} onClick={onReset}>
+              重置
+            </Button>
+          </div>
         </div>
 
         {!locked && panel}

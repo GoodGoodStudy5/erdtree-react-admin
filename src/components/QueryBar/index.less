@@ -60,6 +60,13 @@
   flex: 1 1 auto;
 }
 
+/* 摘要行的 gap 管不到包进来的这层, 自己再给一份 */
+.query-bar-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .query-bar-chip {
   margin: 0;
 }
@@ -114,6 +121,20 @@
   opacity: 1;
   transition-delay: 0s;
   transform: none;
+}
+
+/**
+ * 鼠标停在操作区: 条件区淡到几乎透明, 露出它盖住的那几行表格 —— 瞄一眼被挡的内容不必先把浮层收起.
+ *
+ * 淡得比展开快: 这是随手一瞥, 拖到 0.5s 就瞥不成了. 只压 duration 不重写 transition,
+ * visibility 与 transform 在这一态本就不变.
+ *
+ * 代价认下: 鼠标移回条件区时走展开态那条 0.5s, 恢复比淡下去慢; 淡着的浮层照旧挡点击,
+ * 底下的表格只能看不能点.
+ */
+.query-bar:has(.query-bar-actions:hover) .query-bar-panel {
+  opacity: 0;
+  transition-duration: 0.12s;
 }
 
 /* 展开时上下连成一张卡片: 摘要行的下两角拉直, 阴影接上 */
