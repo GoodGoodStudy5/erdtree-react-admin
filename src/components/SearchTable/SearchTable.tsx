@@ -1,3 +1,4 @@
+import type { TableProps } from 'antd';
 import type { RowLayoutColumnNum } from '@south/components';
 import type { ReactNode, Ref } from 'react';
 import type { QueryFetcher, QueryState, QueryStore } from './store/queryStore';
@@ -63,7 +64,7 @@ function initialOf<T>(slice?: SliceProp<T>) {
   return slice.owner === 'external' ? slice.value : slice.initial;
 }
 
-interface Props<TItem, TPagination extends SliceProp<PaginationData> | undefined> {
+interface Props<TItem, TPagination extends SliceProp<PaginationData> | false | undefined> {
   /** 搜索项定义, 声明顺序就是排布顺序 */
   searchList: BaseSearchList[];
   /** 表格列定义 */
@@ -72,14 +73,21 @@ interface Props<TItem, TPagination extends SliceProp<PaginationData> | undefined
   fetchPage: QueryFetcher<TItem>;
   /** 已提交条件那一片. 不传即由组件自己维护 */
   committed?: SliceProp<BaseFormData>;
-  /** 分页那一片. 不传即由组件自己维护 */
+  /**
+   * 分页那一片. 不传即由组件自己维护, 给 `false` 则这张表没有分页可言 —— 分页器不渲染.
+   *
+   * 关掉的只是分页器: 那一片状态照常活着, 没人改它于是恒为第一页, 取数函数收到的 `page`
+   * 与 `pageSize` 由它自己决定要不要看.
+   */
   pagination?: TPagination;
   /** 搜索栏一行几列, 透传 QueryBar */
   columnNum?: RowLayoutColumnNum;
   /** 搜索栏的行数档位, 透传 QueryBar */
   rowOptions?: number[];
-  /** 行的唯一键, 透传 BaseTable */
-  rowKey?: string;
+  /** 行的唯一键, 原样透传 antd. 键要由几个字段拼出来时给函数 */
+  rowKey?: TableProps<TItem>['rowKey'];
+  /** 展开行, 原样透传 antd. 展开了哪几行归页面, 这一层不碰 */
+  expandable?: TableProps<TItem>['expandable'];
   /**
    * true 则挂载时不自动取数, 全部由 ref 触发.
    *
@@ -91,6 +99,20 @@ interface Props<TItem, TPagination extends SliceProp<PaginationData> | undefined
   toolbar?: ReactNode;
   /** 操作行是否跟着吸顶, 表头恒吸, 不受它影响 —— 滚动时看不见列名, 数据就读不成 */
   stickyToolbar?: boolean;
+  /**
+   * 外部取数中, 与内部那一次取或.
+   *
+   * 本地模式下真正的等待在页面那次取全量上 —— 内部的 `fetchPage` 只是一遍同步的筛, 它的 loading
+   * 一闪而过, 表格靠它会先空一屏再冒出数据.
+   */
+  isLoading?: boolean;
+  /**
+   * 重拉数据. **给了它就进本地模式**, 语义见 `QueryBar` 的同名 prop.
+   *
+   * 一次拉全在客户端筛的页面走这条: 全量归页面, `fetchPage` 只对手上那份做筛选与排序,
+   * 而这个回调负责把全量取新, 取回来后由页面调一次 `reload` 让它重筛.
+   */
+  onRefresh?: () => Promise<unknown>;
   /** 拿到查询状态管理器: 读条件, 改条件, 重查都从它走 */
   ref?: Ref<QueryStore<TItem, SettableOf<TPagination>>>;
 }
@@ -106,7 +128,7 @@ interface Props<TItem, TPagination extends SliceProp<PaginationData> | undefined
  */
 export function SearchTable<
   TItem extends object,
-  TPagination extends SliceProp<PaginationData> | undefined = undefined,
+  TPagination extends SliceProp<PaginationData> | false | undefined = undefined,
 >(props: Props<TItem, TPagination>) {
   const {
     searchList,
@@ -119,10 +141,16 @@ export function SearchTable<
     manual,
     toolbar,
     stickyToolbar,
+    expandable,
+    isLoading,
+    onRefresh,
     ref,
   } = props;
   // 泛型收窄只服务 ref 的类型; 组件内部要改得动分页 (用户点页码走的就是这条路), 所以这里放宽
-  const paginationProp = props.pagination as SliceProp<PaginationData> | undefined;
+  const paginationInput = props.pagination as SliceProp<PaginationData> | false | undefined;
+  /** 分页器要不要渲染. 与「那一片归谁」是两件事, 后者在关掉分页时无从谈起 */
+  const isPaged = paginationInput !== false;
+  const paginationProp = isPaged ? paginationInput : undefined;
 
   // 表单实例由这一层持有: ref 的 getDraft 要读实时值, 而 draft 只住在这个实例里
   const [form] = Form.useForm();
@@ -172,28 +200,32 @@ export function SearchTable<
         columnNum={columnNum}
         rowOptions={rowOptions}
         onSearch={(values) => store.search(() => values)}
+        onRefresh={onRefresh}
       />
 
       <BaseCard className="mt-10px">
         <BaseTable
           isStickyHeader
           isStickyToolbar={stickyToolbar}
-          isLoading={result.loading}
+          isLoading={result.loading || isLoading}
           rowKey={rowKey}
           columns={columns}
           dataSource={result.items}
           leftContent={toolbar}
+          expandable={expandable}
           getPage={() => store.reload()}
         />
 
-        <BasePagination
-          isSticky
-          disabled={result.loading}
-          current={pagination.page}
-          pageSize={pagination.pageSize}
-          total={result.total}
-          onChange={(page, pageSize) => store.set('pagination', () => ({ page, pageSize }))}
-        />
+        {isPaged && (
+          <BasePagination
+            isSticky
+            disabled={result.loading}
+            current={pagination.page}
+            pageSize={pagination.pageSize}
+            total={result.total}
+            onChange={(page, pageSize) => store.set('pagination', () => ({ page, pageSize }))}
+          />
+        )}
       </BaseCard>
     </>
   );

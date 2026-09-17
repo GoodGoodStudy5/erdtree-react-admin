@@ -24,6 +24,7 @@ import type { Key, ReactNode } from 'react';
 import type { RangePickerProps } from 'antd/lib/date-picker';
 import type { DefaultOptionType } from 'antd/lib/select';
 import type { RuleObject } from 'antd/lib/form';
+import type { SearchSelectProps } from '@south/components';
 import type { BusinessComponents } from '@/components/Business';
 import type { EditorProps } from '@/components/WangEditor';
 import type { TextAreaProps } from 'antd/es/input';
@@ -36,7 +37,8 @@ type DefaultDataComponents =
   'Input' | 'InputNumber' | 'TextArea' | 'InputPassword' | 'AutoComplete' | 'customize';
 
 // 下拉组件
-type SelectComponents = 'Select' | 'TreeSelect' | 'ApiSelect' | 'ApiTreeSelect' | 'ApiPageSelect';
+type SelectComponents =
+  'Select' | 'TreeSelect' | 'ApiSelect' | 'ApiTreeSelect' | 'ApiPageSelect' | 'SearchSelect';
 
 // 复选框组件
 type CheckboxComponents = 'Checkbox' | 'CheckboxGroup';
@@ -119,6 +121,7 @@ export type ComponentProps =
   | ApiSelectProps
   | ApiTreeSelectProps
   | ApiPageSelectProps
+  | SearchSelectProps
   | SwitchProps
   | EditorProps;
 

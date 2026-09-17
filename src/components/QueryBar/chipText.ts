@@ -5,8 +5,21 @@ import dayjs from 'dayjs';
 import { DATE_FORMAT } from '@/utils';
 import { isBlank } from './formValue';
 
-/** 摘要上一枚 chip 最多列几个值, 再多就收成计数 —— 一枚 chip 撑满摘要行就失去摘要的意义 */
-const MAX_LISTED = 3;
+/** 一枚 chip 的文案拆解 */
+export interface ChipParts {
+  /** 每个值一条, 码值已换成选项文案. 区间算一条 —— 一格装两端 */
+  items: string[];
+  /** 多值控件才给计数: 单值出「1 项」是废话 */
+  isMulti: boolean;
+}
+
+/**
+ * 单值的那档: 没有计数可言.
+ * @param text - 已成文的值
+ */
+function single(text: string): ChipParts {
+  return { items: [text], isMulti: false };
+}
 
 /** 取控件的格式串. RangePicker 给的是两端各一份, 取第一份 */
 function formatOf(item: BaseSearchList) {
@@ -36,19 +49,23 @@ function numberRangeText(low: unknown, high: unknown) {
 }
 
 /**
- * 一个已填条件在摘要上的文案; 未填返回 null.
+ * 一个已填条件在摘要上的拆解; 未填返回 null.
+ *
+ * **值与计数分开交**: 摘要里装不下的是值那一段, 而「选了几项」是这枚 chip 唯一不可丢的信息 ——
+ * 拼成一句话的话计数排在末尾, 正好落在省略号之后, 于是看得见半个公司名却看不见 4 这个数.
+ * 由此也不再有「最多列几个」的阈值: 列全部, 装得下多少由 CSS 定.
  *
  * 值的形状按 component 与实际内容判, 不另立声明字段: 搜索项的数据结构归接口票, 本组件先不动它.
  * 已知边界: 恰好两项且都是数字的多选 (tags 模式) 会被当成数值区间显示成 `a ~ b`.
  * @param item - 搜索项
  * @param value - 表单里这一项的当前值
  */
-export function chipTextOf(item: BaseSearchList, value: unknown): string | null {
+export function chipPartsOf(item: BaseSearchList, value: unknown): ChipParts | null {
   if (isBlank(value)) return null;
 
-  if (dayjs.isDayjs(value)) return value.format(formatOf(item));
+  if (dayjs.isDayjs(value)) return single(value.format(formatOf(item)));
 
-  if (typeof value === 'boolean') return value ? '是' : '否';
+  if (typeof value === 'boolean') return single(value ? '是' : '否');
 
   if (Array.isArray(value)) {
     const filled = value.filter((one) => !isBlank(one));
@@ -61,19 +78,15 @@ export function chipTextOf(item: BaseSearchList, value: unknown): string | null 
         const [start, end] = value as [unknown, unknown];
         const text = (one: unknown) => (dayjs.isDayjs(one) ? one.format(formatOf(item)) : '不限');
 
-        return `${text(start)} ~ ${text(end)}`;
+        return single(`${text(start)} ~ ${text(end)}`);
       }
       if (filled.every((one) => typeof one === 'number')) {
-        return numberRangeText(value[0], value[1]);
+        return single(numberRangeText(value[0], value[1]));
       }
     }
 
-    const listed = filled.slice(0, MAX_LISTED - 1).map((one) => labelOf(item, one));
-
-    return filled.length > MAX_LISTED
-      ? `${listed.join(', ')} 等 ${filled.length} 项`
-      : filled.map((one) => labelOf(item, one)).join(', ');
+    return { items: filled.map((one) => labelOf(item, one)), isMulti: true };
   }
 
-  return labelOf(item, value);
+  return single(labelOf(item, value));
 }

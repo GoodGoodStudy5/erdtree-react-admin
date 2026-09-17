@@ -71,14 +71,37 @@
   margin: 0;
 }
 
+/**
+ * 一枚 chip 的三段: 字段名与计数不截, 中间的值那段装不下就省略号.
+ *
+ * 保持 inline 而不用 flex: `text-decoration` 不穿过 flex item, 撤回态的划线会只剩容器自己那一层.
+ */
+.query-bar-chip-body {
+  display: inline;
+}
+
 /* 一枚 chip 再长也不许撑满摘要行: 摘要撑满就不成其为摘要 */
-.query-bar-chip-text {
+.query-bar-chip-values {
   display: inline-block;
   max-width: 260px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: bottom;
+}
+
+/* 计数与值之间留一口气. 写在这里而不是塞一个 &nbsp;: 空格不是内容 */
+.query-bar-chip-count {
+  margin-inline-start: 4px;
+}
+
+/*
+ * 撤回态整枚划线. 值那段要单独再画一次 —— 它是 inline-block, 而 text-decoration
+ * 不穿过这种原子级的行内盒.
+ */
+.query-bar-chip-body.is-removed,
+.query-bar-chip-body.is-removed .query-bar-chip-values {
+  text-decoration: line-through;
 }
 
 /**
@@ -209,18 +232,6 @@
   display: none;
 }
 
-/**
- * 第二层的限高只压在栅格上: 压在浮层根节点上会把底栏 (展开按钮) 一起切掉.
- * 卡的是像素不是条目 —— CSS 不知道每行几列, 那是断点决定的.
- *
- * 两个变量都由组件写: 少了任一个 calc 整条失效, 限高退成 none —— 全露而不是全藏, 坏的那一侧朝外.
- */
-.query-bar-grid {
-  max-height: calc(var(--query-bar-rows) * var(--query-bar-row-h));
-  overflow: hidden;
-  transition: max-height 0.2s ease;
-}
-
 .query-bar-foot {
   display: flex;
   justify-content: center;
@@ -229,7 +240,7 @@
 
 /* 挂在不生成盒子的那一层: 锁定后条件区已不是搜索栏的后代, 选择器够不着它 */
 
-/* 行距由栅格的 gutter 给, 再叠一层 margin 就与 --query-bar-row-h 对不上 */
+/* 行距由栅格的 gutter 给一处, 再叠一层 margin 就是两处各给一半 */
 .query-bar-form .ant-form-item {
   margin-bottom: 0;
 }

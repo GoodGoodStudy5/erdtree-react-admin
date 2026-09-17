@@ -1,5 +1,6 @@
-import type { BaseSearchList } from '#/form';
+import type { BaseFormData, BaseSearchList } from '#/form';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { Form } from 'antd';
 import { describe, expect, it, vi } from 'vitest';
 import { QueryBar } from '../QueryBar';
 
@@ -22,9 +23,20 @@ function barOf(container: HTMLElement) {
   return container.querySelector('.query-bar-form') as HTMLElement;
 }
 
-/** 一行占多少像素 */
-function rowHeightOf(container: HTMLElement) {
-  return parseFloat(barOf(container).style.getPropertyValue('--query-bar-row-h'));
+/**
+ * 按整段文字找一枚 chip.
+ *
+ * 字段名, 值与计数住在三个元素里 —— 中间那个才参与截断, 所以整句匹配不到单个元素上.
+ * @param text - 读者看到的那句
+ */
+function chipIs(text: string) {
+  return (_: string, el: Element | null) =>
+    !!el?.classList.contains('query-bar-chip-body') && el.textContent === text;
+}
+
+/** 条件区里当前渲染出来的字段, 按排布顺序. 露几行是靠挑掉不渲染, 所以数得出来 */
+function fieldsOf(container: HTMLElement) {
+  return [...container.querySelectorAll('.query-bar-panel label')].map((el) => el.textContent);
 }
 
 describe('QueryBar', () => {
@@ -32,7 +44,7 @@ describe('QueryBar', () => {
   it('摘要只列已填的条件, 未填的收成一枚计数', async () => {
     render(<QueryBar list={LIST} committed={{ invoiceNo: '25600001' }} onSearch={vi.fn()} />);
 
-    expect(await screen.findByText('发票号码: 25600001')).toBeTruthy();
+    expect(await screen.findByText(chipIs('发票号码: 25600001'))).toBeTruthy();
     expect(screen.getByText('另 3 项未填')).toBeTruthy();
   });
 
@@ -41,7 +53,7 @@ describe('QueryBar', () => {
 
     // 用户先搜过一次
     rerender(<QueryBar list={LIST} committed={{ invoiceNo: 'A' }} onSearch={vi.fn()} />);
-    expect(await screen.findByText('发票号码: A')).toBeTruthy();
+    expect(await screen.findByText(chipIs('发票号码: A'))).toBeTruthy();
 
     // 再由外部注入一批条件: 只回填一次的话, 这一批会看不见也清不掉
     rerender(
@@ -52,8 +64,8 @@ describe('QueryBar', () => {
       />,
     );
 
-    expect(await screen.findByText('销售方名称: 某某公司')).toBeTruthy();
-    expect(screen.getByText('发票号码: A')).toBeTruthy();
+    expect(await screen.findByText(chipIs('销售方名称: 某某公司'))).toBeTruthy();
+    expect(screen.getByText(chipIs('发票号码: A'))).toBeTruthy();
   });
 
   it('已提交条件没变的项不碰, 用户填了一半的内容保得住', async () => {
@@ -70,7 +82,7 @@ describe('QueryBar', () => {
     // 外部只改了发票号码那一项
     rerender(<QueryBar list={LIST} committed={{ invoiceNo: 'B' }} onSearch={vi.fn()} />);
 
-    await waitFor(() => expect(screen.getByText('发票号码: B')).toBeTruthy());
+    await waitFor(() => expect(screen.getByText(chipIs('发票号码: B'))).toBeTruthy());
     expect(seller.value).toBe('半截');
   });
 
@@ -79,12 +91,12 @@ describe('QueryBar', () => {
       <QueryBar list={LIST} committed={{ invoiceNo: '25600001' }} onSearch={vi.fn()} />,
     );
 
-    await screen.findByText('发票号码: 25600001');
+    await screen.findByText(chipIs('发票号码: 25600001'));
     fireEvent.click(container.querySelector('.ant-tag-close-icon') as HTMLElement);
 
     // 条件还在生效, 所以 chip 留在原地; 表单已空, 所以显的必须是已提交的那份
     await waitFor(() =>
-      expect(screen.getByText('发票号码: 25600001').className).toContain('line-through'),
+      expect(screen.getByText(chipIs('发票号码: 25600001')).className).toContain('is-removed'),
     );
     expect(container.querySelector('.ant-tag-warning')).toBeTruthy();
     expect(container.querySelector('.anticon-undo')).toBeTruthy();
@@ -95,13 +107,13 @@ describe('QueryBar', () => {
       <QueryBar list={LIST} committed={{ invoiceNo: '25600001' }} onSearch={vi.fn()} />,
     );
 
-    await screen.findByText('发票号码: 25600001');
+    await screen.findByText(chipIs('发票号码: 25600001'));
     fireEvent.click(container.querySelector('.ant-tag-close-icon') as HTMLElement);
     await waitFor(() => expect(container.querySelector('.anticon-undo')).toBeTruthy());
     fireEvent.click(container.querySelector('.ant-tag-close-icon') as HTMLElement);
 
     await waitFor(() =>
-      expect(screen.getByText('发票号码: 25600001').className).not.toContain('line-through'),
+      expect(screen.getByText(chipIs('发票号码: 25600001')).className).not.toContain('is-removed'),
     );
     expect(container.querySelector('.ant-tag-processing')).toBeTruthy();
     const input = container.querySelector('#invoiceNo') as HTMLInputElement;
@@ -119,7 +131,7 @@ describe('QueryBar', () => {
 
     fireEvent.click(container.querySelector('.ant-tag-close-icon') as HTMLElement);
 
-    await waitFor(() => expect(screen.queryByText('发票号码: 新填的')).toBeNull());
+    await waitFor(() => expect(screen.queryByText(chipIs('发票号码: 新填的'))).toBeNull());
   });
 
   it('一个条件都没填时报出有多少项可用', () => {
@@ -134,7 +146,7 @@ describe('QueryBar', () => {
       <QueryBar list={LIST} committed={{ invoiceNo: '25600001' }} onSearch={onSearch} />,
     );
 
-    await screen.findByText('发票号码: 25600001');
+    await screen.findByText(chipIs('发票号码: 25600001'));
     fireEvent.click(container.querySelector('.ant-tag-close-icon') as HTMLElement);
 
     const input = container.querySelector('#invoiceNo') as HTMLInputElement;
@@ -162,31 +174,23 @@ describe('QueryBar', () => {
     expect(barOf(container).dataset.locked).toBe('true');
   });
 
-  it('限高按实际行数算: 四项里有一项占两列, 三列下排成两行', () => {
+  it('「全部」那一档把条件全渲染出来, 不靠裁切藏', () => {
     const { container } = render(
       <QueryBar list={LIST} committed={{}} columnNum={4} onSearch={vi.fn()} />,
     );
 
-    // 用例环境是 1024px, 落在 md/lg 那档 —— 声明四列也只排得下三列, 保底 8 格
-    expect(barOf(container).style.getPropertyValue('--query-bar-rows')).toBe('2');
+    expect(fieldsOf(container)).toEqual(['发票号码', '销售方名称', '购买方名称', '价税合计']);
   });
 
-  it('窄屏接下 RowLayout 的断点: 列数变少行数变多, 行高也随 label 换行变高', () => {
-    const { container: wide } = render(
-      <QueryBar list={LIST} committed={{}} columnNum={4} onSearch={vi.fn()} />,
-    );
-
+  it('窄屏接下 RowLayout 的断点: label 移到控件上方', () => {
     // 视口宽度是用例可以改的环境事实, setup 里每条用例后还原. 断点在挂载时取一次, 所以要改在渲染前
     window.innerWidth = 600;
 
-    const { container: narrow } = render(
+    const { container } = render(
       <QueryBar list={LIST} committed={{}} columnNum={4} onSearch={vi.fn()} />,
     );
 
-    // 600px 落在 sm 那档: 半行一格, 于是两列 —— 四项排成三行, 占两列的那项挤不进第二行
-    expect(barOf(narrow).style.getPropertyValue('--query-bar-rows')).toBe('3');
-    // label 移到控件上方, 一行占的像素随之变高
-    expect(rowHeightOf(narrow)).toBeGreaterThan(rowHeightOf(wide));
+    expect(container.querySelector('.ant-form-vertical')).toBeTruthy();
   });
 
   it('不传档位就没有行数下拉, 条件区恒为全行', () => {
@@ -203,13 +207,87 @@ describe('QueryBar', () => {
     fireEvent.click(screen.getByTitle('展开几行'));
     fireEvent.click(await screen.findByText('1 行'));
 
-    expect(barOf(container).style.getPropertyValue('--query-bar-rows')).toBe('1');
+    // 1024px 排三列: 前三项占满第一行, 占两列的「价税合计」挤到第二行, 于是只剩它没露
+    expect(fieldsOf(container)).toEqual(['发票号码', '销售方名称', '购买方名称']);
     // 数的是条件不是行: 读者关心还有几个条件没看见
     expect(screen.getByText(/还有 1 个条件/)).toBeTruthy();
 
     fireEvent.click(screen.getByRole('button', { name: /展开/ }));
 
-    expect(barOf(container).style.getPropertyValue('--query-bar-rows')).toBe('2');
+    expect(fieldsOf(container)).toHaveLength(4);
     expect(screen.queryByText(/还有/)).toBeNull();
+  });
+
+  it('折叠掉的条件, 已填的值不跟着卸载走', async () => {
+    const { container } = render(
+      <QueryBar
+        list={LIST}
+        committed={{ grandTotal: '100' }}
+        columnNum={4}
+        rowOptions={[1]}
+        onSearch={vi.fn()}
+      />,
+    );
+
+    await screen.findByText(chipIs('价税合计: 100'));
+    fireEvent.click(screen.getByTitle('展开几行'));
+    fireEvent.click(await screen.findByText('1 行'));
+
+    // 「价税合计」落在第二行, 这会儿真的不渲染了
+    expect(fieldsOf(container)).not.toContain('价税合计');
+    // 而它的值还在: antd 的 Field 默认 preserve, 卸载不清 store —— 关掉那个默认值就会静默丢条件
+    expect(screen.getByText(chipIs('价税合计: 100'))).toBeTruthy();
+  });
+
+  it('给了 onRefresh 就换成刷新按钮, 搜索按钮不出', () => {
+    render(<QueryBar list={LIST} committed={{}} onSearch={vi.fn()} onRefresh={vi.fn()} />);
+
+    expect(screen.getByRole('button', { name: /刷新/ })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /搜索/ })).toBeNull();
+  });
+
+  /**
+   * 借外部按钮走一次 `setFieldValue`.
+   *
+   * 那是懒加载控件 (`Select` 一族) 写值的路: 表单内核只在 `Field` 收到子控件 onChange 时才触发
+   * `onValuesChange`, 所以那条路必须由 `useWatch` 接住, 否则改下拉不会被结算.
+   */
+  function SetByApi(props: { onSearch: (values: BaseFormData) => void }) {
+    const [form] = Form.useForm();
+
+    return (
+      <>
+        <button type="button" onClick={() => form.setFieldValue('invoiceNo', 'A')}>
+          写值
+        </button>
+        <QueryBar
+          list={LIST}
+          committed={{}}
+          form={form}
+          onSearch={props.onSearch}
+          onRefresh={vi.fn()}
+        />
+      </>
+    );
+  }
+
+  it('经 setFieldValue 写的值同样被结算 —— 懒加载控件走的就是这条路', async () => {
+    const onSearch = vi.fn();
+
+    render(<SetByApi onSearch={onSearch} />);
+    fireEvent.click(screen.getByText('写值'));
+
+    await waitFor(() => expect(onSearch).toHaveBeenCalledWith({ invoiceNo: 'A' }));
+  });
+
+  it('不给 onRefresh 就是搜索按钮, 条件改了也不自动提交', async () => {
+    const onSearch = vi.fn();
+    const { container } = render(<QueryBar list={LIST} committed={{}} onSearch={onSearch} />);
+
+    expect(screen.getByRole('button', { name: /搜索/ })).toBeTruthy();
+    fireEvent.change(container.querySelectorAll('input')[0], { target: { value: 'A' } });
+
+    await waitFor(() => expect(screen.getByText(chipIs('发票号码: A'))).toBeTruthy());
+    expect(onSearch).not.toHaveBeenCalled();
   });
 });

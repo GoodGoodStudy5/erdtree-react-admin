@@ -108,6 +108,10 @@ lazyComponents.set(
   lazy(() => import('../../Selects').then((module) => ({ default: module.ApiPageSelect }))),
 );
 lazyComponents.set(
+  'SearchSelect',
+  lazy(() => import('@south/components').then((module) => ({ default: module.SearchSelect }))),
+);
+lazyComponents.set(
   'PasswordStrength',
   lazy(() =>
     import('../../PasswordStrength').then((module) => ({ default: module.PasswordStrength })),

@@ -1,8 +1,8 @@
 import type { BaseFormData, BaseSearchList } from '#/form';
 import type { FormInstance } from 'antd';
 import { UndoOutlined } from '@ant-design/icons';
-import { Form, Tag } from 'antd';
-import { chipTextOf } from './chipText';
+import { Form, Tag, Tooltip } from 'antd';
+import { chipPartsOf } from './chipText';
 import { isBlank, isBlankEqual } from './formValue';
 
 /**
@@ -53,18 +53,18 @@ export function QueryChips(props: Props) {
           ? 'applied'
           : 'pending';
       // 划线的那枚显已提交的那份值 —— 被划掉的正是它, 表单值这会儿是空的
-      const text = chipTextOf(item, state === 'removed' ? applied : draft);
+      const parts = chipPartsOf(item, state === 'removed' ? applied : draft);
 
-      return { item, name, state, text };
+      return { item, name, state, parts };
     })
-    .filter((one) => one.text !== null);
+    .filter((one) => one.parts !== null);
 
   // 已移除的项自己有一枚划线 chip, 再进计数就是同一项数两遍
   const restCount = list.length - chips.length;
 
   return (
     <>
-      {chips.map(({ item, name, state, text }) => (
+      {chips.map(({ item, name, state, parts }) => (
         <Tag
           key={name}
           closable
@@ -79,14 +79,25 @@ export function QueryChips(props: Props) {
             else form.setFieldValue(item.name, undefined);
           }}
         >
-          {/* 两个完整字面量而不是拼串: unocss 靠静态扫源文件提取类名, 拼出来的它认不出 */}
-          <span
-            className={
-              state === 'removed' ? 'query-bar-chip-text line-through' : 'query-bar-chip-text'
-            }
+          {/* 全量值挂在 hover 上: 截断之后「是哪几个」只剩这一条路, 条件区要先把浮层唤出来 */}
+          <Tooltip
+            title={parts?.items.map((one) => (
+              <div key={one}>{one}</div>
+            ))}
           >
-            {item.label}: {text}
-          </span>
+            <span
+              className={
+                state === 'removed' ? 'query-bar-chip-body is-removed' : 'query-bar-chip-body'
+              }
+            >
+              <span>{item.label}: </span>
+              {/* 只有这一段会被省略号截: 字段名与计数在它两侧, 各自不参与截断 */}
+              <span className="query-bar-chip-values">{parts?.items.join(', ')}</span>
+              {!!parts?.isMulti && (
+                <span className="query-bar-chip-count">{parts.items.length} 项</span>
+              )}
+            </span>
+          </Tooltip>
         </Tag>
       ))}
 

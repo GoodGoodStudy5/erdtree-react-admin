@@ -2,22 +2,29 @@ import type { BaseFormData, BaseSearchList } from '#/form';
 import type { FormInstance } from 'antd';
 import type { RowLayoutColumnNum } from '@south/components';
 import type { CSSProperties } from 'react';
-import { ReloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { columnCountAt, RowLayout, useEvent } from '@south/components';
+import { ClearOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { columnCountAt, LoadButton, RowLayout, useEvent } from '@south/components';
 import { Button, Form, Grid, theme } from 'antd';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { QueryAutoSubmit } from './QueryAutoSubmit';
 import { QueryChips } from './QueryChips';
 import { QueryField } from './QueryField';
+import { leadingDebounce } from './debounce';
 import { syncKeys } from './formValue';
 import { QueryPill } from './QueryPill';
 import { countBeyond, planRows } from './rowPlan';
 import './index.less';
 
-/**
- * 栅格的行距. 显式给而不吃 RowLayout 的默认值: 露几行是按像素限高的, 行距与限高必须同源,
- * 各拿各的一份就会在 RowLayout 改默认值那天悄悄切错位置.
- */
+/** 栅格的行距. 显式给而不吃 RowLayout 的默认值: 那个值一改, 这里的行距就跟着变而没人察觉 */
 const ROW_GUTTER = 16;
+
+/**
+ * 自动提交的合并窗口, 毫秒.
+ *
+ * 只影响连续输入的合并 —— 前沿那一下是立刻走的, 见 {@link leadingDebounce}. 写死不开配置项:
+ * 它不跨环境变, 要调就是手感变了, 那次改动本该走评审.
+ */
+const AUTO_SUBMIT_WAIT = 300;
 
 interface Props {
   /** 搜索项定义, 声明顺序就是排布顺序 */
@@ -41,6 +48,15 @@ interface Props {
   isSticky?: boolean;
   /** 点搜索 */
   onSearch: (values: BaseFormData) => void;
+  /**
+   * 重拉数据. **给了它就进本地模式**: 搜索按钮换成刷新按钮, 条件一改自动提交.
+   *
+   * 两个按钮语义不同 —— 搜索是「按条件发请求」, 刷新是「把数据取新一遍」. 数据一次拉全在客户端
+   * 筛的页面只有后者可言, 前者按下去什么也不会发生.
+   *
+   * 绑成一个 prop 而不是拆两个: 少了刷新按钮的自动提交模式没人能把数据取新, 那是个无效组合.
+   */
+  onRefresh?: () => Promise<unknown>;
 }
 
 /**
@@ -57,7 +73,16 @@ interface Props {
  * @param props - 组件参数
  */
 export function QueryBar(props: Props) {
-  const { list, committed, isLoading, columnNum = 4, rowOptions, isSticky, onSearch } = props;
+  const {
+    list,
+    committed,
+    isLoading,
+    columnNum = 4,
+    rowOptions,
+    isSticky,
+    onSearch,
+    onRefresh,
+  } = props;
   const [ownForm] = Form.useForm();
   const form = props.form ?? ownForm;
   const { token } = theme.useToken();
@@ -93,15 +118,18 @@ export function QueryBar(props: Props) {
   );
 
   /**
-   * 一行的像素高度 = 控件高 + 行距, 窄屏再加 label 自己那一行.
+   * 露出来的那几项.
    *
-   * 露 N 行的限高取 N 倍它, 正好落在第 N + 1 行的顶端; 「全部」那一档因此多出一个行距的余量,
-   * 那是余量不是虚高, 展开照样是滑开的.
+   * **按落行挑而不是按像素裁**: 「露两行」说的是两行条件项, 而不是两倍控件高那么多像素 ——
+   * 多选框选上几家就长到几行高, 按像素裁的话它自己吃光额度, 后面的条件被 `overflow` 切在视口外
+   * 静默消失. 挑掉不渲染之后, 每行的高度各自由内容定, 一行撑高不挤别的行.
+   *
+   * 认下的代价: 换档位时字段真的在增删, 于是收放不是滑开的, 也躲不开那一次重渲染.
    */
-  const rowHeight =
-    token.controlHeight +
-    ROW_GUTTER +
-    (stacked ? Math.round(token.fontSize * token.lineHeight) + token.paddingXS : 0);
+  const shown = useMemo(
+    () => list.filter((_, index) => (plan.rows[index] ?? 1) <= visibleRows),
+    [list, plan, visibleRows],
+  );
 
   /**
    * 已提交条件写回表单.
@@ -124,6 +152,15 @@ export function QueryBar(props: Props) {
   useEffect(() => {
     syncToForm(committed);
   }, [committed, syncToForm]);
+
+  /**
+   * 本地模式的自动提交. 造一次就留着, 换一个实例会把正在等的那一拍丢掉.
+   *
+   * 提交那一刻自己去读表单: 值由 `QueryAutoSubmit` 通知而不由它带来 —— 尾部触发时它带的那份已经过期.
+   */
+  const autoSubmit = useMemo(() => leadingDebounce(() => form.submit(), AUTO_SUBMIT_WAIT), [form]);
+
+  useEffect(() => autoSubmit.cancel, [autoSubmit]);
 
   /** 提交: 交出表单原值. 转换是出口层的事, 由 SearchTable 在条件出门时做一次 */
   const onFinish = (values: BaseFormData) => {
@@ -149,19 +186,16 @@ export function QueryBar(props: Props) {
    */
   const panel = (
     <div className={`query-bar-panel ${locked ? 'is-locked' : ''}`}>
-      {/* 限高只压在栅格上: 压在浮层根节点上会把下面的底栏一起切掉 */}
-      <div className="query-bar-grid">
-        <RowLayout columnNum={columnNum} gutter={[ROW_GUTTER, ROW_GUTTER]}>
-          {list.map((item) => (
-            <QueryField
-              key={String(item.name)}
-              item={item}
-              form={form}
-              colProps={{ colSize: item.colSize }}
-            />
-          ))}
-        </RowLayout>
-      </div>
+      <RowLayout columnNum={columnNum} gutter={[ROW_GUTTER, ROW_GUTTER]}>
+        {shown.map((item) => (
+          <QueryField
+            key={String(item.name)}
+            item={item}
+            form={form}
+            colProps={{ colSize: item.colSize }}
+          />
+        ))}
+      </RowLayout>
 
       {!!foldedCount && (
         <div className="query-bar-foot">
@@ -181,8 +215,6 @@ export function QueryBar(props: Props) {
       className="query-bar-form"
       style={
         {
-          '--query-bar-rows': visibleRows,
-          '--query-bar-row-h': `${rowHeight}px`,
           '--query-bar-shadow': token.boxShadowSecondary,
           '--query-bar-split': token.colorSplit,
           '--query-bar-hover-bg': token.colorFillTertiary,
@@ -196,6 +228,7 @@ export function QueryBar(props: Props) {
       wrapperCol={stacked ? undefined : { flex: '1 1 0' }}
       onFinish={onFinish}
     >
+      {!!onRefresh && <QueryAutoSubmit form={form} onChange={autoSubmit.call} />}
       <div
         ref={barRef}
         data-sticky={stickyEdge}
@@ -223,10 +256,22 @@ export function QueryBar(props: Props) {
               onRowsChange={setRows}
             />
 
-            <Button type="primary" htmlType="submit" loading={isLoading} icon={<SearchOutlined />}>
-              搜索
-            </Button>
-            <Button icon={<ReloadOutlined />} onClick={onReset}>
+            {onRefresh ? (
+              <LoadButton type="primary" icon={<ReloadOutlined />} onClick={onRefresh}>
+                刷新
+              </LoadButton>
+            ) : (
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isLoading}
+                icon={<SearchOutlined />}
+              >
+                搜索
+              </Button>
+            )}
+            {/* 重置是清空, 用转圈箭头会与刷新撞脸, 而那个图标在两种模式下都该留给取数 */}
+            <Button icon={<ClearOutlined />} onClick={onReset}>
               重置
             </Button>
           </div>
