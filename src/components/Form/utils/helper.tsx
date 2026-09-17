@@ -2,6 +2,7 @@ import type { FormItemProps } from 'antd';
 import type { BaseFormList, BaseSearchList, ComponentProps, ComponentType } from '#/form';
 import { DATE_FORMAT, TIME_PICKER_FORMAT } from '@/utils';
 import { $t } from '@/locales';
+import { MAX_TAG_COUNT } from '../../Selects';
 
 /**
  * 处理子节点的值的属性
@@ -38,6 +39,8 @@ export function initCompProps(component: ComponentType): ComponentProps {
       return {
         allowClear: true,
         showSearch: true,
+        // 多选的标签折成 +N: 不折的话选上几项就把这一格撑成几行高
+        maxTagCount: MAX_TAG_COUNT,
         placeholder: $t('public.inputPleaseSelect'),
       };
 

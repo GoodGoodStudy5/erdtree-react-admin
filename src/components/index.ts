@@ -17,6 +17,7 @@ export * from './GlobalSearch';
 export * from './I18n';
 export * from './Icon';
 export * from './Money';
+export * from './MultiTextInput';
 export * from './Pagination';
 export * from './PasswordStrength';
 export * from './PrototypeSlot';

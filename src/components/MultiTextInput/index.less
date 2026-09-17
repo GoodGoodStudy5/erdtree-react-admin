@@ -1,0 +1,82 @@
+/** 多值文本框. 尺寸与间距写死在这里, 换来调用点一行属性都不写 */
+
+.multi-text-input {
+  position: relative;
+}
+
+/* 计数不跟着值一起被截断: 它是这一格唯一不可丢的信息 */
+.multi-text-input-count {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--ant-color-text-quaternary);
+}
+
+/**
+ * 条目清单. **必须渲染在搜索栏条件区的 DOM 内部** —— 条件区是 hover 浮层且不留收起宽限,
+ * 挂到 body 上的面板鼠标一移过去 hover 就断, 面板会连同条件区一起消失.
+ *
+ * 紧贴框而不留间隙: 中间那道缝既不属于框也不属于面板, 却要从组件量出来的可用高度里扣掉.
+ */
+.multi-text-input-panel {
+  --multi-text-input-row-h: 28px;
+
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+
+  /* 离视口底要留出的那段由组件量出来给, 这里不复述它留了多少 */
+  max-height: var(--multi-text-input-room, 100vh);
+  background-color: var(--ant-color-bg-elevated);
+  border: 1px solid var(--ant-color-primary-border);
+  border-radius: var(--ant-border-radius);
+  box-shadow: var(--ant-box-shadow-secondary);
+}
+
+/* 不进滚动区: 它只有一行, 让它跟着条目滚走等于白占一行高度 */
+.multi-text-input-head {
+  flex: none;
+  padding: 6px 12px;
+  color: var(--ant-color-text-secondary);
+  border-bottom: 1px solid var(--ant-color-split);
+}
+
+/**
+ * 限高落在列表而不是整个面板: 那样才数得清「12 条」——
+ * 面板还含头部与边框, 按面板算就要把它们的高度再抄一遍.
+ */
+.multi-text-input-list {
+  max-height: calc(12 * var(--multi-text-input-row-h));
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.multi-text-input-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  height: var(--multi-text-input-row-h);
+  padding: 0 4px 0 12px;
+}
+
+.multi-text-input-item:hover {
+  background-color: var(--ant-control-item-bg-hover);
+}
+
+/* 等宽: 序号竖着读成一列, 一眼看得出粘进来几条 */
+.multi-text-input-index {
+  font-variant-numeric: tabular-nums;
+  color: var(--ant-color-text-quaternary);
+}
+
+.multi-text-input-item-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

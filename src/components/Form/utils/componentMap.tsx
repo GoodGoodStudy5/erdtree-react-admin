@@ -1,4 +1,6 @@
 import type { ComponentType, BaseFormList } from '#/form';
+import type { MultiTextInputProps } from '../../MultiTextInput';
+import { MultiTextInput } from '../../MultiTextInput';
 import { initCompProps } from './helper';
 import type { FormInstance, InputProps } from 'antd';
 import { Input, Spin } from 'antd';
@@ -39,9 +41,10 @@ lazyComponents.set(
   'AutoComplete',
   lazy(() => import('antd').then((module) => ({ default: module.AutoComplete }))),
 );
+// 下拉只此一个实现, 与 SearchSelect 的差别只剩调用点给不给 request: 给了是远程搜索, 只给 options 是本地过滤
 lazyComponents.set(
   'Select',
-  lazy(() => import('../../Selects').then((module) => ({ default: module.BaseSelect }))),
+  lazy(() => import('@south/components').then((module) => ({ default: module.SearchSelect }))),
 );
 lazyComponents.set(
   'TreeSelect',
@@ -232,6 +235,16 @@ export function getComponent(item: BaseFormList, form: FormInstance) {
   // 对于Input组件，直接返回
   if (component === 'Input') {
     return renderInput;
+  }
+
+  // 多值文本框同样不走懒加载: 它是搜索栏的主力控件, 首屏就要用
+  if (component === 'MultiTextInput') {
+    return (
+      <MultiTextInput
+        {...(componentProps as MultiTextInputProps)}
+        onPressEnter={handlePressEnter}
+      />
+    );
   }
 
   // 查找懒加载组件

@@ -8,10 +8,20 @@ function strSplitForEmail(no: string | undefined | null) {
   return strSplitForCommon(no, /[\s,，;；\u00A0\n]+/g);
 }
 
+/**
+ * 切分多值文本框里的一串标识. 空白类 (含换行与制表符), 逗号与分号 (含全角) 都算分隔符.
+ *
+ * 与 {@link strSplitForEmail} 眼下逐字相同, 不合并成一个 —— 邮箱与标识日后各自调分隔符是两件事.
+ */
+function strSplitForValues(text: string | undefined | null) {
+  return strSplitForCommon(text, /[\s,，;；\u00A0]+/g);
+}
+
 /** 字符串切分工具. 批量输入框拿到的粘贴文本靠它变成可用数组 */
 export const strUtils = {
   strSplitForCommon,
   strSplitForEmail,
+  strSplitForValues,
 };
 
 /**

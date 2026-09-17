@@ -67,3 +67,49 @@ describe('transString', () => {
     ]);
   });
 });
+
+describe('strUtils.strSplitForValues', () => {
+  it('Excel 里竖着复制一列: 换行分隔', () => {
+    expect(strUtils.strSplitForValues('4545784512\n12321312326\n4545121487')).toEqual([
+      '4545784512',
+      '12321312326',
+      '4545121487',
+    ]);
+  });
+
+  it('Excel 里横着复制一行: 制表符分隔', () => {
+    expect(strUtils.strSplitForValues('4545784512\t12321312326')).toEqual([
+      '4545784512',
+      '12321312326',
+    ]);
+  });
+
+  it('聊天记录里抄来的一串: 空格, 逗号, 分号与全角混着', () => {
+    const pasted = '45457 12321，4545;8888；7777 6666';
+
+    expect(strUtils.strSplitForValues(pasted)).toEqual([
+      '45457',
+      '12321',
+      '4545',
+      '8888',
+      '7777',
+      '6666',
+    ]);
+  });
+
+  it('每个分隔符单独拿出来一个个试', () => {
+    [' ', '\t', '\n', '\r', ',', '，', ';', '；', '\u00A0'].forEach((separator) => {
+      expect(strUtils.strSplitForValues(`4545${separator}8888`)).toEqual(['4545', '8888']);
+    });
+  });
+
+  it('连续分隔符与首尾分隔符都不留空项', () => {
+    expect(strUtils.strSplitForValues('  , 4545 ,,\n 8888 , ')).toEqual(['4545', '8888']);
+  });
+
+  it('空值给空数组', () => {
+    expect(strUtils.strSplitForValues('   ')).toEqual([]);
+    expect(strUtils.strSplitForValues(null)).toEqual([]);
+    expect(strUtils.strSplitForValues(undefined)).toEqual([]);
+  });
+});

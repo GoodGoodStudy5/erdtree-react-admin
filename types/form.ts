@@ -27,6 +27,7 @@ import type { RuleObject } from 'antd/lib/form';
 import type { SearchSelectProps } from '@south/components';
 import type { BusinessComponents } from '@/components/Business';
 import type { EditorProps } from '@/components/WangEditor';
+import type { MultiTextInputProps } from '@/components/MultiTextInput';
 import type { TextAreaProps } from 'antd/es/input';
 
 /** 表单数据的通用形状: 字段名到值, 无契约约束 */
@@ -34,7 +35,13 @@ export type BaseFormData = Record<string, unknown>;
 
 // 基础数据组件
 type DefaultDataComponents =
-  'Input' | 'InputNumber' | 'TextArea' | 'InputPassword' | 'AutoComplete' | 'customize';
+  | 'Input'
+  | 'InputNumber'
+  | 'TextArea'
+  | 'InputPassword'
+  | 'AutoComplete'
+  | 'MultiTextInput'
+  | 'customize';
 
 // 下拉组件
 type SelectComponents =
@@ -123,6 +130,7 @@ export type ComponentProps =
   | ApiPageSelectProps
   | SearchSelectProps
   | SwitchProps
+  | MultiTextInputProps
   | EditorProps;
 
 /** 各表单组件入参的交叉: 自定义渲染函数一次拿到全部可能的入参 */
