@@ -31,7 +31,11 @@ const LOCAL_PAGINATION: TablePaginationConfig = {
   showTotal: (total: number) => $t('public.totalNum', { num: total }),
 };
 
-interface Props<T extends object = object> extends Omit<TableProps<T>, 'bordered' | 'columns'> {
+/** 表格的全部参数: antd 的那套加本组件自己的开关 */
+export interface BaseTableProps<T extends object = object> extends Omit<
+  TableProps<T>,
+  'bordered' | 'columns'
+> {
   columns: TableColumn<T>[];
   isLoading?: boolean; // 是否加载
   isBordered?: boolean; // 是否开启边框
@@ -51,7 +55,7 @@ interface Props<T extends object = object> extends Omit<TableProps<T>, 'bordered
 }
 
 /** 表格, 支持虚拟滚动、列筛选、列宽拖拽、斑马纹与本地分页 */
-export function BaseTable<T extends object = object>(props: Props<T>) {
+export function BaseTable<T extends object = object>(props: BaseTableProps<T>) {
   const {
     isLoading,
     isVirtual,

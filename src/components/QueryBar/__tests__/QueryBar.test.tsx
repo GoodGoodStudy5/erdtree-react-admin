@@ -193,7 +193,7 @@ describe('QueryBar', () => {
     expect(container.querySelector('.ant-form-vertical')).toBeTruthy();
   });
 
-  it('不传档位就没有行数下拉, 条件区恒为全行', () => {
+  it('不传档位就没有档位下拉, 条件区恒为全行', () => {
     render(<QueryBar list={LIST} committed={{}} onSearch={vi.fn()} />);
 
     expect(screen.queryByTitle('展开几行')).toBeNull();
@@ -201,7 +201,7 @@ describe('QueryBar', () => {
 
   it('选了档位就按行收窄, 底栏标出折叠掉几个条件; 点展开回到全行', async () => {
     const { container } = render(
-      <QueryBar list={LIST} committed={{}} columnNum={4} rowOptions={[1]} onSearch={vi.fn()} />,
+      <QueryBar list={LIST} committed={{}} columnNum={4} foldRows={[1]} onSearch={vi.fn()} />,
     );
 
     fireEvent.click(screen.getByTitle('展开几行'));
@@ -218,13 +218,22 @@ describe('QueryBar', () => {
     expect(screen.queryByText(/还有/)).toBeNull();
   });
 
+  it('给了 defaultFoldRows 就一上来折到那几行, 不必等人去切档位', () => {
+    const { container } = render(
+      <QueryBar list={LIST} committed={{}} columnNum={4} defaultFoldRows={1} onSearch={vi.fn()} />,
+    );
+
+    expect(fieldsOf(container)).toEqual(['发票号码', '销售方名称', '购买方名称']);
+    expect(screen.getByText(/还有 1 个条件/)).toBeTruthy();
+  });
+
   it('折叠掉的条件, 已填的值不跟着卸载走', async () => {
     const { container } = render(
       <QueryBar
         list={LIST}
         committed={{ grandTotal: '100' }}
         columnNum={4}
-        rowOptions={[1]}
+        foldRows={[1]}
         onSearch={vi.fn()}
       />,
     );

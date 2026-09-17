@@ -1,8 +1,10 @@
+import type { BaseTableProps } from '../Table';
+import type { QueryBarProps } from '../QueryBar';
 import type { TableProps } from 'antd';
 import type { RowLayoutColumnNum } from '@south/components';
 import type { ReactNode, Ref } from 'react';
 import type { QueryFetcher, QueryState, QueryStore } from './store/queryStore';
-import { useEvent } from '@south/components';
+import { propsMerge, useEvent } from '@south/components';
 import { Form } from 'antd';
 import { useEffect, useImperativeHandle, useState } from 'react';
 import { BaseCard } from '../Card';
@@ -64,7 +66,10 @@ function initialOf<T>(slice?: SliceProp<T>) {
   return slice.owner === 'external' ? slice.value : slice.initial;
 }
 
-interface Props<TItem, TPagination extends SliceProp<PaginationData> | false | undefined> {
+interface Props<
+  TItem extends object,
+  TPagination extends SliceProp<PaginationData> | false | undefined,
+> {
   /** 搜索项定义, 声明顺序就是排布顺序 */
   searchList: BaseSearchList[];
   /** 表格列定义 */
@@ -82,8 +87,10 @@ interface Props<TItem, TPagination extends SliceProp<PaginationData> | false | u
   pagination?: TPagination;
   /** 搜索栏一行几列, 透传 QueryBar */
   columnNum?: RowLayoutColumnNum;
-  /** 搜索栏的行数档位, 透传 QueryBar */
-  rowOptions?: number[];
+  /** 搜索栏可折叠到的行数档位, 透传 QueryBar */
+  foldRows?: number[];
+  /** 搜索栏初始折叠到几行, 透传 QueryBar */
+  defaultFoldRows?: number;
   /** 行的唯一键, 原样透传 antd. 键要由几个字段拼出来时给函数 */
   rowKey?: TableProps<TItem>['rowKey'];
   /** 展开行, 原样透传 antd. 展开了哪几行归页面, 这一层不碰 */
@@ -113,6 +120,22 @@ interface Props<TItem, TPagination extends SliceProp<PaginationData> | false | u
    * 而这个回调负责把全量取新, 取回来后由页面调一次 `reload` 让它重筛.
    */
   onRefresh?: () => Promise<unknown>;
+  /**
+   * 透传给搜索栏的参数.
+   *
+   * 上面那些平铺参数是简化写法: 内部先把它们拼成一份默认值, 再与这里合并后一次性交下去.
+   * 同名时以这里为准, 同名事件则内外两个都调.
+   *
+   * 条件那一片的权威在 store, 所以 `committed` 与 `onSearch` 不在这里 —— 要改走 `committed` 那个
+   * 受控入口; `list` 与 `form` 同理归 `searchList` 与本层.
+   */
+  queryBarProps?: Omit<QueryBarProps, 'list' | 'committed' | 'form' | 'onSearch'>;
+  /**
+   * 透传给表格的参数. 合并口径同 {@link Props.queryBarProps}.
+   *
+   * 列走平铺的 `columns`, 数据源归 store, 两者都不在这里.
+   */
+  baseTableProps?: Omit<BaseTableProps<TItem>, 'columns' | 'dataSource'>;
   /** 拿到查询状态管理器: 读条件, 改条件, 重查都从它走 */
   ref?: Ref<QueryStore<TItem, SettableOf<TPagination>>>;
 }
@@ -136,7 +159,8 @@ export function SearchTable<
     fetchPage,
     committed: committedProp,
     columnNum,
-    rowOptions,
+    foldRows,
+    defaultFoldRows,
     rowKey,
     manual,
     toolbar,
@@ -144,6 +168,8 @@ export function SearchTable<
     expandable,
     isLoading,
     onRefresh,
+    queryBarProps,
+    baseTableProps,
     ref,
   } = props;
   // 泛型收窄只服务 ref 的类型; 组件内部要改得动分页 (用户点页码走的就是这条路), 所以这里放宽
@@ -189,32 +215,46 @@ export function SearchTable<
   const committed = committedProp?.owner === 'external' ? committedProp.value : innerCommitted;
   const pagination = paginationProp?.owner === 'external' ? paginationProp.value : innerPagination;
 
+  /** 平铺参数拼成的那份默认值, 与口袋合并后一次性交给搜索栏 */
+  const queryBar = propsMerge(
+    {
+      isSticky: true,
+      isLoading: result.loading,
+      columnNum,
+      foldRows,
+      defaultFoldRows,
+      onRefresh,
+    },
+    queryBarProps,
+  );
+
+  /** 同上. `getPage` 走事件合成: 内部那一下不能被页面传的同名回调静默拿掉 */
+  const table = propsMerge(
+    {
+      isStickyHeader: true,
+      isStickyToolbar: stickyToolbar,
+      isLoading: result.loading || isLoading,
+      rowKey,
+      expandable,
+      leftContent: toolbar,
+    },
+    baseTableProps,
+    { getPage: () => store.reload() },
+  );
+
   return (
     <>
+      {/* 被 Omit 的那几个写在展开之后: 它们归 store, 不接受覆盖 */}
       <QueryBar
-        isSticky
+        {...queryBar}
         list={searchList}
         form={form}
         committed={committed}
-        isLoading={result.loading}
-        columnNum={columnNum}
-        rowOptions={rowOptions}
         onSearch={(values) => store.search(() => values)}
-        onRefresh={onRefresh}
       />
 
       <BaseCard className="mt-10px">
-        <BaseTable
-          isStickyHeader
-          isStickyToolbar={stickyToolbar}
-          isLoading={result.loading || isLoading}
-          rowKey={rowKey}
-          columns={columns}
-          dataSource={result.items}
-          leftContent={toolbar}
-          expandable={expandable}
-          getPage={() => store.reload()}
-        />
+        <BaseTable {...table} columns={columns} dataSource={result.items} />
 
         {isPaged && (
           <BasePagination

@@ -11,8 +11,8 @@ interface Props {
   locked: boolean;
   /** 当前露几行 */
   rows: number | typeof ALL;
-  /** 可选的行数档位, 由页面给; 空数组表示不出行数这一半 */
-  options: number[];
+  /** 可折叠到的行数档位, 由页面给; 空数组表示不出行数这一半 */
+  foldRows: number[];
   /** 全行是几行 */
   totalRows: number;
   /** 切换固定展开 */
@@ -30,7 +30,7 @@ interface Props {
  * @param props - 组件参数
  */
 export function QueryPill(props: Props) {
-  const { locked, rows, options, totalRows, onLockedChange, onRowsChange, getPopupContainer } =
+  const { locked, rows, foldRows, totalRows, onLockedChange, onRowsChange, getPopupContainer } =
     props;
   const [open, setOpen] = useState(false);
 
@@ -65,7 +65,7 @@ export function QueryPill(props: Props) {
         {locked ? <LockFilled /> : <UnlockOutlined />}
       </button>
 
-      {!!options.length && (
+      {!!foldRows.length && (
         <>
           <span className="query-bar-pill-divider" />
           <Dropdown
@@ -77,7 +77,7 @@ export function QueryPill(props: Props) {
               onClick: onSelect,
               items: [
                 itemOf(ALL, `全部 ${totalRows} 行`),
-                ...options.map((one) => itemOf(one, `${one} 行`)),
+                ...foldRows.map((one) => itemOf(one, `${one} 行`)),
               ],
             }}
             onOpenChange={setOpen}

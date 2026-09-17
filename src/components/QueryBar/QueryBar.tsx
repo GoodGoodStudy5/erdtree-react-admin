@@ -26,7 +26,8 @@ const ROW_GUTTER = 16;
  */
 const AUTO_SUBMIT_WAIT = 300;
 
-interface Props {
+/** 搜索栏的全部参数 */
+export interface QueryBarProps {
   /** 搜索项定义, 声明顺序就是排布顺序 */
   list: BaseSearchList[];
   /** 已提交的查询条件. 变了会按项同步进表单, 见 syncKeys */
@@ -42,8 +43,14 @@ interface Props {
   isLoading?: boolean;
   /** 一行几列, 透传 RowLayout; 断点不给配 */
   columnNum?: RowLayoutColumnNum;
-  /** 行数档位; 不传则没有行数下拉, 条件区恒为全行 */
-  rowOptions?: number[];
+  /**
+   * 可折叠到的行数档位; 不传则没有档位下拉.
+   *
+   * 不叫 options 是因为这个组件里那个词已经被 `componentProps.options` 占着指下拉的候选项.
+   */
+  foldRows?: number[];
+  /** 初始折叠到几行; 不传即一上来就全露. 比总行数还大时按全露算 */
+  defaultFoldRows?: number;
   /** 摘要行吸在标签栏底下. 锁定后自动退出, 见下方 data-sticky */
   isSticky?: boolean;
   /** 点搜索 */
@@ -72,13 +79,14 @@ interface Props {
  * label 折行) 露出的行数就不准; 摘要只读, 改一个已填条件要先进条件区.
  * @param props - 组件参数
  */
-export function QueryBar(props: Props) {
+export function QueryBar(props: QueryBarProps) {
   const {
     list,
     committed,
     isLoading,
     columnNum = 4,
-    rowOptions,
+    foldRows,
+    defaultFoldRows,
     isSticky,
     onSearch,
     onRefresh,
@@ -89,7 +97,7 @@ export function QueryBar(props: Props) {
   const screens = Grid.useBreakpoint();
   const barRef = useRef<HTMLDivElement>(null);
   const [locked, setLocked] = useState(false);
-  const [rows, setRows] = useState<number | 'all'>('all');
+  const [rows, setRows] = useState<number | 'all'>(defaultFoldRows ?? 'all');
   // 上一次同步用的已提交条件. 逐项比它才知道这次哪几项真的变了
   const syncedRef = useRef<BaseFormData>({});
 
@@ -109,12 +117,12 @@ export function QueryBar(props: Props) {
   const foldedCount = countBeyond(plan, visibleRows);
   // 档位由页面给, 不由组件按断点推: 推出来的档位数随屏宽变, 同一个页面在两台机器上下拉长度不同.
   // 比总行数还大的档位与「全部」重合, 去掉
-  const options = useMemo(
+  const usableFoldRows = useMemo(
     () =>
-      [...new Set(rowOptions ?? [])]
+      [...new Set(foldRows ?? [])]
         .filter((one) => one > 0 && one < plan.total)
         .sort((a, b) => a - b),
-    [rowOptions, plan.total],
+    [foldRows, plan.total],
   );
 
   /**
@@ -249,7 +257,7 @@ export function QueryBar(props: Props) {
             <QueryPill
               locked={locked}
               rows={rows}
-              options={options}
+              foldRows={usableFoldRows}
               totalRows={plan.total}
               getPopupContainer={() => barRef.current as HTMLElement}
               onLockedChange={setLocked}
