@@ -116,8 +116,6 @@ export interface QueryStore<
   reload: () => void;
   /** 当前已提交条件过出口层的结果. 导出按当前条件取参数就用它 */
   toParams: () => Record<string, unknown>;
-  /** 卸载时调. 之后所有动词记日志后静默返回, 在飞的响应一律作废 */
-  destroy: () => void;
 }
 
 /**
@@ -145,18 +143,12 @@ export function createQueryStore<TItem>(config: QueryStoreConfig<TItem>): QueryS
   const toParams: QueryStore<TItem>['toParams'] = () => config.toParams(get('committed'));
 
   /**
-   * 卸载后调动词只记日志不抛.
+   * 取一次数.
    *
-   * 那多半是异步回调的竞态, 调用方无从处理; 此时抛会炸掉一条与本组件无关的 promise 链.
-   * 挂载前调不必在这里管 —— 那时 `ref.current` 还是 null, 取属性自己就炸了.
-   * @param verb - 被调的动词名, 只用于日志
+   * 竞态只靠序号: 每次领一个新号, 回来时对不上就丢弃. **不另设「已销毁」那种开关** ——
+   * keepalive 走的是 React 的 `Activity`, 它把页面藏起来时照样跑 effect 的 cleanup,
+   * 那种开关会在切走那一刻立起来且再也放不下, 于是切回来整个 store 拒收指令.
    */
-  const isGone = (verb: string) => {
-    if (slices.isDestroyed()) console.warn(`[QueryStore] 组件已卸载, ${verb} 被忽略`);
-
-    return slices.isDestroyed();
-  };
-
   async function asyncRunFetch() {
     const current = (ticket += 1);
 
@@ -164,14 +156,14 @@ export function createQueryStore<TItem>(config: QueryStoreConfig<TItem>): QueryS
     try {
       const page = await config.fetch({ ...toParams(), ...get('pagination') });
 
-      if (current !== ticket || slices.isDestroyed()) return;
+      if (current !== ticket) return;
       slices.set('result', () => ({
         items: page.items ?? [],
         total: page.total,
         loading: false,
       }));
     } catch (error) {
-      if (current !== ticket || slices.isDestroyed()) return;
+      if (current !== ticket) return;
       // 提示由响应拦截器统一弹, 这一层只做两件事: 保住上一次的 items 不把表格清空, 收掉 loading
       console.error(error);
       slices.set('result', (result) => ({ ...result, loading: false }));
@@ -179,7 +171,6 @@ export function createQueryStore<TItem>(config: QueryStoreConfig<TItem>): QueryS
   }
 
   const search: QueryStore<TItem>['search'] = (updater) => {
-    if (isGone('search')) return;
     const next = updater(get('committed'), api);
     const prevPage = get('pagination');
     /**
@@ -199,7 +190,6 @@ export function createQueryStore<TItem>(config: QueryStoreConfig<TItem>): QueryS
   };
 
   const set: QueryStore<TItem>['set'] = (slice, updater) => {
-    if (isGone('set')) return;
     // 判据是调用方需要知道自己调错了片. 不按归属挡: 受控片的写口在类型上已经收成 never,
     // 而组件内部改分页 (用户点了页码) 走的是同一条路 —— 运行期挡住会把自己人一起挡了
     if (slice !== 'pagination') throw new Error(`[QueryStore] ${slice} 片不可 set`);
@@ -211,14 +201,7 @@ export function createQueryStore<TItem>(config: QueryStoreConfig<TItem>): QueryS
   const getDraft: QueryStore<TItem>['getDraft'] = () => config.readDraft();
 
   const reload: QueryStore<TItem>['reload'] = () => {
-    if (isGone('reload')) return;
     void asyncRunFetch();
-  };
-
-  const destroy: QueryStore<TItem>['destroy'] = () => {
-    slices.destroy();
-    // 推掉序号, 在飞的响应回来时一律对不上号
-    ticket += 1;
   };
 
   const api: QueryStore<TItem> = {
@@ -229,7 +212,6 @@ export function createQueryStore<TItem>(config: QueryStoreConfig<TItem>): QueryS
     reload,
     subscribe: slices.subscribe,
     toParams,
-    destroy,
   };
 
   return api;

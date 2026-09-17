@@ -99,7 +99,7 @@ interface Props<
    * true 则挂载时不自动取数, 全部由 ref 触发.
    *
    * 给在 keepalive 里的页面用: 那里的 `useEffectOnActive` 挂载时也跑一次, 不关掉就与组件自己的
-   * 挂载取数重一发.
+   * 挂载取数重一发. 且 `Activity` 每次把页面切回可见都会重跑 effect, 不给它的页面每切回一次就多取一次数.
    */
   manual?: boolean;
   /** 表格操作行左侧的操作区, 与右侧的刷新, 列筛选同行. 哑的: 放什么由页面决定, 这里只留位置 */
@@ -200,10 +200,14 @@ export function SearchTable<
   useImperativeHandle(ref, () => store as QueryStore<TItem, SettableOf<TPagination>>, [store]);
 
   useEffect(() => {
-    // 挂载即取一次: 列表页首屏就该有数据. 卸载时销毁, 在飞的响应一律作废
+    /*
+     * 挂载即取一次: 列表页首屏就该有数据.
+     *
+     * **没有 cleanup**: store 只是 useState 拿着的一坨状态, 组件实例被回收时它跟着走, 而订阅由
+     * `useSyncExternalStore` 自己解. 在这里销毁它反而会出事 —— keepalive 走 React 的 `Activity`,
+     * 藏起页面时照样跑 cleanup, 而 state 是保留的, 于是切回来拿到的是一个已经销毁的 store.
+     */
     if (!manual) store.reload();
-
-    return () => store.destroy();
     // manual 只在挂载那一刻起作用, 中途改它不该重新取数
   }, [store]);
 

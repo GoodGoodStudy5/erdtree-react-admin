@@ -198,34 +198,4 @@ describe('createQueryStore', () => {
 
     expect(store.toParams()).toEqual({ a: 1, marked: true });
   });
-
-  it('卸载后调动词记日志后静默, 不再取数', async () => {
-    const warn = vi.spyOn(console, 'warn').mockReturnValue(undefined);
-    const fetch = okFetch();
-    const store = createQueryStore<Row>({ fetch, toParams: identity, readDraft: emptyDraft });
-
-    store.destroy();
-    store.search(() => ({ a: 1 }));
-    store.reload();
-    await tick();
-
-    expect(fetch).not.toHaveBeenCalled();
-    expect(store.get('committed')).toEqual({});
-    expect(warn).toHaveBeenCalledTimes(2);
-  });
-
-  it('卸载时在飞的响应不再落地', async () => {
-    const fetch = vi.fn(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 20));
-
-      return { items: [{ id: 'late' }], total: 1 };
-    }) as unknown as QueryFetcher<Row>;
-    const store = createQueryStore<Row>({ fetch, toParams: identity, readDraft: emptyDraft });
-
-    store.reload();
-    store.destroy();
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    expect(store.get('result').items).toEqual([]);
-  });
 });

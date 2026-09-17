@@ -90,17 +90,15 @@ describe('createSliceStore', () => {
     expect(listener).not.toHaveBeenCalled();
   });
 
-  it('销毁后读写无效, 订阅一律退订', () => {
-    const { store, onA } = make();
+  it('退订之后那个订阅者不再收到通知', () => {
+    const { store } = make();
     const listener = vi.fn();
 
-    store.subscribe('a', listener);
-    store.destroy();
+    const off = store.subscribe('a', listener);
+
+    off();
     store.set('a', () => 99);
 
-    expect(store.isDestroyed()).toBe(true);
-    expect(store.get('a')).toBe(1);
     expect(listener).not.toHaveBeenCalled();
-    expect(onA).not.toHaveBeenCalled();
   });
 });

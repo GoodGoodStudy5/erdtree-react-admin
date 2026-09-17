@@ -50,10 +50,6 @@ export interface SliceStore<S extends SliceMap> extends ReadableSliceStore<S> {
   set: <K extends keyof S>(slice: K, updater: (current: S[K]) => S[K]) => void;
   /** 一次改多片, 只走一轮通知. 跨片联动要的就是这个 —— 分两次改会让中间那个半截状态被订阅者看见 */
   patch: (next: Partial<S>) => void;
-  /** 已销毁则读写一律无效. 要不要为此报错由调用方决定, 这一层只如实回答 */
-  isDestroyed: () => boolean;
-  /** 销毁. 之后 set 与 patch 静默无效, 已有的订阅一律退订 */
-  destroy: () => void;
 }
 
 /**
@@ -67,10 +63,6 @@ export function createSliceStore<S extends SliceMap>(configs: SliceConfigs<S>): 
   for (const key of keys) seed[key] = configs[key].initial;
 
   const store = createStore<S>(() => seed);
-  /** 自己记一份退订函数: zustand 没有「全部退订」, 而销毁后还挂着的订阅会拖住整个 store 不被回收 */
-  const unsubscribes = new Set<() => void>();
-  let destroyed = false;
-
   /** 逐片比引用, 变了的那几片各通知一次 */
   const notify = (prev: S, next: S) => {
     for (const key of keys) {
@@ -79,7 +71,6 @@ export function createSliceStore<S extends SliceMap>(configs: SliceConfigs<S>): 
   };
 
   const patch: SliceStore<S>['patch'] = (next) => {
-    if (destroyed) return;
     const prev = store.getState();
 
     store.setState(next);
@@ -95,24 +86,10 @@ export function createSliceStore<S extends SliceMap>(configs: SliceConfigs<S>): 
       patch(next);
     },
     patch,
-    subscribe: (slice, listener) => {
-      const unsubscribe = store.subscribe((state, prev) => {
+    subscribe: (slice, listener) =>
+      store.subscribe((state, prev) => {
         if (state[slice] !== prev[slice]) listener(state[slice]);
-      });
-      const off = () => {
-        unsubscribes.delete(off);
-        unsubscribe();
-      };
-
-      unsubscribes.add(off);
-
-      return off;
-    },
-    isDestroyed: () => destroyed,
-    destroy: () => {
-      destroyed = true;
-      for (const off of [...unsubscribes]) off();
-    },
+      }),
   };
 
   return api;
