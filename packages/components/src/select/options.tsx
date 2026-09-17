@@ -2,6 +2,15 @@ import type { CSSProperties, ReactNode } from 'react';
 import type { SearchSelectColumnsTable, SearchSelectOption } from './types';
 
 /**
+ * 多列下拉的默认弹层宽度. 调用方要更宽的表格就传 `popupWidth`.
+ *
+ * **弹层, 表头, 选项行三处认同一个数, 列才对得齐**: 表头挂在弹层上, 选项行住在虚拟列表里,
+ * 两者的父容器中间隔着好几层 antd 自己的结构, 宽度差得出几个像素. 各自撑满父容器的话,
+ * `flex: 1` 会把那点差摊到每一列上; 都钉在同一个数上, 差多少都只落在行的右端, 被裁掉而已.
+ */
+export const DEFAULT_COLUMNS_POPUP_WIDTH = 360;
+
+/**
  * 按 include / exclude 过滤选项.
  *
  * include 有值时只认它 (优先级高于 exclude): 正选与反选同时给是调用方的口径冲突,
@@ -88,44 +97,50 @@ function renderCell({
   );
 }
 
-/** 多列下拉的表头 */
-export function renderColumnsHeader<OT extends SearchSelectOption>(
-  columnsTable: SearchSelectColumnsTable<OT>,
-): ReactNode {
-  return (
-    <div className="search-select-table-header">
-      {columnsTable.columns.map((column) =>
-        renderCell({
-          key: column.dataIndex,
-          maxWidth: column.maxWidth,
-          title: toPlainText(column.title),
-          children: column.title,
-        }),
-      )}
-    </div>
-  );
-}
+/**
+ * 建一份多列下拉的渲染器: 表头与选项行从同一份上下文出来.
+ *
+ * **同宽由此成为结构上的事实**: 两处引用同一个 `size`, 想让它们不同宽得先改结构, 而不是某次漏传
+ * 一个参数就悄悄发生 —— 列一错开只有截图上看得出来, 类型不会报错.
+ *
+ * 往后要加的共享项 (行高, 空态, hover 规则) 都进这里, 两个出口的签名不再长.
+ * @param table - 列定义, 外加它们共用的宽度
+ */
+export function createColumnsRenderer<OT extends SearchSelectOption>({
+  columns,
+  allowWrap,
+  width,
+}: SearchSelectColumnsTable<OT> & { width: number }) {
+  const size = { width };
 
-/** 多列下拉的一行. 每个单元格按 dataIndex 取值, 给了 render 就交给它 */
-export function renderColumnsRow<OT extends SearchSelectOption>(
-  option: OT,
-  columnsTable: SearchSelectColumnsTable<OT>,
-): ReactNode {
-  const { columns, allowWrap } = columnsTable;
+  return {
+    header: (): ReactNode => (
+      <div className="search-select-table-header" style={size}>
+        {columns.map((column) =>
+          renderCell({
+            key: column.dataIndex,
+            maxWidth: column.maxWidth,
+            title: toPlainText(column.title),
+            children: column.title,
+          }),
+        )}
+      </div>
+    ),
 
-  return (
-    <div className="search-select-table-row">
-      {columns.map((column) => {
-        const value = option[column.dataIndex];
+    row: (option: OT): ReactNode => (
+      <div className="search-select-table-row" style={size}>
+        {columns.map((column) => {
+          const value = option[column.dataIndex];
 
-        return renderCell({
-          key: column.dataIndex,
-          allowWrap,
-          maxWidth: column.maxWidth,
-          title: toPlainText(value),
-          children: column.render ? column.render(value, option) : (value as ReactNode),
-        });
-      })}
-    </div>
-  );
+          return renderCell({
+            key: column.dataIndex,
+            allowWrap,
+            maxWidth: column.maxWidth,
+            title: toPlainText(value),
+            children: column.render ? column.render(value, option) : (value as ReactNode),
+          });
+        })}
+      </div>
+    ),
+  };
 }

@@ -6,10 +6,10 @@ import { useEvent, useRequest } from '../hooks';
 import { useLocale } from '../locale';
 import { propsMerge } from '../utils';
 import {
+  createColumnsRenderer,
+  DEFAULT_COLUMNS_POPUP_WIDTH,
   filterVisibleOptions,
   matchOptionByKeys,
-  renderColumnsHeader,
-  renderColumnsRow,
 } from './options';
 import type {
   SearchSelectOption,
@@ -21,8 +21,6 @@ import './SearchSelect.less';
 
 /** 搜索防抖默认 500ms: 再快就是边打字边发请求, 再慢用户会觉得下拉卡住了 */
 const DEFAULT_DEBOUNCE_WAIT = 500;
-/** 多列下拉的默认弹层宽度. 跟着输入框宽度走放不下几列表格 */
-const COLUMNS_POPUP_WIDTH = 360;
 /** request 缺省时的占位. fetchOptions 会先挡住调用, 它只为让 useRequest 的签名成立 */
 const NO_REQUEST = async () => [];
 
@@ -52,6 +50,7 @@ export function SearchSelect<
     include,
     exclude,
     columnsTable,
+    popupWidth = DEFAULT_COLUMNS_POPUP_WIDTH,
     ...restProps
   } = props;
   const locale = useLocale('SearchSelect');
@@ -121,6 +120,11 @@ export function SearchSelect<
     }
   });
 
+  /** 多列下拉的两个渲染出口, 绑一次共用同一个宽度 */
+  const table = columnsTable
+    ? createColumnsRenderer({ ...columnsTable, width: popupWidth })
+    : undefined;
+
   const handleOpenChange = useEvent((open: boolean) => {
     // 关闭时若还留着搜索词, 内部补一次空搜索, 下次打开看到的才是完整选项.
     // 不转发给外部 onSearch —— 这一下不是用户输入
@@ -140,18 +144,17 @@ export function SearchSelect<
       filterOption: isRemoteSearch
         ? false
         : (keyword: string, option?: OT) => matchOptionByKeys(option, keyword, localSearchKeys),
-      ...(columnsTable
+      ...(table
         ? {
-            popupMatchSelectWidth: COLUMNS_POPUP_WIDTH,
+            popupMatchSelectWidth: popupWidth,
             classNames: { popup: { root: 'search-select-table-popup' } },
             popupRender: (menu: ReactElement) => (
               <>
-                {renderColumnsHeader(columnsTable)}
+                {table.header()}
                 {menu}
               </>
             ),
-            optionRender: ({ data: option }: { data: OT }) =>
-              renderColumnsRow(option, columnsTable),
+            optionRender: ({ data: option }: { data: OT }) => table.row(option),
           }
         : undefined),
     } as SelectProps<VT, OT>,

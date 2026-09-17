@@ -117,6 +117,12 @@ export interface SearchSelectProps<
   /** 多列下拉 (表头 + 每列取值) */
   columnsTable?: SearchSelectColumnsTable<OT>;
   /**
+   * 多列下拉的弹层宽度, 默认 360. 只在 `columnsTable` 有值时管用.
+   *
+   * 不跟着输入框走: 几列表格摆不进一个输入框的宽度里.
+   */
+  popupWidth?: number;
+  /**
    * 命令式把手, 见 {@link SearchSelectRef}.
    *
    * 注意它不是底层 Select 的 ref: 交出去的是本组件的四个动作, 不是 DOM 或 antd 的实例.

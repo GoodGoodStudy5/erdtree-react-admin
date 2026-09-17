@@ -1,17 +1,29 @@
-/* 多列下拉: 表头与选项行用同一套列宽规则, 两者才对得齐 */
-.search-select-table-popup {
-  padding-top: 0;
+/** 末列右端留给选中勾的宽度: 勾浮在这道位里 */
+@state-width: 24px;
 
-  /*
-   * 两者都显式撑满. 行不写这一条就退回内容宽 —— 它是 `.ant-select-item-option-content` 的
-   * flex item, 默认 `flex: 0 1 auto`; 单元格的 `flex: 1` 于是在内容宽里等分, 而表头在弹层
-   * 整宽里等分, 两边的列对不齐.
-   */
+/** 单元格左右内边距 */
+@cell-padding-x: 8px;
+
+/*
+ * 多列下拉: 表头与选项行用同一套列宽规则, 两者才对得齐.
+ *
+ * **类名写两遍是要紧的**: 本块里覆盖 antd 的那几条与它同特异性, 而 antd 的样式由 CSS-in-JS 在
+ * 组件挂载时插进 head, 永远排在本表之后 —— 平局归它. 重复一次把整块抬高一级, 里面的覆盖才生效,
+ * 往后新增覆盖也不必逐条叠类名.
+ */
+.search-select-table-popup.search-select-table-popup {
+  /* 弹层不留内边距: 表头与选项行的宽度就是弹层宽度, 留了边它们要各自减去它 */
+  padding: 0;
+
+  /* 宽度由渲染函数钉在这两个元素上, 不撑父容器 —— 判据见 options.tsx 的 COLUMNS_POPUP_WIDTH */
   .search-select-table-header,
   .search-select-table-row {
     display: flex;
-    width: 100%;
+
+    /* 不许被压: 选项行是 flex item, 父容器一窄就缩, 缩了宽度就不再是钉死的那个数 */
+    flex-shrink: 0;
     white-space: nowrap;
+    border-bottom: 1px solid #f0f0f0;
   }
 
   .search-select-table-header {
@@ -23,11 +35,18 @@
 
   .search-select-table-cell {
     flex: 1;
-    padding: 4px 8px;
+    padding: 4px @cell-padding-x;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    border-bottom: 1px solid #f0f0f0;
+
+    /*
+     * 末列右边多留一道给选中勾. 留在列里而不是留在整行上: 留在行上, 没有勾的表头右端会空出
+     * 一块底色, 而列宽是平分出来的, 两边都留才对得齐.
+     */
+    &:last-child {
+      padding-inline-end: @cell-padding-x + @state-width;
+    }
 
     &.search-select-table-cell-wrap {
       word-break: break-all;
@@ -40,17 +59,24 @@
     border-left: 1px solid #f0f0f0;
   }
 
-  /* 选项本身不再留内边距, 内边距归单元格 */
-  .ant-select-item-option {
+  /* 选项本身不再留内边距, 内边距归单元格. 内边距是 antd 挂在 `.ant-select-item` 上的 */
+  .ant-select-item {
     padding: 0;
   }
 
   /*
-   * 多选的选中勾挂在选项行右侧, 会占掉一截宽度, 于是行比表头窄, 两者的列就错开了.
-   * 选中与否由 antd 自己的背景色表达, 表格式下拉里再放一个勾也会压坏列对齐.
+   * 选中勾脱离 flex 流, 浮到行右端预留的那道位里 —— 留在流里它会占宽度, 行就比表头窄一截.
+   *
+   * 定位参照是选项行自己: antd 给 `.ant-select-item` 的 `position: relative` 顺带管了这件事.
    */
   .ant-select-item-option-state {
-    display: none;
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: @state-width;
   }
 
   .ant-select-item-option-content {
