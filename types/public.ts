@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { ColumnType } from 'antd/es/table';
+import type { ParagraphProps } from 'antd/es/typography/Paragraph';
 import type { ItemType } from 'antd/es/menu/interface';
 import type { MenuIcon } from '@/menus';
 
@@ -62,8 +63,13 @@ export interface ColumnsEnum {
   type?: EnumShowType;
 }
 
+// 单元格文本的省略细节: 不给 rows 是单行省略, 给了才多行折叠
+export type CellEllipsis = Exclude<ParagraphProps['ellipsis'], boolean>;
+
 // 表格列数据
-export interface TableColumn<T = object> extends ColumnType<T> {
+export interface TableColumn<T = object> extends Omit<ColumnType<T>, 'ellipsis'> {
+  // 省略与折叠: true 是单行省略, 给对象可细化行数与能否展开; 与 showTitle 取交集才赋得回 ColumnType
+  ellipsis?: boolean | (CellEllipsis & { showTitle?: boolean });
   enum?: ColumnsEnum[] | Record<string, unknown>;
   children?: TableColumn<T>[];
   isKeepFixed?: boolean; // 手机端默认关闭fixed，该属性开启fixed

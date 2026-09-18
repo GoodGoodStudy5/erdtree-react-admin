@@ -13,7 +13,7 @@ import { getTableHeight, handleRowHeight, filterTableColumns } from './utils/hel
 import { ResizableTitle } from './components/ResizableTitle';
 import { useVirtualTable } from './hooks/useVirtual';
 import { TableFilter } from './components/TableFilter';
-import { EllipsisText } from './components/EllipsisText';
+import { EllipsisText } from '../Ellipsis';
 import './index.less';
 import { $t } from '@/locales';
 
@@ -171,6 +171,8 @@ export function BaseTable<T extends object = object>(props: BaseTableProps<T>) {
       .filter((col) => !(col as TableColumn).hidden)
       .map((col, index) => ({
         ...col,
+        // antd 那层只用 ellipsis 判 table-layout, 省略的细节归 EllipsisText
+        ellipsis: !!col.ellipsis,
         // 手机端去除列固定，除非设置了isKeepFixed
         fixed: col?.fixed && !(isPhone && !(col as TableColumn)?.isKeepFixed) ? col.fixed : false,
         onHeaderCell: (column: object, i: number) => ({
@@ -232,7 +234,8 @@ export function BaseTable<T extends object = object>(props: BaseTableProps<T>) {
             }
 
             // 列宽撞上上限后折行, 不打省略号; 要省略号的列自己声明 ellipsis
-            if (!col.ellipsis) {
+            const ellipsis = (col as TableColumn).ellipsis;
+            if (!ellipsis) {
               return (
                 <span className="break-all break-words whitespace-pre-wrap" style={{ color }}>
                   {textContent}
@@ -242,10 +245,9 @@ export function BaseTable<T extends object = object>(props: BaseTableProps<T>) {
 
             return (
               <EllipsisText
-                width={col.width}
                 text={textContent}
                 color={color}
-                className="break-all"
+                ellipsis={typeof ellipsis === 'object' ? ellipsis : undefined}
               />
             );
           }
