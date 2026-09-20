@@ -1,0 +1,35 @@
+/** 叠层层号: 压在最上面那一层抽屉的遮罩上, 标记与层号由 BaseDrawer 写入 */
+
+@mark-size: 80px;
+@ring-size: 120px;
+@ring-width: 2px;
+@mark-inset: 24px;
+
+/** 固定浅色不跟主题: 它压在遮罩上, 而遮罩在明暗两套下都是黑的 */
+@mark-color: rgb(255 255 255 / 22%);
+
+/**
+ * 落在遮罩不落在面板: 面板是 rc-motion 用 transform 滑进来的那个元素, 挂在它身上的数字会跟着
+ * 面板一起飞.
+ */
+.drawer-stacked > .ant-drawer-mask::before {
+  position: absolute;
+  bottom: @mark-inset;
+  left: @mark-inset;
+  display: grid;
+  place-items: center;
+  width: @ring-size;
+  height: @ring-size;
+  font-size: @mark-size;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: @mark-color;
+
+  /* 点它等同点遮罩: 在遮罩那块像素上叠第二种语义, 会与 antd 既有的「关最顶层」撞 */
+  pointer-events: none;
+  content: counter(drawer-stack);
+  counter-reset: drawer-stack var(--drawer-stack-depth, 0);
+  border: @ring-width solid @mark-color;
+  border-radius: 50%;
+}

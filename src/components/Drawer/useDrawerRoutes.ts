@@ -58,12 +58,22 @@ function parsePayload(raw: string | null): DrawerPayload {
  * 认出这个实例是表里的哪一项. 没登记过的抽屉不参与记账.
  * @param modalId - 实例 id
  */
-function identify(modalId: number): (DrawerIdentity & { props: Record<string, unknown> }) | null {
-  const instance = getModalInstances().find((one) => one.id === modalId);
+function identify(
+  modalId: number,
+): (DrawerIdentity & { props: Record<string, unknown>; first: boolean }) | null {
+  const instances = getModalInstances();
+  const instance = instances.find((one) => one.id === modalId);
   if (!instance) return null;
 
   const identity = registry.get(instance.Comp);
-  return identity ? { ...identity, props: instance.props } : null;
+  if (!identity) return null;
+
+  return {
+    ...identity,
+    props: instance.props,
+    // 载荷按抽屉名做键, 一个名字放不下两格, 所以同名叠开时只认最早那个实例
+    first: instances.find((one) => one.Comp === instance.Comp)?.id === modalId,
+  };
 }
 
 /**
@@ -94,8 +104,11 @@ export function DrawerRouteSync(props: { modalId: number; open: boolean }): null
     const identity = identify(modalId);
     if (!identity) return;
 
-    // 人已经不在抽屉那一页了: 这次关闭是路由带走的, 再写就写到别人的地址栏上去了
-    if (!open && pathname !== identity.pathname) return;
+    // 只记本页那张表里的格子: 抽屉名的权威在页面, 写到别人的地址栏上会在刷新时开出错抽屉配错 props
+    if (pathname !== identity.pathname) return;
+
+    // 同名叠开的第二层不记账: 记了就会在关自己那一刻把外层的格子一起删掉
+    if (!identity.first) return;
     written.current = open;
 
     const params = new URLSearchParams(searchParams);

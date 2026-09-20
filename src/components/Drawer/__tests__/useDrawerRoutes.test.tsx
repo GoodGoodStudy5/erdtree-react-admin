@@ -59,6 +59,8 @@ function Page() {
     <>
       <Probe />
       <button onClick={() => void openModal(DetailDrawer, { id: 7 })}>开详情</button>
+      {/* 与组内兄弟单同形: 从详情里再开一层同一个抽屉, 两层共用 detail 这个名字 */}
+      <button onClick={() => void openModal(DetailDrawer, { id: 8 })}>开另一张详情</button>
       <button onClick={() => void openModal(DetailDrawer, { id: 7, leaveTo: '/invoice' })}>
         开可跳走的详情
       </button>
@@ -306,5 +308,66 @@ describe('抽屉路由 · 标签页那份 query', () => {
 
     expect(query()).not.toContain('openDrawer');
     expect(instances()).toBe('');
+  });
+});
+
+/** 关最上面那一层. 抽屉的 portal 按挂载顺序排在 body 下, 末位压在最上面 */
+function clickCloseTop() {
+  const closes = document.querySelectorAll<HTMLElement>('.ant-drawer-close');
+  const close = closes[closes.length - 1];
+  if (!close) throw new Error('关闭按钮没渲染');
+  act(() => {
+    close.click();
+  });
+}
+
+describe('抽屉路由 · 只记本页自己那一格', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('同名叠开: 内层不记账, 关内层也不动外层那一格', async () => {
+    mount();
+
+    act(() => {
+      screen.getByText('开详情').click();
+    });
+    await waitFor(() => expect(query()).not.toBe(''));
+    const outer = query();
+
+    act(() => {
+      screen.getByText('开另一张详情').click();
+    });
+    await waitFor(() => expect(instances()).toMatch(/^\d+:开,\d+:开$/));
+
+    // 一个名字放不下两格, 内层的 props 不该盖掉外层的
+    expect(query()).toBe(outer);
+
+    clickCloseTop();
+    act(() => {
+      vi.advanceTimersByTime(400);
+    });
+
+    await waitFor(() => expect(instances()).toMatch(/^\d+:开$/));
+    expect(query()).toBe(outer);
+  });
+
+  it('抽屉登记在别的页上: 开出来了也一个字不写进当前这页的 query', async () => {
+    const router = mountKeptAlive();
+
+    await act(async () => {
+      await router.navigate('/invoice');
+    });
+
+    act(() => {
+      screen.getByText('开详情').click();
+    });
+
+    await waitFor(() => expect(instances()).toMatch(/^\d+:开$/));
+    expect(query()).toBe('');
   });
 });
