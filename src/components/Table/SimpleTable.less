@@ -79,3 +79,17 @@
   --ant-table-cell-padding-inline: @simple-padding-inline;
   --ant-table-cell-padding-inline-sm: @simple-padding-inline;
 }
+
+/**
+ * 折行态: 元素内容撞上列宽后往下折, 不溢出压到隔壁格子上.
+ *
+ * 缺省不开 —— 溢出是 CSS 在固定列宽下的缺省, 替调用方改掉它, 长号码那种「就是要横着一行」的表
+ * 反倒没法写. `cell()` 包的那层 span 让字符串一直能折, 这里补的是元素: 链接与金额原样交出,
+ * 不继承点什么就只能溢出. 两个属性都可继承, 一路作用到格子里的 a 与 span.
+ */
+.simple-table.is-wrap {
+  td {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+}

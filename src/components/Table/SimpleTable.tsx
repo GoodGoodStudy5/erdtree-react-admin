@@ -45,6 +45,12 @@ interface Props<T extends object> extends Omit<
   isOperate?: boolean;
   /** 素色: 表体、表头、悬浮一律不上底色, 只留分隔线. 缺省真 —— 底色归外面的卡片 */
   isPlain?: boolean;
+  /**
+   * 撞上列宽的内容折行. 缺省关 —— 固定列宽下超出就溢出, 那是 CSS 的缺省, 这里不替调用方改掉它.
+   *
+   * 只管元素内容: 字符串由 {@link cell} 一直包着能折行的 span, 与这个开关无关.
+   */
+  isWrap?: boolean;
 }
 
 /**
@@ -83,15 +89,15 @@ function cell(content: ReactNode) {
 function NativeTable<T extends object>(props: Props<T>) {
   const { columns, rows, rowKey, rowClassName, onRow, showHeader, locale, className, style } =
     props;
+  // 缺省交给样式表那条 auto, 不在这里重复写一个默认值
+  const tableStyle = props.tableLayout ? { tableLayout: props.tableLayout } : undefined;
+  const classes = ['simple-table', 'is-native', props.isWrap && 'is-wrap', className];
   const hasWidth = columns.some((column) => column.width !== undefined);
   const words = typeof locale?.emptyText === 'function' ? locale.emptyText() : locale?.emptyText;
 
   return (
-    <div
-      className={className ? `simple-table is-native ${className}` : 'simple-table is-native'}
-      style={style}
-    >
-      <table>
+    <div className={classes.filter(Boolean).join(' ')} style={style}>
+      <table style={tableStyle}>
         {hasWidth && (
           <colgroup>
             {columns.map((column, index) => (
@@ -150,7 +156,8 @@ function NativeTable<T extends object>(props: Props<T>) {
  * @param props - 组件参数
  */
 function AntdTable<T extends object>(props: Props<T>) {
-  const { columns, rows, isPlain = true, isNative, ...rest } = props;
+  const { columns, rows, isPlain = true, isNative, isWrap, ...rest } = props;
+  const classes = ['simple-table', isPlain && 'is-plain', isWrap && 'is-wrap'];
 
   /*
    * 合成 `dataIndex`: BaseTable 的列筛选按它取键, 一个都取不到时 `useFiler` 返回空列表, 整张表
@@ -165,7 +172,7 @@ function AntdTable<T extends object>(props: Props<T>) {
   }));
 
   return (
-    <div className={isPlain ? 'simple-table is-plain' : 'simple-table'}>
+    <div className={classes.filter(Boolean).join(' ')}>
       <BaseTable<T>
         columns={tableColumns}
         dataSource={rows}
