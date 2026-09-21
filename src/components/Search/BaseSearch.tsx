@@ -207,7 +207,7 @@ export const BaseSearch = (props: Props) => {
 
       {type === 'grid' && !!isShowExpand && (
         <div
-          className="text-12px cursor-pointer color-#1677ff hover:color-#69b1ff mt-8px"
+          className="text-12px cursor-pointer text-link hover:text-link-hover mt-8px"
           onClick={() => {
             setExpand(!isExpand);
           }}

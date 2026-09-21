@@ -35,7 +35,6 @@ interface Props {
 
 function MenuAuthorize(props: Props) {
   const { isBordered = true, treeData, defaultCheckedKeys, onChange, isLoading = false } = props;
-  const theme = usePublicStore((state) => state.theme);
   const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
   const list = treeData || [];
   // 勾选结果由外部表单值驱动, 本地勾选经 onChange 回流后生效
@@ -243,9 +242,7 @@ function MenuAuthorize(props: Props) {
 
   return (
     <Spin spinning={isLoading}>
-      <div
-        className={isBordered ? `b ${theme === 'dark' ? 'b-#454545' : 'b-#E4E4E7'} b-rd-8px` : ''}
-      >
+      <div className={isBordered ? 'b border-split b-rd-8px' : ''}>
         <div className="p-10px">
           <div className="flex items-center justify-between mb-10px">
             <Checkbox

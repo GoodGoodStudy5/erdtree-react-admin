@@ -6,6 +6,7 @@ import checkFile from 'eslint-plugin-check-file';
 import importX from 'eslint-plugin-import-x';
 import jsdoc from 'eslint-plugin-jsdoc';
 import tseslint from 'typescript-eslint';
+import { noRawColor } from './eslint/rules/noRawColor.js';
 
 /**
  * flat config 的规则选项是整体替换而非合并, 所以每个用到 no-restricted-syntax 的块
@@ -715,5 +716,17 @@ export default tseslint.config(
     rules: {
       'no-restricted-imports': ['error', TEST_ONLY_VIA_FACADE],
     },
+  },
+  {
+    // 三处豁免各有各的理由: antd 的 theme token 与 Tag 的 color prop 收的就是色值本身;
+    // echarts 的 option 画在 canvas 上, 吃不了 CSS 变量
+    files: ['**/*.{ts,tsx}'],
+    ignores: [
+      'src/router/AppRouter.tsx',
+      'src/utils/constants.ts',
+      'src/pages/dashboard/components/*.tsx',
+    ],
+    plugins: { style: { rules: { 'no-raw-color': noRawColor } } },
+    rules: { 'style/no-raw-color': 'error' },
   },
 );

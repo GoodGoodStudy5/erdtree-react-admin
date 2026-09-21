@@ -56,12 +56,15 @@ export function WangEditor(props: EditorProps) {
   };
 
   return (
-    <div className={className} style={{ ...(style || {}), border: '1px solid #ccc', zIndex: 100 }}>
+    <div
+      className={className}
+      style={{ ...(style || {}), border: '1px solid var(--ant-color-border)', zIndex: 100 }}
+    >
       <Toolbar
         editor={editor}
         defaultConfig={toolbarConfig}
         mode="default"
-        style={{ borderBottom: '1px solid #ccc' }}
+        style={{ borderBottom: '1px solid var(--ant-color-border)' }}
       />
 
       <Editor

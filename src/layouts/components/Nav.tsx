@@ -44,9 +44,7 @@ function Nav(props: Props) {
           <div className={`${className} flex items-center text-truncate ellipsis break-all`}>
             {nav?.map((item, index) => (
               <span key={index}>
-                {index !== 0 && (
-                  <span className="px-4px color-#000073 breadcrumb-separator">/</span>
-                )}
+                {index !== 0 && <span className="px-4px breadcrumb-separator">/</span>}
                 <span
                   className={`px-4px ${index !== nav.length - 1 ? 'breadcrumb-separator' : ''}`}
                 >

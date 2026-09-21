@@ -1,4 +1,4 @@
-import { emptyText } from '@south/utils';
+import { Dash } from '../Dash';
 
 /** 千分位加两位小数. 建一次复用, 每次渲染新建实例很贵 */
 const FORMATTER = new Intl.NumberFormat('zh-CN', {
@@ -26,11 +26,11 @@ export function Money(props: Props) {
   const { value } = props;
 
   if (value === null || value === undefined) {
-    return <span className="text-[#c9ced7]">{emptyText}</span>;
+    return <Dash />;
   }
 
   return (
-    <span className={value < 0 ? 'tabular-nums text-[#d6363b]' : 'tabular-nums'}>
+    <span className={value < 0 ? 'tabular-nums text-credit-note' : 'tabular-nums'}>
       {FORMATTER.format(value)}
     </span>
   );

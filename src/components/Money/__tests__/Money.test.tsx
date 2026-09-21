@@ -15,13 +15,13 @@ describe('Money', () => {
     const span = container.querySelector('span');
 
     expect(span?.textContent).toBe('-1,234.56');
-    expect(span?.className).toContain('text-[#d6363b]');
+    expect(span?.className).toContain('text-credit-note');
   });
 
   it('正数不标红', () => {
     const { container } = render(<Money value={1234.56} />);
 
-    expect(container.querySelector('span')?.className).not.toContain('text-[#d6363b]');
+    expect(container.querySelector('span')?.className).not.toContain('text-credit-note');
   });
 
   it('零按正数呈现, 不当空值', () => {
@@ -29,7 +29,7 @@ describe('Money', () => {
     const span = container.querySelector('span');
 
     expect(span?.textContent).toBe('0.00');
-    expect(span?.className).not.toContain('text-[#d6363b]');
+    expect(span?.className).not.toContain('text-credit-note');
   });
 
   it('空值给占位符, 不显示 0', () => {

@@ -92,11 +92,11 @@ export function BaseModal(props: BaseModalProps) {
     onCancel?.();
   };
 
-  /** 自定义关闭和放大图标 */
+  /** 自定义关闭和放大图标. 悬停色取值不取名: 包发给别的项目用, 那边没有本仓的色名, antd 的变量才共有 */
   const CloseRender = (
     <div className="flex items-center justify-end absolute right-15px">
       <Tooltip
-        className="hover:text-#404040"
+        className="hover:text-[var(--ant-color-text)]"
         placement="bottom"
         title={!isFullscreen ? text.maximize : text.exitMaximized}
       >

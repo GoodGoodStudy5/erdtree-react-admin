@@ -5,6 +5,7 @@ export * from './Card';
 export * from './Content';
 export * from './Copy';
 export * from './Count';
+export * from './Dash';
 export * from './Dates';
 export * from './Descriptions';
 export * from './Drawer';

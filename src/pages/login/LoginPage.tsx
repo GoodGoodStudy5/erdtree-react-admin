@@ -267,7 +267,7 @@ function LoginPage() {
                 : {}
             }
           >
-            <div className="text-#AAA6A6 text-14px mb-8px">{$t('login.username')}</div>
+            <div className="text-muted text-14px mb-8px">{$t('login.username')}</div>
 
             <Form.Item
               name="username"
@@ -286,7 +286,7 @@ function LoginPage() {
               />
             </Form.Item>
 
-            <div className="text-#AAA6A6 text-14px mb-8px">{$t('login.password')}</div>
+            <div className="text-muted text-14px mb-8px">{$t('login.password')}</div>
 
             <Form.Item
               name="password"

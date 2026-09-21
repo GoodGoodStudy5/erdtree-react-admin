@@ -18,12 +18,12 @@ function IconInput(props: InputProps) {
       />
 
       <div
-        className="w-30px h-30px ml-10px flex items-center justify-center b b-#d9d9d9 rd-6px"
+        className="w-30px h-30px ml-10px flex items-center justify-center b border-split rd-6px"
         style={
           !value
             ? {
                 backgroundImage:
-                  'repeating-linear-gradient(-45deg, #ececec, #ececec 2px, transparent 2px, transparent 5px)',
+                  'repeating-linear-gradient(-45deg, var(--ant-color-fill-tertiary), var(--ant-color-fill-tertiary) 2px, transparent 2px, transparent 5px)',
               }
             : {}
         }
