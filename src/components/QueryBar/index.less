@@ -137,32 +137,44 @@
   transform: translateY(-4px);
 }
 
+/* 焦点这一条挂在条件区自己身上: 挂在搜索栏上会把摘要行的按钮算进来, 点完刷新鼠标移出就收不起来 */
 .query-bar:hover .query-bar-panel,
-.query-bar:focus-within .query-bar-panel {
+.query-bar-panel:focus-within {
   pointer-events: auto;
   visibility: visible;
   opacity: 1;
-  transition-delay: 0s;
+
+  /*
+   * opacity 单独晚 0.1s 淡入: 鼠标从操作区快速划出时, 它在延迟里还没抬起, 划过的那几帧于是不闪.
+   * 正常移进条件区的路径本来就是 0.5s 淡入, 多这一档看不出来.
+   *
+   * 三个值按位对应上面那条 transition 的 opacity / transform / visibility. 写成
+   * `transition-delay: 0.1s` 会把 visibility 也推后, 浮层于是晚 0.1s 才可点, 而且不报错.
+   */
+  transition-delay: 0.1s, 0s, 0s;
   transform: none;
 }
 
 /**
  * 鼠标停在操作区: 条件区淡到几乎透明, 露出它盖住的那几行表格 —— 瞄一眼被挡的内容不必先把浮层收起.
  *
- * 淡得比展开快: 这是随手一瞥, 拖到 0.5s 就瞥不成了. 只压 duration 不重写 transition,
- * visibility 与 transform 在这一态本就不变.
+ * 淡得比展开快: 这是随手一瞥, 拖到半秒就瞥不成了. 展开态给 opacity 的那段淡入延迟也要在这里
+ * 归零, 否则一瞥要等延迟与淡出两段叠起来.
  *
- * 代价认下: 鼠标移回条件区时走展开态那条 0.5s, 恢复比淡下去慢; 淡着的浮层照旧挡点击,
+ * 只压这两项不重写整条 transition: visibility 与 transform 在这一态本就不变.
+ *
+ * 代价认下: 鼠标移回条件区时走展开态那条淡入, 恢复比淡下去慢; 淡着的浮层照旧挡点击,
  * 底下的表格只能看不能点.
  */
 .query-bar:has(.query-bar-actions:hover) .query-bar-panel {
   opacity: 0;
-  transition-duration: 0.12s;
+  transition-delay: 0s;
+  transition-duration: 0.6s;
 }
 
 /* 展开时上下连成一张卡片: 摘要行的下两角拉直, 阴影接上 */
 .query-bar:hover,
-.query-bar:focus-within {
+.query-bar:has(.query-bar-panel:focus-within) {
   border-radius: var(--query-bar-radius) var(--query-bar-radius) 0 0;
 }
 
@@ -198,7 +210,7 @@
 }
 
 .query-bar:hover::after,
-.query-bar:focus-within::after {
+.query-bar:has(.query-bar-panel:focus-within)::after {
   opacity: 1;
   transition-delay: 0s;
 }
