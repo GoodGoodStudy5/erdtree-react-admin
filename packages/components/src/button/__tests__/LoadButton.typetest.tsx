@@ -80,6 +80,7 @@ function ButtonProps透传() {
       </LoadButton>
       {/* @ts-expect-error 拼错的 props 要当场报, 不静默落到 DOM 上 */}
       <LoadButton dangerr>删除</LoadButton>
+      <LoadButton selectable>复制这份文案</LoadButton>
     </>
   );
 }

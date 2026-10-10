@@ -32,6 +32,11 @@ export interface LoadButtonProps extends Omit<ButtonProps, 'onClick'> {
   loadingChildren?: ReactNode;
   /** 点击前置校验. 返回 false 则短路后续事件, 且确认气泡不弹 */
   beforeClick?: (event: MouseEvent<HTMLElement>) => void | false;
+  /**
+   * 允许划选按钮文案. 默认跟 antd 按钮走, user-select: none.
+   * 文件名这类需要抄走的文字按钮打开.
+   */
+  selectable?: boolean;
 }
 
 /** popconfirmProps 给 false 表示不要气泡; 收窄掉之后才能安全读它的 title / content */
@@ -66,6 +71,7 @@ export function LoadButton(props: LoadButtonProps) {
     popconfirmProps = false,
     loadingChildren,
     children,
+    selectable,
     ...restProps
   } = props;
   const [isLoading, setLoading] = useState(false);
@@ -118,7 +124,13 @@ export function LoadButton(props: LoadButtonProps) {
     {
       type: 'link',
       // 没显式给 type 时这是一枚文字按钮, 去掉 antd link 按钮的内边距与行高, 好嵌在表格行里
-      className: restProps.type === undefined ? 'load-button load-button-link-text' : 'load-button',
+      className: [
+        'load-button',
+        restProps.type === undefined ? 'load-button-link-text' : '',
+        selectable ? 'load-button-selectable' : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
     } as ButtonProps,
     restProps,
   );

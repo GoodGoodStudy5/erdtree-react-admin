@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Form } from 'antd';
 import { describe, expect, it, vi } from 'vitest';
 import { QueryBar } from '../QueryBar';
+import { QueryChips } from '../QueryChips';
 
 /**
  * 四项里最后一项占两列. 全用 Input: 其余控件是懒加载的, 等它们落地与本组件的行为无关.
@@ -298,5 +299,15 @@ describe('QueryBar', () => {
 
     await waitFor(() => expect(screen.getByText(chipIs('发票号码: A'))).toBeTruthy());
     expect(onSearch).not.toHaveBeenCalled();
+  });
+});
+
+describe('QueryChips readOnly', () => {
+  it('只看 committed, 不可关, 也不出未填计数', () => {
+    render(<QueryChips readOnly list={LIST} committed={{ invoiceNo: '25600001' }} />);
+
+    expect(screen.getByText(chipIs('发票号码: 25600001'))).toBeTruthy();
+    expect(screen.queryByRole('img', { name: /close/i })).toBeNull();
+    expect(screen.queryByText('另 3 项未填')).toBeNull();
   });
 });

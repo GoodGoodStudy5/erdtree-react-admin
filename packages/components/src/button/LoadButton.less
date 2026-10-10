@@ -11,6 +11,11 @@
       border: none;
     }
   }
+
+  /* antd 按钮写死 user-select: none. 打开后压过它, 文案才能划选 */
+  &.load-button-selectable {
+    user-select: text;
+  }
 }
 
 /* 确认气泡的双行标题 */

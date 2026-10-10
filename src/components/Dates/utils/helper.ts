@@ -26,20 +26,15 @@ export function dayjs2String(value: Dayjs | string, format = DATE_FORMAT): strin
 }
 
 /**
- * 字符串类型转dayjs类型
- * @param value - 字符串
+ * 认得出的转 Dayjs; 其余 undefined. 不能丢给 dayjs(value), undefined 会变成现在.
  */
-export function string2Dayjs(value: Dayjs | string | number): Dayjs {
-  if (dayjs.isDayjs(value)) {
-    return value;
-  }
-
-  // 如果是时间戳
-  if (typeof value === 'number' && isFinite(value)) {
-    return dayjs.unix(value);
-  }
-
-  return dayjs(value);
+export function string2Dayjs(value: Dayjs | string | number | Date): Dayjs;
+export function string2Dayjs(value: unknown): Dayjs | undefined;
+export function string2Dayjs(value: unknown): Dayjs | undefined {
+  if (dayjs.isDayjs(value)) return value;
+  if (value instanceof Date) return dayjs(value);
+  if (typeof value === 'number' && isFinite(value)) return dayjs.unix(value);
+  if (typeof value === 'string') return dayjs(value);
 }
 
 /**

@@ -166,4 +166,12 @@ describe('LoadButton', () => {
     expect(className).toContain('load-button-link-text');
     expect(className).toContain('my-btn');
   });
+
+  it('默认禁选; selectable 打开后文案可选', () => {
+    const { rerender } = render(<LoadButton>应付对账明细_20261010</LoadButton>);
+    expect(screen.getByRole('button').className).not.toContain('load-button-selectable');
+
+    rerender(<LoadButton selectable>应付对账明细_20261010</LoadButton>);
+    expect(screen.getByRole('button').className).toContain('load-button-selectable');
+  });
 });
