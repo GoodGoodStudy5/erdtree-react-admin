@@ -1,16 +1,37 @@
 import type { TimeRangePickerProps } from 'antd';
+import type { DateFieldProps, RangeFieldValue } from './DatePickerCore';
 import { TimePicker } from 'antd';
-import { stringRang2DayjsRang } from '../utils/helper';
+import { DatePickerCore } from './DatePickerCore';
 
 const { RangePicker } = TimePicker;
 
-/** 时间区间选择器, 字符串区间自动转 dayjs 后回填 */
-export function BaseTimeRangePicker(props: TimeRangePickerProps) {
-  const { value } = props;
-  const params = { ...props };
+/** 时间区间的 props: antd 时间 RangePicker 的去掉值与格式, 换成 string 契约. 整天口径不适用 */
+export type BaseTimeRangePickerProps = Omit<
+  TimeRangePickerProps,
+  'value' | 'defaultValue' | 'onChange' | 'onOk' | 'format'
+> &
+  Omit<DateFieldProps<RangeFieldValue>, 'wholeDay'>;
 
-  // 如果值不是dayjs类型则进行转换
-  if (value) params.value = stringRang2DayjsRang(value);
+/** 时间区间选择器: 外面只认 string, 两端各自可空 */
+export function BaseTimeRangePicker(props: BaseTimeRangePickerProps) {
+  const { value, format, onChange, ...rest } = props;
 
-  return <RangePicker {...params} />;
+  return (
+    <DatePickerCore
+      kind="timeRange"
+      value={value}
+      format={format}
+      allowEmpty={rest.allowEmpty}
+      onChange={onChange}
+    >
+      {(binding) => (
+        <RangePicker
+          {...rest}
+          value={binding.range}
+          format={binding.formats}
+          onChange={binding.onChange}
+        />
+      )}
+    </DatePickerCore>
+  );
 }

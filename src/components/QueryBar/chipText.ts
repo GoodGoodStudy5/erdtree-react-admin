@@ -13,6 +13,9 @@ export interface ChipParts {
   isMulti: boolean;
 }
 
+/** 两端都由日期组件出 string 的控件 */
+const DATE_RANGE_COMPONENTS: BaseSearchList['component'][] = ['RangePicker', 'TimeRangePicker'];
+
 /**
  * 单值的那档: 没有计数可言.
  * @param text - 已成文的值
@@ -74,9 +77,15 @@ export function chipPartsOf(item: BaseSearchList, value: unknown): ChipParts | n
 
     // 区间控件两端各一个值, 缺的那端留成空位, 所以按原长度判而不是按去空后的长度
     if (value.length === 2) {
-      if (filled.every((one) => dayjs.isDayjs(one))) {
+      // 两个 string 的多选与日期区间长得一样, 所以 string 区间按控件认; dayjs 二元组本身就认得出
+      const isDateRange =
+        DATE_RANGE_COMPONENTS.includes(item.component) || filled.every((one) => dayjs.isDayjs(one));
+      if (isDateRange) {
         const [start, end] = value as [unknown, unknown];
-        const text = (one: unknown) => (dayjs.isDayjs(one) ? one.format(formatOf(item)) : '不限');
+        const text = (one: unknown) => {
+          if (dayjs.isDayjs(one)) return one.format(formatOf(item));
+          return isBlank(one) ? '不限' : String(one);
+        };
 
         return single(`${text(start)} ~ ${text(end)}`);
       }

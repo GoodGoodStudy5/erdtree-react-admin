@@ -1,15 +1,36 @@
 import type { Dayjs } from 'dayjs';
 import type { DatePickerProps } from 'antd';
+import type { DateFieldProps } from './DatePickerCore';
 import { DatePicker } from 'antd';
-import { string2Dayjs } from '../utils/helper';
+import { DatePickerCore } from './DatePickerCore';
 
-/** 日期选择器, 字符串日期自动转 dayjs 后回填 */
-export function BaseDatePicker(props: DatePickerProps) {
-  const { value } = props;
-  const params = { ...props };
+/** 单日的 props: antd DatePicker 的去掉值、格式、多选与时间面板, 换成 string 契约 */
+export type BaseDatePickerProps = Omit<
+  DatePickerProps<Dayjs, false>,
+  'value' | 'defaultValue' | 'onChange' | 'onOk' | 'format' | 'multiple' | 'picker' | 'showTime'
+> &
+  DateFieldProps<string | Dayjs>;
 
-  // 如果值不是dayjs类型则进行转换
-  if (value) params.value = string2Dayjs(value as Dayjs);
+/** 日期选择器: 外面只认 string */
+export function BaseDatePicker(props: BaseDatePickerProps) {
+  const { value, format, wholeDay, onChange, ...rest } = props;
 
-  return <DatePicker {...params} />;
+  return (
+    <DatePickerCore
+      kind="date"
+      value={value}
+      format={format}
+      wholeDay={wholeDay}
+      onChange={onChange}
+    >
+      {(binding) => (
+        <DatePicker
+          {...rest}
+          value={binding.single}
+          format={binding.formats}
+          onChange={binding.onChange}
+        />
+      )}
+    </DatePickerCore>
+  );
 }

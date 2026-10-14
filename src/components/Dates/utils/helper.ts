@@ -1,8 +1,7 @@
 import type { Dayjs } from 'dayjs';
 import type { DatePickerProps } from 'antd';
 import type { BaseFormData, BaseFormList } from '#/form';
-import type { RangeValueType } from 'rc-picker/lib/PickerInput/RangePicker';
-import { DATE_FORMAT } from '@/utils';
+import { DATE_FORMAT, TIME_PICKER_FORMAT } from '@/utils';
 import dayjs from 'dayjs';
 
 /**
@@ -15,10 +14,9 @@ type EventValue<T> = T | null;
 export type RangeValue<T> = [EventValue<T>, EventValue<T>] | null;
 
 /**
- * dayjs类型转字符串类型
- * @param value - dayjs时间类型值
+ * Dayjs 转字符串; 其余原样返回. 空值不会变成现在.
  */
-export function dayjs2String(value: Dayjs | string, format = DATE_FORMAT): string {
+export function dayjs2String<T>(value: T, format = DATE_FORMAT) {
   if (dayjs.isDayjs(value)) {
     return value.format(format);
   }
@@ -37,63 +35,41 @@ export function string2Dayjs(value: unknown): Dayjs | undefined {
   if (typeof value === 'string') return dayjs(value);
 }
 
-/**
- * dayjs数组类型转字符串类型
- * @param value - dayjs时间类型值
- */
-export function dayjsRang2StringRang(value: RangeValue<Dayjs>, format = DATE_FORMAT) {
-  if (!value) return undefined;
+/** 空端保持空, 不丢给 dayjs: null / undefined 会变成现在. */
+function end2Dayjs(value: unknown): Dayjs | null {
+  if (value === null || value === undefined || value === '') return null;
+  return string2Dayjs(value) ?? null;
+}
 
-  if (value?.length > 1 && dayjs.isDayjs(value?.[0]) && dayjs.isDayjs(value?.[1])) {
-    return [value[0].format(format), value[1].format(format)];
-  }
-  return value;
+function end2String(value: unknown, format: string): string | undefined {
+  if (value === null || value === undefined || value === '') return undefined;
+  if (typeof value === 'string') return value;
+  const date = string2Dayjs(value);
+  return date ? date.format(format) : undefined;
 }
 
 /**
- * 字符串类型转dayjs类型
- * @param value - 字符串
+ * 区间转字符串. 两端各自可空, 空端是 undefined 不是现在.
+ */
+export function dayjsRang2StringRang(
+  value?: [unknown, unknown] | null,
+  format = DATE_FORMAT,
+): [string | undefined, string | undefined] | undefined {
+  if (!value) return undefined;
+  const from = end2String(value[0], format);
+  const to = end2String(value[1], format);
+  if (from === undefined && to === undefined) return undefined;
+  return [from, to];
+}
+
+/**
+ * 区间转 Dayjs. 两端各自可空, 空端是 null 不是现在.
  */
 export function stringRang2DayjsRang(
-  value: RangeValueType<string | number> | RangeValueType<Dayjs>,
+  value?: [unknown, unknown] | null,
 ): RangeValue<Dayjs> | undefined {
   if (!value) return undefined;
-
-  // 当第一个数据都不为Dayjs
-  if (value?.length > 1 && !dayjs.isDayjs(value?.[0]) && dayjs.isDayjs(value?.[1])) {
-    // 判断是否是时间戳
-    if (typeof value[0] === 'number' && isFinite(value[0])) {
-      return [dayjs.unix(value[0]), value[1]];
-    }
-
-    return [dayjs(value[0]), value[1]];
-  }
-
-  // 当最后一个数据都不为Dayjs
-  if (value?.length > 1 && dayjs.isDayjs(value?.[0]) && !dayjs.isDayjs(value?.[1])) {
-    // 判断是否是时间戳
-    if (typeof value[1] === 'number' && isFinite(value[1])) {
-      return [value[0], dayjs.unix(value[1])];
-    }
-
-    return [value[0], dayjs(value[1])];
-  }
-
-  // 当两个数据都不为Dayjs
-  if (value?.length > 1 && !dayjs.isDayjs(value?.[0]) && !dayjs.isDayjs(value?.[1])) {
-    // 判断是否是时间戳
-    if (
-      typeof value[0] === 'number' &&
-      isFinite(value[0]) &&
-      typeof value[1] === 'number' &&
-      isFinite(value[1])
-    ) {
-      return [dayjs.unix(value[0]), dayjs.unix(value[1])];
-    }
-
-    return [dayjs(value[0]), dayjs(value[1])];
-  }
-  return value as RangeValue<Dayjs>;
+  return [end2Dayjs(value[0]), end2Dayjs(value[1])];
 }
 
 /**

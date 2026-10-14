@@ -1,16 +1,38 @@
-import { DatePicker } from 'antd';
 import type { RangePickerProps } from 'antd/es/date-picker';
-import { stringRang2DayjsRang } from '../utils/helper';
+import type { DateFieldProps, RangeFieldValue } from './DatePickerCore';
+import { DatePicker } from 'antd';
+import { DatePickerCore } from './DatePickerCore';
 
 const { RangePicker } = DatePicker;
 
-/** 日期区间选择器, 字符串区间自动转 dayjs 后回填 */
-export function BaseRangePicker(props: RangePickerProps) {
-  const { value } = props;
-  const params = { ...props };
+/** 日期区间的 props: antd RangePicker 的去掉值、格式与时间面板, 换成 string 契约 */
+export type BaseRangePickerProps = Omit<
+  RangePickerProps,
+  'value' | 'defaultValue' | 'onChange' | 'onOk' | 'format' | 'picker' | 'showTime'
+> &
+  DateFieldProps<RangeFieldValue>;
 
-  // 如果值不是dayjs类型则进行转换
-  if (value) params.value = stringRang2DayjsRang(value);
+/** 日期区间选择器: 外面只认 string, 两端各自可空 */
+export function BaseRangePicker(props: BaseRangePickerProps) {
+  const { value, format, wholeDay, onChange, ...rest } = props;
 
-  return <RangePicker {...params} />;
+  return (
+    <DatePickerCore
+      kind="dateRange"
+      value={value}
+      format={format}
+      wholeDay={wholeDay}
+      allowEmpty={rest.allowEmpty}
+      onChange={onChange}
+    >
+      {(binding) => (
+        <RangePicker
+          {...rest}
+          value={binding.range}
+          format={binding.formats}
+          onChange={binding.onChange}
+        />
+      )}
+    </DatePickerCore>
+  );
 }

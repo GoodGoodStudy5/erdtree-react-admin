@@ -59,6 +59,25 @@ describe('chipPartsOf', () => {
     expect(textOf(chipPartsOf(range, value))).toBe('2026-08-01 ~ 2026-08-31');
   });
 
+  it('日期控件出门的是 string: 区间照样读成两端, 缺的那端读不限', () => {
+    const range = item({ component: 'RangePicker' });
+
+    expect(textOf(chipPartsOf(range, ['2026-08-01', '2026-08-31']))).toBe(
+      '2026-08-01 ~ 2026-08-31',
+    );
+    expect(textOf(chipPartsOf(range, [null, '2026-08-31']))).toBe('不限 ~ 2026-08-31');
+    expect(chipPartsOf(range, ['2026-08-01', '2026-08-31'])?.isMulti).toBe(false);
+    expect(
+      textOf(chipPartsOf(item({ component: 'TimeRangePicker' }), ['08:00:00', '18:00:00'])),
+    ).toBe('08:00:00 ~ 18:00:00');
+  });
+
+  it('两个 string 的多选不误认成区间: 按控件判, 不按值的形状猜', () => {
+    const nos = item({ component: 'Select', componentProps: { mode: 'tags' } });
+
+    expect(textOf(chipPartsOf(nos, ['A', 'B']))).toBe('A, B 2 项');
+  });
+
   it('数值区间缺一端时写成不等式, 不把缺的那端说成 0', () => {
     const money = item({ component: 'customize' });
 
@@ -101,5 +120,6 @@ describe('chipPartsOf', () => {
     expect(textOf(chipPartsOf(item({ component: 'DatePicker' }), dayjs('2026-08-25')))).toBe(
       '2026-08-25',
     );
+    expect(textOf(chipPartsOf(item({ component: 'DatePicker' }), '2026-08-25'))).toBe('2026-08-25');
   });
 });
