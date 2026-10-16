@@ -1,5 +1,6 @@
 import checkFile from 'eslint-plugin-check-file';
 import jsdoc from 'eslint-plugin-jsdoc';
+import { asyncFormValidator } from './rules/asyncFormValidator.js';
 import { noRawColor } from './rules/noRawColor.js';
 
 /** 外壳的 modalProps 只能展开到 antd Modal 系载体 */
@@ -390,5 +391,11 @@ export const conventions = [
     ],
     plugins: { style: { rules: { 'no-raw-color': noRawColor } } },
     rules: { 'style/no-raw-color': 'error' },
+  },
+  {
+    // 独立规则: no-restricted-syntax 选项整体替换, 豁免一个文件要把其余规则一并摘掉再加回来
+    files: ['**/*.{ts,tsx}'],
+    plugins: { form: { rules: { 'async-validator': asyncFormValidator } } },
+    rules: { 'form/async-validator': 'error' },
   },
 ];
