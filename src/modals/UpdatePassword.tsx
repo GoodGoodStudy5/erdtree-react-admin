@@ -35,7 +35,7 @@ export function UpdatePassword(props: ModalControl<boolean>) {
     return true;
   };
 
-  const { form, handleFinish, modalProps } = useModalForm<FormValues, boolean>(props, {
+  const { form, modalProps } = useModalForm<FormValues, boolean>(props, {
     onSubmit,
   });
 
@@ -43,7 +43,6 @@ export function UpdatePassword(props: ModalControl<boolean>) {
     <BaseModal {...modalProps} title={$t('public.changePassword')}>
       <Form
         form={form}
-        onFinish={handleFinish}
         labelWrap
         labelCol={{ span: 5 }}
         wrapperCol={{ span: 19 }}

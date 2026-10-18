@@ -19,7 +19,7 @@ type ExportButtonPropsOmit = Omit<
 export interface ExportButtonProps {
   /**
    * form / asyncForm 交窗里的值; noForm 交 `{ fileName: defaultFileName }`, 没传默认名则是 `{}`.
-   * 同步下载在里面调 submitHiddenForm.
+   * 同步导出在里面调业务函数取回文件.
    */
   request: (values: ExportFormValues) => void | Promise<void>;
   /** 默认 form, 不用填 */
@@ -65,7 +65,7 @@ function ExportFormModal(
   },
 ) {
   const { title, defaultFileName, formChildren, request, notify, ...control } = props;
-  const { form, handleFinish, modalProps } = useModalForm<ExportFormValues, void>(control, {
+  const { form, modalProps } = useModalForm<ExportFormValues, void>(control, {
     async onSubmit(values) {
       await request(values);
       if (notify) message.success('正在异步导出中');
@@ -79,7 +79,7 @@ function ExportFormModal(
 
   return (
     <BaseModal {...modalProps} title={title}>
-      <Form form={form} labelCol={{ flex: '0 0 100px' }} onFinish={handleFinish}>
+      <Form form={form} labelCol={{ flex: '0 0 100px' }}>
         {formChildren ? formChildren({ nodeFileName }) : nodeFileName}
       </Form>
     </BaseModal>
@@ -87,7 +87,7 @@ function ExportFormModal(
 }
 
 /**
- * 确认后一律调 request. 同步下载由调用方在 request 里走 submitHiddenForm;
+ * 确认后一律调 request. 同步导出由调用方在 request 里取回文件;
  * 壳不认识 CSRF, 也不认识业务字段.
  */
 export function ExportButton(props: ExportButtonProps) {

@@ -256,14 +256,12 @@ type UserForm = { username: string; age: number };
 declare function submitUser(values: UserForm): Promise<User>;
 
 function ModalUserForm(props: { id?: string } & ModalControl<User>) {
-  const { form, handleFinish, modalProps } = useModalForm<UserForm, User>(props, {
+  const { form, modalProps } = useModalForm<UserForm, User>(props, {
     onSubmit: (values) => submitUser(values),
   });
   return (
     <BaseModal {...modalProps} title="编辑用户">
-      <Form form={form} onFinish={handleFinish}>
-        表单项
-      </Form>
+      <Form form={form}>表单项</Form>
     </BaseModal>
   );
 }

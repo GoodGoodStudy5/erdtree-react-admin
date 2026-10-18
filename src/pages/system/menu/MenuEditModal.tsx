@@ -28,7 +28,7 @@ export function MenuEditModal(props: Props) {
   const [isLoading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
 
-  const { form, handleFinish, modalProps } = useModalForm<object, boolean>(props, {
+  const { form, modalProps } = useModalForm<object, boolean>(props, {
     onSubmit: async (raw) => {
       // BaseForm 的 form 是 FormInstance<object>, 泛型不变性下只能按 object 取, 值在此收窄
       const values = raw as BaseFormData;
@@ -76,7 +76,6 @@ export function MenuEditModal(props: Props) {
           data={data}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 19 }}
-          handleFinish={handleFinish}
         />
       )}
     </BaseModal>

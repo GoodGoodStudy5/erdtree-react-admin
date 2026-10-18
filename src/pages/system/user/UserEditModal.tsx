@@ -24,7 +24,7 @@ export function UserEditModal(props: Props) {
   const [isLoading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
 
-  const { form, handleFinish, modalProps } = useModalForm<object, boolean>(props, {
+  const { form, modalProps } = useModalForm<object, boolean>(props, {
     onSubmit: async (raw) => {
       // BaseForm 的 form 是 FormInstance<object>, 泛型不变性下只能按 object 取, 值在此收窄
       const values = raw as BaseFormData;
@@ -61,13 +61,7 @@ export function UserEditModal(props: Props) {
       {contextHolder}
       {loadError && <Result status="error" title={loadError} />}
       {!loadError && (
-        <BaseForm
-          form={form}
-          list={createList(!id)}
-          data={data}
-          labelCol={{ span: 4 }}
-          handleFinish={handleFinish}
-        />
+        <BaseForm form={form} list={createList(!id)} data={data} labelCol={{ span: 4 }} />
       )}
     </BaseModal>
   );

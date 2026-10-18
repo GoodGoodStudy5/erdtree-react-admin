@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // 用例站在包外看这个工具库, 所以从门面取件, 不走深层路径
-import { downloadFile } from '@south/utils';
+import { downloadBlob, downloadFile } from '@south/utils';
 
 describe('downloadFile', () => {
   it('建 a 标签交给浏览器: href、download 与新标签页三件齐, 点完自我清理', () => {
@@ -30,6 +30,55 @@ describe('downloadFile', () => {
     downloadFile('https://oss.invalid/a/b.pdf');
 
     expect(click).toHaveBeenCalledOnce();
+    click.mockRestore();
+  });
+});
+
+describe('downloadBlob', () => {
+  const createObjectURL = vi.fn(() => 'blob:download');
+  const revokeObjectURL = vi.fn();
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    URL.createObjectURL = createObjectURL;
+    URL.revokeObjectURL = revokeObjectURL;
+  });
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+    createObjectURL.mockClear();
+    revokeObjectURL.mockClear();
+  });
+
+  it('让出当前栈再点 a[download], 不新开标签, 稍后才摘节点并释放地址', async () => {
+    const blob = new Blob(['x'], { type: 'application/octet-stream' });
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+      this: HTMLAnchorElement,
+    ) {
+      expect(this.getAttribute('href')).toBe('blob:download');
+      expect(this.download).toBe('对账.xlsx');
+      expect(this.hasAttribute('target')).toBe(false);
+      expect(this.isConnected).toBe(true);
+    });
+
+    const done = downloadBlob(blob, '对账.xlsx');
+
+    expect(createObjectURL).toHaveBeenCalledWith(blob);
+    expect(click).not.toHaveBeenCalled();
+    expect(revokeObjectURL).not.toHaveBeenCalled();
+
+    vi.advanceTimersToNextTimer();
+    await done;
+
+    expect(click).toHaveBeenCalledOnce();
+    expect(document.querySelector('a')).not.toBeNull();
+    expect(revokeObjectURL).not.toHaveBeenCalled();
+
+    vi.advanceTimersToNextTimer();
+
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:download');
+    expect(document.querySelector('a')).toBeNull();
     click.mockRestore();
   });
 });

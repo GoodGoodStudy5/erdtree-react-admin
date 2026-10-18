@@ -22,7 +22,7 @@ interface Props extends FormProps {
   children?: ReactNode;
   labelCol?: Partial<ColProps>;
   wrapperCol?: Partial<ColProps>;
-  handleFinish: FormProps['onFinish'];
+  handleFinish?: FormProps['onFinish'];
 }
 
 /** 声明式表单, 按 list 描述渲染各表单项 */

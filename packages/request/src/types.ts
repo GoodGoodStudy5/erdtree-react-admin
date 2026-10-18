@@ -4,10 +4,8 @@ import type { AxiosResponse, InternalAxiosRequestConfig, CreateAxiosDefaults, Ca
 export interface RequestCancel extends Cancel {
   response: {
     status: number;
-    data: {
-      code?: number;
-      message?: string;
-    };
+    /** 普通接口是信封对象; responseType blob 时是 Blob */
+    data?: unknown;
   };
 }
 
@@ -16,8 +14,8 @@ export interface RequestInterceptors<T> {
   // 请求拦截
   requestInterceptors?: (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig;
   requestInterceptorsCatch?: (err: RequestCancel) => unknown;
-  // 响应拦截
-  responseInterceptors?: (config: T) => T;
+  // 响应拦截. 读 JSON blob 要 await, 因此允许 Promise
+  responseInterceptors?: (config: T) => T | Promise<T>;
   responseInterceptorsCatch?: (err: RequestCancel) => unknown;
 }
 
@@ -40,4 +38,14 @@ export interface ServerResult<T = unknown> {
   code: number;
   message?: string;
   data: T;
+}
+
+/** `request.blob` 取回的字节. 另存名与追踪号来自响应头, 没有就不给 */
+export interface BlobDownload {
+  /** 响应体 */
+  blob: Blob;
+  /** Content-Disposition 的 filename*, 没有则空 */
+  fileName?: string;
+  /** X-Trace-Id, 没有则空 */
+  traceId?: string;
 }

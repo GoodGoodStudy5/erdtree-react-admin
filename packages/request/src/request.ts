@@ -5,7 +5,7 @@ import type {
   InternalAxiosRequestConfig,
   AxiosRequestConfig,
 } from 'axios';
-import type { RequestInterceptors, CreateRequestConfig } from './types';
+import type { BlobDownload, RequestInterceptors, CreateRequestConfig } from './types';
 
 interface NewAxiosRequestConfig extends AxiosRequestConfig {
   _abortController?: AbortController;
@@ -60,8 +60,8 @@ class AxiosRequest {
     );
     // 全局响应拦截器保证最后执行
     this.instance.interceptors.response.use(
-      // 业务信封已由实例拦截器剥掉, 这里的 res.data 就是调用方要的数据
-      (res: AxiosResponse) => res.data,
+      // blob 要带头, 不能剥成 data; 其余信封已由实例拦截器剥掉
+      (res: AxiosResponse) => (res.config.responseType === 'blob' ? res : res.data),
       (err: object) => Promise.reject(err),
     );
   }
@@ -134,6 +134,22 @@ class AxiosRequest {
    */
   delete<T = object>(url: string, options = {}) {
     return this.instance.delete(url, options) as Promise<T>;
+  }
+
+  /**
+   * 取回字节, 不剥信封. 另存名与追踪号从响应头取, 没有就不给.
+   */
+  async blob(url: string, config: AxiosRequestConfig = {}): Promise<BlobDownload> {
+    const res = (await this.instance.request({
+      ...config,
+      url,
+      responseType: 'blob',
+    })) as AxiosResponse<Blob>;
+    return {
+      blob: res.data,
+      fileName: savedNameOf(res.headers),
+      traceId: headerOf(res.headers, 'x-trace-id'),
+    };
   }
 
   /**
@@ -302,6 +318,28 @@ class AxiosRequest {
       abortController.abort();
     };
   }
+}
+
+/** Content-Disposition 的 filename*, 没有这一格就不给 */
+function savedNameOf(headers: AxiosResponse['headers']): string | undefined {
+  const raw = headerOf(headers, 'content-disposition');
+  if (!raw) return undefined;
+  const star = /filename\*=UTF-8''([^;]+)/i.exec(raw);
+  if (!star) return undefined;
+  try {
+    return decodeURIComponent(star[1]);
+  } catch {
+    return star[1];
+  }
+}
+
+function headerOf(headers: AxiosResponse['headers'] | undefined, name: string): string | undefined {
+  if (!headers) return undefined;
+  const value =
+    typeof headers.get === 'function'
+      ? headers.get(name)
+      : (headers as Record<string, unknown>)[name];
+  return typeof value === 'string' && value ? value : undefined;
 }
 
 /** axios 实例的封装类. 拦截器、取消与统一错误处理都在它身上 */

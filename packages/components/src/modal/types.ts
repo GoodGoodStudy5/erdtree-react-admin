@@ -93,12 +93,10 @@ export type UseModalFormOptions<V, R> = {
   onError?: (error: unknown) => void;
 };
 
-/** useModalForm 的产出. 在外壳产出之上多给 form 实例与提交回调 */
+/** useModalForm 的产出. 在外壳产出之上多给 form 实例 */
 export type UseModalFormResult<V> = UseModalShellResult & {
   /** 与表单共用的实例 */
   form: FormInstance<V>;
-  /** 接到裸 antd Form 的 onFinish, 或自带 Form 的表单组件的提交回调上 */
-  handleFinish: (values: V) => void;
 };
 
 /** 命令式入口的签名. 自由函数, 不依赖 React 上下文, 实现必须 satisfies 它 */

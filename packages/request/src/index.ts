@@ -36,10 +36,13 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
         return Promise.reject(new RequestError(0, err?.message || '请求超时'));
       },
       // 接口响应拦截
-      responseInterceptors(res) {
-        const { data } = res;
+      async responseInterceptors(res) {
+        const data = res.data as (ServerResult & { detail?: string }) | Blob;
+        const json = await jsonResultOf(data);
+        const envelope = json ?? (!(data instanceof Blob) ? data : undefined);
+
         // 权限过期
-        if (data?.code === 401) {
+        if (envelope?.code === 401) {
           const currentToken = getLocalInfo(tokenKey) || '';
           const requestToken = String(res.config.headers.get('Authorization') || '').replace(
             'Bearer ',
@@ -54,7 +57,7 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
           const zhMsg = '权限过期，请重新登录！';
           const msg = lang === 'en' ? enMsg : zhMsg;
           removeLocalInfo(tokenKey);
-          console.error('错误信息:', data?.message || msg);
+          console.error('错误信息:', envelope?.message || msg);
 
           localStorage.setItem(LOGIN_EXPIRED_MSG, msg);
 
@@ -69,8 +72,12 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
           throw new RequestError(401, msg);
         }
 
-        // blob 响应（文件下载）跳过业务 code 校验，交由调用方处理（如 ExportModal 解析错误 blob）
+        // blob: JSON 信封走与普通接口同一套失败分支; 其余交给调用方按 Content-Type 落盘
         if (data instanceof Blob || res.config?.responseType === 'blob') {
+          if (json && json.code !== 200) {
+            handleError(json.message);
+            throw new RequestError(json.code ?? 0, json.message ?? '请求失败');
+          }
           return res;
         }
 
@@ -85,17 +92,48 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
         res.data = (data as ServerResult).data;
         return res;
       },
-      responseInterceptorsCatch(err) {
+      async responseInterceptorsCatch(err) {
         // 清场时会 abort 在飞请求: 取消不是失败, 不提示
         if (axios.isCancel(err)) return Promise.reject(err);
+        // 成功拦截器已判过的业务拒绝, 不再盖成「服务器错误」
+        if (err instanceof RequestError) return Promise.reject(err);
 
-        const response = (err as RequestCancel)?.response;
-        const msg = response?.data?.message || '服务器错误！';
+        const { status, data } = (err as RequestCancel)?.response ?? {};
+        const json = await jsonResultOf(data);
+        const text = json?.message || messageOf(data);
+
+        if (axios.isAxiosError(err) && err.code === 'ECONNABORTED') {
+          handleError('请求超时！');
+          return Promise.reject(new RequestError(status ?? 0, '请求超时！'));
+        }
+
+        const msg = text || '服务器错误！';
         handleError(msg);
-        return Promise.reject(new RequestError(response?.status ?? 0, msg));
+        return Promise.reject(new RequestError(status ?? 0, msg));
       },
     },
   });
+}
+
+/** Blob.type 是 JSON 时读成 ServerResult; 读不出就当不是信封 */
+async function jsonResultOf(data: unknown): Promise<ServerResult | undefined> {
+  if (!(data instanceof Blob) || !data.type.startsWith('application/json')) return undefined;
+  try {
+    const parsed: unknown = JSON.parse(await data.text());
+    return isEnvelope(parsed) ? parsed : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function isEnvelope(value: unknown): value is ServerResult {
+  return Boolean(value && typeof value === 'object' && 'code' in value);
+}
+
+function messageOf(value: unknown): string | undefined {
+  if (!value || typeof value !== 'object' || !('message' in value)) return undefined;
+  const text = (value as { message?: unknown }).message;
+  return typeof text === 'string' && text ? text : undefined;
 }
 
 /**
@@ -103,7 +141,7 @@ function creteRequest(url: string, tokenKey: string, options?: CreateRequestOpti
  * @param error - 错误信息
  * @param content - 自定义内容
  */
-const handleError = (error: string, content?: string) => {
+const handleError = (error?: string, content?: string) => {
   console.error('错误信息:', error);
   message.error({
     content: content || error || '服务器错误',
@@ -114,4 +152,9 @@ const handleError = (error: string, content?: string) => {
 export { creteRequest, LOGIN_EXPIRED_MSG };
 export { RequestError } from './requestError';
 // 后端信封与拦截器内部的错误形状不外泄, 调用方拿到的是剥好的业务数据
-export type { CreateRequestConfig, CreateRequestOptions, RequestInterceptors } from './types';
+export type {
+  BlobDownload,
+  CreateRequestConfig,
+  CreateRequestOptions,
+  RequestInterceptors,
+} from './types';
