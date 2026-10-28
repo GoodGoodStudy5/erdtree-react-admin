@@ -1,7 +1,6 @@
-import type { SideMenu } from '#/public';
 import type { InputProps, InputRef } from 'antd';
 import type { Ref } from 'react';
-import { useEffect, useRef, useState, useImperativeHandle } from 'react';
+import { useEffect, useMemo, useRef, useState, useImperativeHandle } from 'react';
 import { debounce } from 'lodash';
 import { Modal, Input } from 'antd';
 import { Icon } from '../../Icon';
@@ -25,12 +24,24 @@ interface Props {
 export function SearchModal(props: Props) {
   const navigate = useNavigateProgress();
   const inputRef = useRef<InputRef>(null);
+  const currentValue = useRef('');
   const { modalRef } = props;
   const { permissions, menuList } = useCommonStore();
   const [value, setValue] = useState(''); // 输入框值
-  const [active, setActive] = useState(''); // 选中值
-  const [list, setList] = useState<SideMenu[]>([]);
+  const [activeKey, setActive] = useState(''); // 选中值
+  const [searchValue, setSearchValue] = useState('');
   const [isOpen, setOpen] = useState(false);
+  const showHiddenMenus = useMenuStore((state) => state.showHiddenMenus);
+  const jumpAuth = useMenuStore((state) => state.jumpAuth);
+  const debounceSearch = useMemo(() => debounce(setSearchValue, 200), []);
+  const list = useMemo(
+    () =>
+      isOpen
+        ? searchMenuValue({ menus: menuList, permissions, value: searchValue, showHiddenMenus })
+        : [],
+    [isOpen, menuList, permissions, searchValue, showHiddenMenus, jumpAuth],
+  );
+  const active = list.some((item) => item.key === activeKey) ? activeKey : (list[0]?.key ?? '');
   const { setOpenKeys } = useMenuStore.getState();
   const { addTabs, setActiveKey } = useTabsStore.getState();
 
@@ -55,11 +66,19 @@ export function SearchModal(props: Props) {
 
     // 退出时清空数据
     return () => {
+      debounceSearch.cancel();
+      currentValue.current = '';
       setValue('');
       setActive('');
-      setList([]);
+      setSearchValue('');
     };
-  }, [isOpen]);
+  }, [isOpen, debounceSearch]);
+
+  useEffect(() => {
+    debounceSearch.cancel();
+    setSearchValue(currentValue.current);
+    return () => debounceSearch.cancel();
+  }, [menuList, permissions, showHiddenMenus, jumpAuth, debounceSearch]);
 
   /**
    * 更改选中值
@@ -92,27 +111,13 @@ export function SearchModal(props: Props) {
   };
 
   /**
-   * 防抖处理搜索结果
-   * @param value - 搜索值
-   */
-  const debounceSearch = debounce((value: string) => {
-    const searchProps = { menus: menuList, permissions, value };
-    const searchValue = searchMenuValue(searchProps);
-    if (searchValue?.length) {
-      setActive((searchValue as SideMenu[])?.[0]?.key || '');
-      setList(searchValue as SideMenu[]);
-    } else {
-      setActive('');
-      setList([]);
-    }
-  }, 200);
-
-  /**
    * 防抖处理值变化值变化
    * @param event - 输入框参数
    */
   const onChange: InputProps['onChange'] = (event) => {
     const { value } = event.target;
+    currentValue.current = value;
+    setActive('');
     setValue(value);
     debounceSearch(value);
   };

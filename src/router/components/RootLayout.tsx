@@ -1,7 +1,19 @@
-import { Outlet } from 'react-router-dom';
+import { useLayoutEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { ModalOutlet } from '@south/components';
+import { useMenuStore } from '@/stores';
+import { applyJumpAuthSearch } from '@/utils';
 
 function RootLayout() {
+  const { search } = useLocation();
+  const applyMenuSearch = useMenuStore((state) => state.applyMenuSearch);
+  const setJumpAuth = useMenuStore((state) => state.setJumpAuth);
+
+  // 首页的 effect 会跳第一个菜单, 参数必须先于该跳转落入会话
+  useLayoutEffect(() => {
+    setJumpAuth(applyJumpAuthSearch(search));
+    applyMenuSearch(search);
+  }, [search, applyMenuSearch, setJumpAuth]);
   return (
     <>
       <Outlet />

@@ -33,3 +33,4 @@ import 'nprogress/nprogress.css';
 import './scrollbar.less';
 import './theme-color.less';
 import './antd.less';
+import './jump-auth.less';

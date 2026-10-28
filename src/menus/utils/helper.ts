@@ -1,6 +1,6 @@
 import type { SideMenu } from '#/public';
 import type { Langs } from '@/components';
-import { LANG } from '@/utils';
+import { LANG, checkPermission } from '@/utils';
 
 /**
  * 根据路由获取展开菜单数组
@@ -83,6 +83,7 @@ interface SearchMenuProps {
   menus: SideMenu[] | undefined;
   permissions: string[];
   value: string;
+  showHiddenMenus?: boolean;
   currentPath?: MenuPath[];
   result?: SideMenu[];
 }
@@ -92,7 +93,7 @@ interface SearchMenuProps {
  * @param data - 菜单、权限和搜索值等数据
  */
 export function searchMenuValue(data: SearchMenuProps): SideMenu[] {
-  const { menus, permissions, value } = data;
+  const { menus, permissions, value, showHiddenMenus = false } = data;
   let { currentPath, result } = data;
   if (!menus?.length || !value) return [];
   if (!currentPath) currentPath = [];
@@ -100,6 +101,7 @@ export function searchMenuValue(data: SearchMenuProps): SideMenu[] {
   const lang = localStorage.getItem(LANG);
 
   for (let i = 0; i < menus.length; i++) {
+    if (menus[i].hidden && !showHiddenMenus) continue;
     const { key, label, labelZh, labelEn, children } = menus[i];
     // 如果存在子数组则递归
     if (hasChildren(menus[i])) {
@@ -115,6 +117,7 @@ export function searchMenuValue(data: SearchMenuProps): SideMenu[] {
         menus: children,
         permissions,
         value,
+        showHiddenMenus,
         currentPath,
         result,
       };
@@ -286,17 +289,22 @@ export const getMenuName = (list: SideMenu[], path: string, lang: string) => {
  * @param menus - 菜单
  * @param permissions - 权限列表
  */
-export function filterMenus(menus: SideMenu[], permissions: string[]): SideMenu[] {
+export function filterMenus(
+  menus: SideMenu[],
+  permissions: string[],
+  showHiddenMenus = false,
+): SideMenu[] {
   const result: SideMenu[] = [];
   const lang = localStorage.getItem(LANG);
 
   for (let i = 0; i < menus.length; i++) {
+    if (menus[i].hidden && !showHiddenMenus) continue;
     // 逐层浅拷贝: 下面要改 children 与 label, 而 defaultMenus 是模块级常量, 改进去会留到下一次调用
     const item = { ...menus[i] };
 
     // 处理子数组
     if (hasChildren(item)) {
-      const children = filterMenus(item.children as SideMenu[], permissions);
+      const children = filterMenus(item.children as SideMenu[], permissions, showHiddenMenus);
 
       // 有子权限数据则保留
       item.children = children?.length ? children : undefined;
@@ -320,14 +328,26 @@ export function filterMenus(menus: SideMenu[], permissions: string[]): SideMenu[
  * @param menus - 菜单
  * @param permissions - 权限
  */
-export function getFirstMenu(menus: SideMenu[], permissions: string[], result = ''): string {
+export function getFirstMenu(
+  menus: SideMenu[],
+  permissions: string[],
+  result = '',
+  showHiddenMenus = false,
+): string {
   // 有结构时直接返回
   if (result) return result;
 
   for (let i = 0; i < menus.length; i++) {
+    if (menus[i].hidden && !showHiddenMenus) continue;
+
     // 处理子数组
     if (hasChildren(menus[i]) && !result) {
-      const childResult = getFirstMenu(menus[i].children as SideMenu[], permissions, result);
+      const childResult = getFirstMenu(
+        menus[i].children as SideMenu[],
+        permissions,
+        result,
+        showHiddenMenus,
+      );
 
       // 有结果则赋值
       if (childResult) {
@@ -405,6 +425,8 @@ export function handleFilterMenus(menus: SideMenu[], level = 0): SideMenu[] {
     if (!data.key) data.key = getChildrenKey(data.children, level);
     delete data.labelZh;
     delete data.labelEn;
+    // 是否保留已由 filterMenus 计算, 不能再把业务 hidden 透传成 DOM 隐藏属性
+    delete data.hidden;
 
     currentItem.push(data as SideMenu);
   }
@@ -418,7 +440,7 @@ export function handleFilterMenus(menus: SideMenu[], level = 0): SideMenu[] {
  * @param permissions - 权限
  */
 function hasPermission(route: SideMenu, permissions: string[]): boolean {
-  return permissions?.includes(route?.rule || '');
+  return checkPermission(route.rule || '', permissions);
 }
 
 /**

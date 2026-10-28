@@ -78,6 +78,8 @@ function LayoutMenu() {
   const { isMaximize, isCollapsed, isPhone, openKeys, selectedKeys, permissions, menuList } =
     useCommonStore();
   const { toggleCollapsed, setSelectedKeys, setOpenKeys } = useMenuStore.getState();
+  const showHiddenMenus = useMenuStore((state) => state.showHiddenMenus);
+  const jumpAuth = useMenuStore((state) => state.jumpAuth);
 
   // 菜单展开与选中项以 store 为唯一来源, 全局搜索等入口也从这里驱动菜单
   const currentOpenKeys = openKeys || [];
@@ -85,10 +87,10 @@ function LayoutMenu() {
 
   // 过滤菜单
   const filteredMenus = useMemo(() => {
-    if (permissions.length === 0 || menuList.length === 0) return [];
-    const newMenus = filterMenus(menuList, permissions);
+    if (menuList.length === 0) return [];
+    const newMenus = filterMenus(menuList, permissions, showHiddenMenus);
     return filterMenuIcon(newMenus);
-  }, [menuList, permissions, i18n.language]);
+  }, [menuList, permissions, showHiddenMenus, jumpAuth, i18n.language]);
 
   // 刷新页面根据路由选中对应的菜单
   useEffect(() => {
@@ -207,12 +209,12 @@ function LayoutMenu() {
 
   /** 点击logo */
   const onClickLogo = useCallback(() => {
-    const firstMenu = getFirstMenu(filteredMenus, permissions);
+    const firstMenu = getFirstMenu(filteredMenus, permissions, '', showHiddenMenus);
     goPath(firstMenu);
     if (isPhone) {
       hiddenMenu();
     }
-  }, [filteredMenus, permissions, goPath, isPhone, hiddenMenu]);
+  }, [filteredMenus, permissions, showHiddenMenus, goPath, isPhone, hiddenMenu]);
 
   // 缓存菜单项
   const menuItems = useMemo(

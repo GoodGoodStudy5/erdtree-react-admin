@@ -26,12 +26,14 @@ function Layout() {
   const [messageApi, contextHolder] = message.useMessage();
   const aliveRef = usePublicStore(useShallow((state) => state.aliveRef));
   const menuList = useMenuStore((state) => state.menuList);
+  const jumpAuth = useMenuStore((state) => state.jumpAuth);
   const { setAliveRef } = usePublicStore.getState();
   const { setPermissions, setUserInfo } = useUserStore.getState();
   const { setMenuList, toggleCollapsed, togglePhone } = useMenuStore.getState();
 
   // 样式字段不在这里读: 一读 Layout 就因折叠重渲, useOutlet() 跟着重新调用, 当前页面整棵重建
   const { permissions, userId } = useCommonStore();
+  const canRenderContent = permissions.length > 0 || jumpAuth;
 
   // keepalive 实例挂载后发布到 store, 供跨页面刷新调用
   useEffect(() => {
@@ -112,7 +114,7 @@ function Layout() {
   return (
     <div id="layout">
       {contextHolder}
-      {permissions.length > 0 && menuList.length > 0 && <Menu />}
+      {canRenderContent && menuList.length > 0 && <Menu />}
 
       <div className={styles.layout_right}>
         <WatchData
@@ -124,7 +126,7 @@ function Layout() {
           )}
         >
           <Header />
-          {permissions.length > 0 && menuList.length > 0 && <Tabs aliveRef={keepaliveRef} />}
+          {canRenderContent && menuList.length > 0 && <Tabs aliveRef={keepaliveRef} />}
         </WatchData>
         <WatchData
           use={useContentClassName}
@@ -134,12 +136,12 @@ function Layout() {
             </div>
           )}
         >
-          {isLoading && permissions.length === 0 && (
+          {isLoading && !canRenderContent && (
             <Skeleton active className="p-30px" paragraph={{ rows: 10 }} />
           )}
-          {!isLoading && permissions.length === 0 && <Forbidden />}
+          {!isLoading && !canRenderContent && <Forbidden />}
           <KeepAlive aliveRef={keepaliveRef} activeCacheKey={pathname} max={10}>
-            {permissions.length > 0 && (
+            {canRenderContent && (
               <motion.div
                 key={pathname}
                 initial={{ opacity: 0 }}

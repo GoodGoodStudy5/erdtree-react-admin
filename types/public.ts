@@ -40,6 +40,8 @@ export interface SideMenu extends Omit<ItemType, 'children' | 'label' | 'icon'> 
   key: string;
   icon?: React.ReactElement | MenuIcon;
   rule?: string; // 路由权限
+  /** 默认隐藏导航分支, showHiddenMenus 只放开展示, 不授予权限. */
+  hidden?: boolean;
   nav?: string[]; // 面包屑路径
   children?: SideMenu[];
 }
